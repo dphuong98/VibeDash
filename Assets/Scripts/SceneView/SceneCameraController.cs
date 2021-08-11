@@ -21,7 +21,10 @@ public class SceneCameraController : MonoBehaviour
 
     public void SetViewMode(ViewMode mode)
     {
-        var stagePosition = stageManager.GetCurrentStage().transform.position;
+        if (stageManager.GetCurrentStage() is var stage && stage == null)
+            return;
+        
+        var stagePosition = stage.transform.position;
 
         if (mode == ViewMode.Isometric)
         {

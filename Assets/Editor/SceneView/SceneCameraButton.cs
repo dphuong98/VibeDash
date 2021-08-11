@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.XR;
 
 [CustomEditor(typeof(SceneCameraController))]
-public class SceneCameraSelector : Editor
+public class SceneCameraButton : Editor
 {
     private int cameraNumber;
     
