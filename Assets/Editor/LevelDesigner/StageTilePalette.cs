@@ -14,7 +14,8 @@ public class StageTilePalette : EditorWindow
     private readonly Vector2 buttonSize = new Vector2(50,50);
 
     private GameObject tilemapPalette;
-    private NonStackPrefabBrush[] brushes;
+    private InfoBrush[] infoBrush;
+    private NonStackPrefabBrush[] tileBrushes;
 
     [MenuItem("Extra/TileBrush")]
     static void Init()
@@ -25,13 +26,28 @@ public class StageTilePalette : EditorWindow
 
     private void OnEnable()
     {
-        brushes = Resources.LoadAll<NonStackPrefabBrush>("TileBrushes");
+        infoBrush = Resources.LoadAll<InfoBrush>("TileBrushes");
+        tileBrushes = Resources.LoadAll<NonStackPrefabBrush>("TileBrushes");
     }
 
     private void OnGUI()
     {
+        GUILayout.BeginVertical();
         GUILayout.BeginHorizontal();
-        foreach (var brush in brushes)
+        foreach (var brush in infoBrush)
+        {
+            var buttonContent = new GUIContent(brush.name);
+            if (GUILayout.Button(buttonContent, GUILayout.Width(buttonSize.x), GUILayout.Height(buttonSize.y)))
+            {
+                GetTilePaletteWindow();
+                EditorTools.SetActiveTool(typeof(PaintTool));
+                GridPaintingState.gridBrush = brush;
+            }
+        }
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        foreach (var brush in tileBrushes)
         {
             var so = new SerializedObject(brush);
             var prefab = so.FindProperty("m_Prefab").objectReferenceValue;
@@ -45,6 +61,7 @@ public class StageTilePalette : EditorWindow
             }
         }
         GUILayout.EndHorizontal();
+        GUILayout.EndVertical();
     }
 
     private void GetTilePaletteWindow()

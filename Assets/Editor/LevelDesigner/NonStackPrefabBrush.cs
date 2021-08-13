@@ -58,7 +58,7 @@ namespace UnityEditor.Tilemaps
         private void WipeObjectsInCell(GridLayout grid, GameObject brushTarget, Vector3Int position)
         {
             var objectsInCell = GetObjectsInCell(grid, brushTarget.transform, position);
-            objectsInCell.ForEach(o => DestroyImmediate(o));
+            objectsInCell.ForEach(o => Undo.DestroyObjectImmediate(o));
         }
 
         /// <summary>
