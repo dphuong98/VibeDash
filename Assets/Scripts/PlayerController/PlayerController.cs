@@ -11,11 +11,11 @@ public class PlayerController : MonoBehaviour
     }
     
     public PlayerObject playerObject;
-    public GridLayout grid;
+    public Grid grid;
 
     public void DirectionalMove(Vector3Int destination)
     {
-        var destionationPosition = grid.CellToWorld(destination);
+        var destionationPosition = grid.GetCellCenterWorld(destination);
         playerObject.transform.position = destionationPosition;
     }
 }

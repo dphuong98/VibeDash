@@ -9,7 +9,7 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.WSA;
 
-public class StageTilePalette : EditorWindow
+public class LevelDesigner : EditorWindow
 {
     private readonly Vector2 buttonSize = new Vector2(50,50);
 
@@ -21,7 +21,7 @@ public class StageTilePalette : EditorWindow
     static void Init()
     {
         // TODO Make floating window
-        GetWindow(typeof(StageTilePalette));
+        GetWindow(typeof(LevelDesigner));
     }
 
     private void OnEnable()
@@ -74,6 +74,6 @@ public class StageTilePalette : EditorWindow
                                      && m.GetParameters()[0].ParameterType == typeof(string)
                                 );
         var genericMethod = getWindowInfo.MakeGenericMethod(type);
-        genericMethod.Invoke(null, new object[] { "Tile Palette", false, new Type[] { typeof(StageTilePalette) }});
+        genericMethod.Invoke(null, new object[] { "Tile Palette", false, new Type[] { typeof(LevelDesigner) }});
     }
 }
