@@ -9,23 +9,23 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.WSA;
 
-public class TileBrush : EditorWindow
+public class StageTilePalette : EditorWindow
 {
     private readonly Vector2 buttonSize = new Vector2(50,50);
 
     private GameObject tilemapPalette;
-    private PrefabBrush[] brushes;
+    private NonStackPrefabBrush[] brushes;
 
     [MenuItem("Extra/TileBrush")]
     static void Init()
     {
         // TODO Make floating window
-        GetWindow(typeof(TileBrush));
+        GetWindow(typeof(StageTilePalette));
     }
 
     private void OnEnable()
     {
-        brushes = Resources.LoadAll<PrefabBrush>("TileBrushes");
+        brushes = Resources.LoadAll<NonStackPrefabBrush>("TileBrushes");
     }
 
     private void OnGUI()
@@ -53,9 +53,10 @@ public class TileBrush : EditorWindow
         var getWindowInfo = typeof(EditorWindow)
             .GetMethods().First(m => m.Name == "GetWindow"
                                      && m.IsGenericMethod
-                                     && m.GetParameters().Length > 0
-                                     && m.GetParameters()[0].ParameterType == typeof(Type[]));
+                                     && m.GetParameters().Length == 3
+                                     && m.GetParameters()[0].ParameterType == typeof(string)
+                                );
         var genericMethod = getWindowInfo.MakeGenericMethod(type);
-        genericMethod.Invoke(null, new object[] { new Type[] { typeof(TileBrush) }});
+        genericMethod.Invoke(null, new object[] { "Tile Palette", false, new Type[] { typeof(StageTilePalette) }});
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class StageManager : MonoBehaviour
 {
+    //public 
     public Stage currentStage;
 
     public Stage GetCurrentStage()

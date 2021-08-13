@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 248829294186967460}
   m_Layer: 0
-  m_Name: Wall
+  m_Name: Road
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -90,7 +90,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 32110126fdf729a4188ae2197ef8b1c2, type: 2}
+  - {fileID: 2100000, guid: 4cba33047ffc8a24fb85aa8d52cc1383, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

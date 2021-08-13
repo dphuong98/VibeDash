@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dc0c81fc1d394414ea6940e247756ae3, type: 3}
-  m_Name: WallBrush
+  m_Name: RoadBrush
   m_EditorClassIdentifier: 
   m_Cells:
   - m_Tile: {fileID: 0}
@@ -36,5 +36,5 @@ MonoBehaviour:
   m_Pivot: {x: 0, y: 0, z: 0}
   m_CanChangeZPosition: 0
   m_Anchor: {x: 0.5, y: 0.5, z: 0.5}
-  m_Prefab: {fileID: 5745008388756971587, guid: 2185c88614dc7df45a4fa6d93afd2e1f,
+  m_Prefab: {fileID: 5745008388756971587, guid: f19d210a4f763164795752c94cf3a4b1,
     type: 3}
