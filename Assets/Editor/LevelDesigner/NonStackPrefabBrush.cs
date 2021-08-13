@@ -55,7 +55,7 @@ namespace UnityEditor.Tilemaps
             base.InstantiatePrefabInCell(grid, brushTarget, position, m_Prefab, m_Rotation);
         }
 
-        public void WipeObjectsInCell(GridLayout grid, GameObject brushTarget, Vector3Int position)
+        private void WipeObjectsInCell(GridLayout grid, GameObject brushTarget, Vector3Int position)
         {
             var objectsInCell = GetObjectsInCell(grid, brushTarget.transform, position);
             objectsInCell.ForEach(o => DestroyImmediate(o));
