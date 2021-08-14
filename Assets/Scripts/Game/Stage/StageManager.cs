@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class StageManager : MonoBehaviour
 {
-    //public 
+    //TODO encapsulation
     public Stage currentStage;
 
     public Stage GetCurrentStage()

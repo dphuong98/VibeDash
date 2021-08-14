@@ -16,7 +16,6 @@ public class PlayerControllerEditor : Editor
         GUILayout.BeginHorizontal();
         destination.x = EditorGUILayout.IntField(destination.x);
         destination.y = EditorGUILayout.IntField(destination.y);
-        destination.z = EditorGUILayout.IntField(destination.z);
         GUILayout.EndHorizontal();
         if (GUILayout.Button("MoveTo"))
         {

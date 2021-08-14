@@ -19,5 +19,34 @@ namespace UnityEditor.Tilemaps
 
             Debug.Log(text);
         }
+        
+        [CustomEditor(typeof(InfoBrush))]
+        public class InfoBrushEditor : BasePrefabBrushEditor
+        {
+            /// <summary>
+            /// Callback for painting the inspector GUI for the PrefabBrush in the Tile Palette.
+            /// The PrefabBrush Editor overrides this to have a custom inspector for this Brush.
+            /// </summary>
+            public override void OnPaintInspectorGUI()
+            {
+                const string eraseAnyObjectsTooltip =
+                    "If true, erases any GameObjects that are in a given position " +
+                    "within the selected layers with Erasing. " +
+                    "Otherwise, erases only GameObjects that are created " +
+                    "from owned Prefab in a given position within the selected layers with Erasing.";
+
+                base.OnPaintInspectorGUI();
+
+                m_SerializedObject.UpdateIfRequiredOrScript();
+
+                m_SerializedObject.ApplyModifiedPropertiesWithoutUndo();
+            }
+        }
+        
+        [MenuItem("Assets/Create/2D/Brushes/Info Brush")]
+        static void CreatePrefabBrush()
+        {
+            ProjectWindowUtil.CreateAsset(ScriptableObject.CreateInstance<InfoBrush>(), "New Info Brush.asset");
+        }
     }
 }
