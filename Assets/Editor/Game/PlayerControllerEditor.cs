@@ -19,7 +19,7 @@ public class PlayerControllerEditor : Editor
         GUILayout.EndHorizontal();
         if (GUILayout.Button("MoveTo"))
         {
-            playerController.DirectionalMove(destination);
+            playerController.MoveTo(destination);
         }
     }
 }

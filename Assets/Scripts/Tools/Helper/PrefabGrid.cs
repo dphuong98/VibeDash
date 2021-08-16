@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public static class PrefabGrid 
@@ -25,5 +26,11 @@ public static class PrefabGrid
             }
         }
         return results;
+    }
+    
+    public static GameObject GetObjectInCell(GridLayout grid, Transform parent, Vector3Int position)
+    {
+        var objects = GetObjectsInCell(grid, parent, position);
+        return objects.Count == 0 ? null : objects.First();
     }
 }

@@ -11,7 +11,7 @@ public class Testspam : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        playerController.DirectionalMove(new Vector3Int(2, 3, 0));
+        playerController.MoveTo(new Vector3Int(2, 3, 0));
     }
 
     // Update is called once per frame

@@ -6329,7 +6329,7 @@ PrefabInstance:
     - target: {fileID: 8572301229440925919, guid: dd8d392e3fc5bb145934817ceb542aec,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.5
+      value: -1.5
       objectReference: {fileID: 0}
     - target: {fileID: 8572301229440925919, guid: dd8d392e3fc5bb145934817ceb542aec,
         type: 3}
@@ -6339,7 +6339,7 @@ PrefabInstance:
     - target: {fileID: 8572301229440925919, guid: dd8d392e3fc5bb145934817ceb542aec,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.5
+      value: -1.5
       objectReference: {fileID: 0}
     - target: {fileID: 8572301229440925919, guid: dd8d392e3fc5bb145934817ceb542aec,
         type: 3}
@@ -7996,6 +7996,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerObject: {fileID: 1347652590}
   grid: {fileID: 1124784929}
+  tilemap: {fileID: 709684834}
 --- !u!4 &1865248602
 Transform:
   m_ObjectHideFlags: 0

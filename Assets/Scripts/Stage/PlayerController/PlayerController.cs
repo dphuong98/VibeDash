@@ -13,9 +13,9 @@ public class PlayerController : MonoBehaviour
     public PlayerObject playerObject;
     public Grid grid;
 
-    public void DirectionalMove(Vector3Int destination)
+    public void MoveTo(Vector3Int destination)
     {
-        var destionationPosition = grid.GetCellCenterWorld(destination);
-        playerObject.transform.position = destionationPosition;
+        var destinationPosition = grid.GetCellCenterWorld(destination);
+        playerObject.transform.position = destinationPosition;
     }
 }

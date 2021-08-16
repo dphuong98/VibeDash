@@ -9,6 +9,10 @@ public class MovementManager : MonoBehaviour
     
     public void Move(Vector3Int direction)
     {
-        
+        Vector3Int destination;
+        if (stageLogic.TryMove(direction, out destination))
+        {
+            playerController.MoveTo(destination);
+        }
     }
 }
