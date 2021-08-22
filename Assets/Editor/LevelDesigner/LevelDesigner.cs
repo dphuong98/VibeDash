@@ -7,73 +7,86 @@ using UnityEditor.EditorTools;
 using UnityEditor.Tilemaps;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.Windows;
 using UnityEngine.WSA;
+using Object = UnityEngine.Object;
 
 public class LevelDesigner : EditorWindow
 {
     private readonly Vector2 buttonSize = new Vector2(50,50);
-
-    private GameObject tilemapPalette;
-    private InfoBrush[] infoBrush;
-    private NonStackPrefabBrush[] tileBrushes;
-
-    [MenuItem("Extra/TileBrush")]
+    private string levelFolder = "Assets/Resources/ScriptableObjects/Levels";
+    private Object selectedLevel;
+    
+    [MenuItem("Extra/LevelDesigner")]
     static void Init()
     {
-        // TODO Make floating window
         GetWindow(typeof(LevelDesigner));
-    }
-
-    private void OnEnable()
-    {
-        infoBrush = Resources.LoadAll<InfoBrush>("TileBrushes");
-        tileBrushes = Resources.LoadAll<NonStackPrefabBrush>("TileBrushes");
     }
 
     private void OnGUI()
     {
         GUILayout.BeginVertical();
+
+        // Level
+        GUILayout.Label("Level");
         GUILayout.BeginHorizontal();
-        foreach (var brush in infoBrush)
+        selectedLevel = EditorGUILayout.ObjectField(selectedLevel, typeof(LevelScriptable), true);
+        
+        if (GUILayout.Button("New"))
         {
-            var buttonContent = new GUIContent(brush.name);
-            if (GUILayout.Button(buttonContent, GUILayout.Width(buttonSize.x), GUILayout.Height(buttonSize.y)))
-            {
-                GetTilePaletteWindow();
-                EditorTools.SetActiveTool(typeof(PaintTool));
-                GridPaintingState.gridBrush = brush;
-            }
+            NewLevel();
+        }
+        if (GUILayout.Button("Delete"))
+        {
+            DeleteLevel(selectedLevel as LevelScriptable);
         }
         GUILayout.EndHorizontal();
 
-        GUILayout.BeginHorizontal();
-        foreach (var brush in tileBrushes)
-        {
-            var so = new SerializedObject(brush);
-            var prefab = so.FindProperty("m_Prefab").objectReferenceValue;
+        if (selectedLevel == null) return;
 
-            var buttonContent = new GUIContent(AssetPreview.GetAssetPreview(prefab), brush.name);
-            if (GUILayout.Button(buttonContent, GUILayout.Width(buttonSize.x), GUILayout.Height(buttonSize.y)))
-            {
-                GetTilePaletteWindow();
-                EditorTools.SetActiveTool(typeof(PaintTool));
-                GridPaintingState.gridBrush = brush;
-            }
+        var level = selectedLevel as LevelScriptable;
+        
+        GUILayout.Label("Stages");
+        
+        
+        level.stages.RemoveAll(item => item == null);
+        for (var i = 0; i < level.stages.Count; i++)
+        {
+            level.stages[i] = (StageScriptable) EditorGUILayout.ObjectField(level.stages[i], typeof(StageScriptable), true);
         }
-        GUILayout.EndHorizontal();
+
+        Object addStage = null;
+        addStage  = EditorGUILayout.ObjectField(addStage, typeof(StageScriptable), true);
+        if (addStage != null) level.stages.Add(addStage as StageScriptable);
+ 
         GUILayout.EndVertical();
     }
 
-    private void GetTilePaletteWindow()
+    private void NewLevel()
     {
-        var type = Type.GetType("UnityEditor.Tilemaps.GridPaintPaletteWindow, Unity.2D.Tilemap.Editor.dll");
-        var getWindowInfo = typeof(EditorWindow)
-            .GetMethods().First(m => m.Name == "GetWindow"
-                                     && m.IsGenericMethod
-                                     && m.GetParameters().Length == 3
-                                     && m.GetParameters()[0].ParameterType == typeof(string)
-                                );
-        var genericMethod = getWindowInfo.MakeGenericMethod(type);
-        genericMethod.Invoke(null, new object[] { "Tile Palette", false, new Type[] { typeof(LevelDesigner) }});
+        var newLevelName = GetNewName();
+        selectedLevel = ScriptableObject.CreateInstance<LevelScriptable>();
+        AssetDatabase.CreateAsset(selectedLevel, levelFolder + "/" + newLevelName + ".asset");
+        AssetDatabase.SaveAssets();
+    }
+
+    private void DeleteLevel(LevelScriptable level)
+    {
+        if (level == null) return;
+        
+        AssetDatabase.DeleteAsset(levelFolder + "/" + level.name + ".asset");
+        AssetDatabase.SaveAssets();
+    }
+
+    private string GetNewName()
+    {
+        var number = 0;
+        var prefix = "Level";
+        while (File.Exists(levelFolder + "/" + prefix + number))
+        {
+            number++;
+        }
+
+        return prefix + number;
     }
 }
