@@ -4,13 +4,19 @@ using UnityEngine;
 
 public class LevelLoader
 {
-    public static void LoadLevel(Transform parent, LevelScriptable levelData)
-    {
-        Debug.Log(levelData.name);
-    }
-
-    public static void LoadStageAt(Transform parent, StageScriptable stageData, Vector3 entrancePosition)
+    public static void LoadLevelAt(Grid parent, Stage stageData, Vector2Int startingGrid)
     {
         
     }
+
+    // public static void LoadStageAt(Grid parent, StageScriptable stageData, Vector2Int startingGrid)
+    // {
+    //     for (var y = 0; y < stageData.StageSize.y; y++)
+    //     {
+    //         for (var x = 0; x < stageData.StageSize.x; x++)
+    //         {
+    //             
+    //         }
+    //     }
+    // }
 }

@@ -6,18 +6,19 @@ using UnityEngine;
 [CustomEditor(typeof(Testspam))]
 public class TestspamEditor : Editor
 {
-    public Object stageData;
-    public Transform levelTransform;
+    public Stage stageData;
+    public Grid parentGrid;
     
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
 
-        stageData = EditorGUILayout.ObjectField(stageData, typeof(StageScriptable), true);
+        stageData = (Stage)EditorGUILayout.ObjectField(stageData, typeof(Stage), true);
+        parentGrid = (Grid)EditorGUILayout.ObjectField(parentGrid, typeof(Transform), true);
 
-        if (GUILayout.Button("LoadStage"))
+        if (GUILayout.Button("LoadLevel"))
         {
-            LevelLoader.LoadStageAt(levelTransform, stageData as StageScriptable, Vector3.zero);
+            LevelLoader.LoadLevelAt(parentGrid, stageData, new Vector2Int());
         }
     }
 }
