@@ -18,6 +18,12 @@ public class StageBuilder : MonoBehaviour
         {TileType.Road, 'r'}
     };
 
+    private static Dictionary<TileType, Color> ColorMap = new Dictionary<TileType, Color>()
+    {
+        {TileType.Wall, Color.clear},
+        {TileType.Road, Color.blue}
+    };
+
     private Grid grid;
     private Vector2Int selectedTile = new Vector2Int(-1, -1);
     
@@ -30,7 +36,6 @@ public class StageBuilder : MonoBehaviour
         {
             if (_currentStage == null)
             {
-                Debug.Log("Creating a new level...");
                 _currentStage = AssetDatabase.LoadAssetAtPath<Stage>(TempFile);
                 
                 if (_currentStage == null)

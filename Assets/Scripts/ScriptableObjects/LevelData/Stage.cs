@@ -103,10 +103,10 @@ public class Stage : ScriptableObject
         size.y--;
     }
 
-    public TileType this[int r, int c]
+    public TileType this[int c, int r]
     {
-        get => tiles[r * size.y + c];
-        set => tiles[r * size.y + c] = value;
+        get => tiles[r * size.x + c];
+        set => tiles[r * size.x + c] = value;
     }
 }
 

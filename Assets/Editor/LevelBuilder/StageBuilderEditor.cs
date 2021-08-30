@@ -34,7 +34,7 @@ public class StageBuilderEditor : Editor
         GUILayout.Label("File");
         
         GUI.enabled = false;
-        EditorGUILayout.ObjectField("Targeted Stage: ", stageBuilder.CurrentStage, typeof(Stage));
+        EditorGUILayout.ObjectField("Targeted Stage: ", stageBuilder.CurrentStage, typeof(Stage), true);
         GUI.enabled = true;
         GUILayout.BeginHorizontal();
         {
