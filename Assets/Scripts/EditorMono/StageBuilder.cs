@@ -9,10 +9,19 @@ using UnityEngine;
 public class StageBuilder : MonoBehaviour
 {
     //Paths
-    private const string TempFile = "Assets/Editor/LevelBuilderTmp/_tmp_.asset"; //OG named these caches but they dont behave like caches
+    private const string TempFile = "Assets/Editor/LevelBuilderTmp/_tmp_.asset"; //OG named these caches but they dont behave like caches.
+    
+    //Data
+    private static Dictionary<TileType, char> ShortCuts = new Dictionary<TileType, char>()
+    {
+        {TileType.Wall, 'w'},
+        {TileType.Road, 'r'}
+    };
 
     private Grid grid;
     private Vector2Int selectedTile = new Vector2Int(-1, -1);
+    
+    
 
     private Stage _currentStage;
     public Stage CurrentStage
@@ -77,35 +86,24 @@ public class StageBuilder : MonoBehaviour
             Event.current.modifiers == EventModifiers.None &&
             Event.current.button == 0)
         {
-            var worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
-
-            if (Physics.Raycast(worldRay, out var hitInfo))
+            if (TileSelected(out var gridPos))
             {
-                if (hitInfo.collider.gameObject == this.gameObject)
-                {
-                    Vector3 point = hitInfo.point;
-                    var worldPos = hitInfo.collider.gameObject.transform.InverseTransformPoint(point);
-                    var gridPos = grid.WorldToCell(worldPos);
-                    selectedTile = new Vector2Int(gridPos.x, gridPos.y);
-
-                    Event.current.Use();
-                }
+                selectedTile = gridPos;
             }
         }
 
-        /*if (Selection.activeGameObject == gameObject &&
+        if (Selection.activeGameObject == gameObject &&
             Event.current.type == EventType.MouseDown &&
             Event.current.modifiers == EventModifiers.None &&
             Event.current.button == 1)
         {
-            Index index = new Index();
-            if (GetClickedDot(ref index))
+            if (TileSelected(out var gridPos))
             {
-                selection = index;
+                selectedTile = gridPos;
                 SceneView.RepaintAll();
-                CreateMenu(index).ShowAsContext();
+                TileMenu(selectedTile).ShowAsContext();
             }
-        }*/
+        }
 
 
         /*if (Selection.activeGameObject == gameObject &&
@@ -154,6 +152,83 @@ public class StageBuilder : MonoBehaviour
             }
 
         }*/
+    }
+
+    private GenericMenu TileMenu(Vector2Int vector2Int)
+    {
+        GenericMenu menu = new GenericMenu();
+
+        var dot = CurrentStage[vector2Int.x, vector2Int.y];
+
+        foreach (TileType t in Enum.GetValues(typeof(TileType)))
+        {
+            menu.AddItem(new GUIContent(string.Format("[{1}] {0}", t, GetShortcut(t))), t == dot, OnTileMenuClicked, new Tuple<int, int, TileType>(vector2Int.x, vector2Int.y, t));
+        }
+
+        //menu.AddSeparator("");
+        /*menu.AddItem(new GUIContent("Hint [h]"), EditingLevel.IsHint(dot.Index),
+            OnContextHintClicked, new MenuItemData(dot, dot.type));
+
+        menu.AddSeparator("");
+        for (int i = 0; i < dot.lamp.Length; i++)
+        {
+            menu.AddItem(new GUIContent(string.Format("Lamp: {0} [{1}]", SideToString[i], i + 6)), dot.lamp[i],
+                OnContextLampClicked, new MenuItemData(dot, dot.type, i));
+        }
+
+        menu.AddSeparator("");
+        for (int i = 0; i < dot.source.Length; i++)
+        {
+            foreach (Level.LightDirection st in Enum.GetValues(typeof(Level.LightDirection)))
+            {
+                menu.AddItem(new GUIContent("Source " + SideToString[i] + "/" + st.ToString()), st == dot.source[i],
+                    OnContextSourceClicked, new MenuItemData(dot, st, i));
+            }
+        }*/
+
+        return menu;
+    }
+
+    private void OnTileMenuClicked(object userdata)
+    {
+        if (userdata is Tuple<int, int, TileType> menuData)
+        {
+            CurrentStage[menuData.Item1, menuData.Item2] = menuData.Item3;
+            EditorUtility.SetDirty(_currentStage);
+        }
+    }
+
+    private char GetShortcut(TileType tile)
+    {
+        if (ShortCuts.TryGetValue(tile, out var shortcut))
+        {
+            return shortcut;
+        }
+
+        return ' ';
+    }
+
+    private bool TileSelected(out Vector2Int gridPos)
+    {
+        var worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
+
+        if (Physics.Raycast(worldRay, out var hitInfo))
+        {
+            if (hitInfo.collider.gameObject == this.gameObject)
+            {
+                Vector3 point = hitInfo.point;
+                var worldPos = hitInfo.collider.gameObject.transform.InverseTransformPoint(point);
+                var temp = grid.WorldToCell(worldPos);
+                gridPos = new Vector2Int(temp.x, temp.y);
+
+                Event.current.Use();
+
+                return true;
+            }
+        }
+
+        gridPos = Vector2Int.zero;
+        return false;
     }
 
     private void DrawTileIcons()
