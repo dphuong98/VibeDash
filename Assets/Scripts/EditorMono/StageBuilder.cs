@@ -20,8 +20,8 @@ public class StageBuilder : MonoBehaviour
 
     private static Dictionary<TileType, Color> ColorMap = new Dictionary<TileType, Color>()
     {
-        {TileType.Wall, Color.clear},
-        {TileType.Road, Color.blue}
+        { TileType.Wall, new Color(0.96f, .25f, .82f, 1) },
+        { TileType.Road, new Color(0f, 1f, 1f, 0.5f) }
     };
 
     private Grid grid;
@@ -55,6 +55,7 @@ public class StageBuilder : MonoBehaviour
     {
         SceneView.duringSceneGui += DrawSceneGUI;
         grid = GetComponentInChildren<Grid>();
+        CreateBackgroundMesh();
     }
 
     private void OnDisable()
@@ -273,10 +274,10 @@ public class StageBuilder : MonoBehaviour
 
     private void DrawTileIcon(TileType tile, Vector2Int gridPos)
     {
-        if (tile == TileType.Wall)
+        if (ColorMap.TryGetValue(tile, out var color))
         {
             var worldPos = grid.GetCellCenterWorld(new Vector3Int(gridPos.x, gridPos.y, 0));
-            Handles.color = Color.green;
+            Handles.color = color;
 
             float iconRadius = 0.45f;
             Handles.DrawAAConvexPolygon(new Vector3[]
