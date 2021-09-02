@@ -61,7 +61,7 @@ public class StageBuilderEditor : Editor
                     GUILayout.FlexibleSpace();
                     if (GUILayout.Button("↑", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
                     {
-                        stageBuilder.ExpandTop();
+                        stageBuilder.ExpandBottom();
                     }
                     GUILayout.FlexibleSpace();
                 }
@@ -93,7 +93,7 @@ public class StageBuilderEditor : Editor
                     GUILayout.FlexibleSpace();
                     if (GUILayout.Button("↓", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
                     {
-                        stageBuilder.ExpandBottom();
+                        stageBuilder.ExpandTop();
                     }
                     GUILayout.FlexibleSpace();
                 }

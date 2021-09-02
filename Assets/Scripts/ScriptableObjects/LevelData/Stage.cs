@@ -27,7 +27,7 @@ public class Stage : ScriptableObject
     {
         for (int r = 0; r < size.x; r++)
         {
-            tiles.Insert(0, TileType.Wall);
+            tiles.Insert(0, TileType.Air);
         }
         size.y++;
     }
@@ -36,7 +36,7 @@ public class Stage : ScriptableObject
     {
         for (int r = 0; r < size.y; r++)
         {
-            tiles.Insert(r * (size.x + 1), TileType.Wall);
+            tiles.Insert(r * (size.x + 1), TileType.Air);
         }
         size.x++;
     }
@@ -45,7 +45,7 @@ public class Stage : ScriptableObject
     {
         for (int r = 0; r < size.y; r++)
         {
-            tiles.Insert(size.x + r * (size.x + 1), TileType.Wall);
+            tiles.Insert(size.x + r * (size.x + 1), TileType.Air);
         }
         size.x++;
     }
@@ -54,7 +54,7 @@ public class Stage : ScriptableObject
     {
         for (int r = 0; r < size.x; r++)
         {
-            tiles.Insert(tiles.Count, TileType.Wall);
+            tiles.Insert(tiles.Count, TileType.Air);
         }
         size.y++;
     }
@@ -112,6 +112,7 @@ public class Stage : ScriptableObject
 
 public enum TileType
 {
-    Wall,
+    Air,
     Road,
+    Wall,
 }

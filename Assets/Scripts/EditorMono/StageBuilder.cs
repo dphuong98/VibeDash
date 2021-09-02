@@ -14,14 +14,16 @@ public class StageBuilder : MonoBehaviour
     //Data
     private static Dictionary<TileType, char> ShortCuts = new Dictionary<TileType, char>()
     {
+        {TileType.Air, 'a'},
+        {TileType.Road, 'r'},
         {TileType.Wall, 'w'},
-        {TileType.Road, 'r'}
     };
 
     private static Dictionary<TileType, Color> ColorMap = new Dictionary<TileType, Color>()
     {
+        { TileType.Air, Color.clear },
+        { TileType.Road, new Color(0f, 1f, 1f, 0.5f) },
         { TileType.Wall, new Color(0.96f, .25f, .82f, 1) },
-        { TileType.Road, new Color(0f, 1f, 1f, 0.5f) }
     };
 
     private Grid grid;
@@ -77,41 +79,17 @@ public class StageBuilder : MonoBehaviour
 
         DrawTileIcons();
         HandleClick();
+        HandleKey();
 
         //Other GUI option
-        
+
         //Stage info
 
         //DrawSolution
     }
 
-    private void HandleClick()
+    private void HandleKey()
     {
-        if (Selection.activeGameObject == this.gameObject &&
-            Event.current.type == EventType.MouseDown &&
-            Event.current.modifiers == EventModifiers.None &&
-            Event.current.button == 0)
-        {
-            if (TileSelected(out var gridPos))
-            {
-                selectedTile = gridPos;
-            }
-        }
-
-        if (Selection.activeGameObject == gameObject &&
-            Event.current.type == EventType.MouseDown &&
-            Event.current.modifiers == EventModifiers.None &&
-            Event.current.button == 1)
-        {
-            if (TileSelected(out var gridPos))
-            {
-                selectedTile = gridPos;
-                SceneView.RepaintAll();
-                TileMenu(selectedTile).ShowAsContext();
-            }
-        }
-
-
         /*if (Selection.activeGameObject == gameObject &&
             Event.current.type == EventType.KeyDown
             )
@@ -160,6 +138,62 @@ public class StageBuilder : MonoBehaviour
         }*/
     }
 
+    private void HandleClick()
+    {
+        if (Selection.activeGameObject == this.gameObject &&
+            Event.current.type == EventType.MouseDown &&
+            Event.current.modifiers == EventModifiers.None &&
+            Event.current.button == 0)
+        {
+            if (TileSelected(out var gridPos))
+            {
+                selectedTile = gridPos;
+            }
+        }
+
+        if (Selection.activeGameObject == gameObject &&
+            Event.current.type == EventType.MouseDown &&
+            Event.current.modifiers == EventModifiers.None &&
+            Event.current.button == 1)
+        {
+            if (TileSelected(out var gridPos))
+            {
+                selectedTile = gridPos;
+                SceneView.RepaintAll();
+                TileMenu(selectedTile).ShowAsContext();
+            }
+        }
+    }
+
+    private void ExpandBorder(ref Vector2Int newTilePos)
+    {
+        var offsetVector = new Vector2Int();
+
+        if (newTilePos.x == -1)
+        {
+            ExpandLeft();
+            offsetVector.x = -1;
+        }
+        
+        if (newTilePos.x == Cols)
+        {
+            ExpandRight();
+        }
+
+        if (newTilePos.y == -1)
+        {
+            ExpandBottom();
+            offsetVector.y = -1;
+        }
+        
+        if (newTilePos.y == Rows)
+        {
+            ExpandTop();
+        }
+
+        newTilePos -= offsetVector;
+    }
+
     private GenericMenu TileMenu(Vector2Int vector2Int)
     {
         GenericMenu menu = new GenericMenu();
@@ -199,7 +233,9 @@ public class StageBuilder : MonoBehaviour
     {
         if (userdata is Tuple<int, int, TileType> menuData)
         {
-            CurrentStage[menuData.Item1, menuData.Item2] = menuData.Item3;
+            var tilePos = new Vector2Int(menuData.Item1, menuData.Item2);
+            ExpandBorder(ref tilePos);
+            CurrentStage[tilePos.x, tilePos.y] = menuData.Item3;
             EditorUtility.SetDirty(_currentStage);
         }
     }
@@ -237,6 +273,9 @@ public class StageBuilder : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Draw from (0,0) of grid
+    /// </summary>
     private void DrawTileIcons()
     {
         for (var y = 0; y < CurrentStage.Size.y; y++)
@@ -301,7 +340,7 @@ public class StageBuilder : MonoBehaviour
     }
 
     //TODO add enum direction to prevent repetition
-    public void ExpandTop()
+    public void ExpandBottom()
     {
         CurrentStage.ExpandTop();
         EditorUtility.SetDirty(CurrentStage);
@@ -322,7 +361,7 @@ public class StageBuilder : MonoBehaviour
         CreateBackgroundMesh();
     }
 
-    public void ExpandBottom()
+    public void ExpandTop()
     {
         CurrentStage.ExpandBottom();
         EditorUtility.SetDirty(CurrentStage);
@@ -366,7 +405,7 @@ public class StageBuilder : MonoBehaviour
     private void RepositionGrid()
     {
         var posX = - Cols / 2.0f * grid.cellSize.x;
-        var posY = Rows / 2.0f * grid.cellSize.y;
+        var posY = - Rows / 2.0f * grid.cellSize.y;
         grid.transform.position = new Vector3(posX, posY, 0);
     }
 }
