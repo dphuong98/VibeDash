@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(StageBuilder))]
-public class StageBuilderEditor : Editor
+[CustomEditor(typeof(LevelBuilder))]
+public class LevelBuilderEditor : Editor
 {
     //LevelBuilder members
-    private StageBuilder stageBuilder;
+    private LevelBuilder _levelBuilder;
     
     //InspectorGUI members
     private bool dimensionExpaned;
@@ -16,7 +16,7 @@ public class StageBuilderEditor : Editor
 
     private void OnEnable()
     {
-        stageBuilder = target as StageBuilder;
+        _levelBuilder = target as LevelBuilder;
     }
 
     private void OnDisable()
@@ -28,25 +28,26 @@ public class StageBuilderEditor : Editor
     public override void OnInspectorGUI()
     {
         //Stage data
-        GUILayout.Label("Stage Info");
-        GUILayout.Label("Stage size: (" + stageBuilder.CurrentStage.Size.x + ", " + stageBuilder.CurrentStage.Size.y + ")");
+        GUILayout.Label("Level Info", EditorStyles.boldLabel);
+        GUILayout.Label("Level size: (" + _levelBuilder.CurrentLevel.Size.x + ", " + _levelBuilder.CurrentLevel.Size.y + ")");
         
-        GUILayout.Label("File");
-        
+        GUILayoutExt.HorizontalSeparator();
+        GUILayout.Label("File", EditorStyles.boldLabel);
         GUI.enabled = false;
-        EditorGUILayout.ObjectField("Targeted Stage: ", stageBuilder.CurrentStage, typeof(Stage), true);
+        EditorGUILayout.ObjectField("Targeted Level: ", _levelBuilder.CurrentLevel, typeof(Level), true);
         GUI.enabled = true;
         GUILayout.BeginHorizontal();
         {
             if (GUILayout.Button("New"))
             {
-                stageBuilder.NewStage();
+                _levelBuilder.NewStage();
             }
         }
         GUILayout.EndHorizontal();
 
+        GUILayoutExt.HorizontalSeparator();
+        GUILayout.Label("Level Tools", EditorStyles.boldLabel);
         dimensionExpaned = EditorGUILayout.Foldout(dimensionExpaned, "Expand & Shrink");
-
         if (dimensionExpaned)
         {
             EditorGUILayout.BeginHorizontal();
@@ -61,7 +62,7 @@ public class StageBuilderEditor : Editor
                     GUILayout.FlexibleSpace();
                     if (GUILayout.Button("↑", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
                     {
-                        stageBuilder.ExpandBottom();
+                        _levelBuilder.ExpandBottom();
                     }
                     GUILayout.FlexibleSpace();
                 }
@@ -74,7 +75,7 @@ public class StageBuilderEditor : Editor
                     //GUILayout.Button();
                     if (GUILayout.Button("←", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
                     {
-                        stageBuilder.ExpandLeft();
+                        _levelBuilder.ExpandLeft();
                     }
                     if (GUILayout.Button("", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
                     {
@@ -82,7 +83,7 @@ public class StageBuilderEditor : Editor
                     }
                     if (GUILayout.Button("→", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
                     {
-                        stageBuilder.ExpandRight();
+                        _levelBuilder.ExpandRight();
                     }
                     GUILayout.FlexibleSpace();
                 }
@@ -93,7 +94,7 @@ public class StageBuilderEditor : Editor
                     GUILayout.FlexibleSpace();
                     if (GUILayout.Button("↓", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
                     {
-                        stageBuilder.ExpandTop();
+                        _levelBuilder.ExpandTop();
                     }
                     GUILayout.FlexibleSpace();
                 }
@@ -114,7 +115,7 @@ public class StageBuilderEditor : Editor
                     GUILayout.FlexibleSpace();
                     if (GUILayout.Button("↓", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
                     {
-                        stageBuilder.CollapseTop();
+                        _levelBuilder.CollapseTop();
                     }
                     GUILayout.FlexibleSpace();
                 }
@@ -127,7 +128,7 @@ public class StageBuilderEditor : Editor
                     //GUILayout.Button();
                     if (GUILayout.Button("→", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
                     {
-                        stageBuilder.CollapseLeft();
+                        _levelBuilder.CollapseLeft();
                     }
                     if (GUILayout.Button("", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
                     {
@@ -135,7 +136,7 @@ public class StageBuilderEditor : Editor
                     }
                     if (GUILayout.Button("←", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
                     {
-                        stageBuilder.CollapseRight();
+                        _levelBuilder.CollapseRight();
                     }
                     GUILayout.FlexibleSpace();
                 }
@@ -146,7 +147,7 @@ public class StageBuilderEditor : Editor
                     GUILayout.FlexibleSpace();
                     if (GUILayout.Button("↑", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
                     {
-                        stageBuilder.CollapseBottom();
+                        _levelBuilder.CollapseBottom();
                     }
                     GUILayout.FlexibleSpace();
                 }

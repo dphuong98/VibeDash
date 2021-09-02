@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class StageBuilder : MonoBehaviour
+public class LevelBuilder : MonoBehaviour
 {
     //Paths
     private const string TempFile = "Assets/Editor/LevelBuilderTmp/_tmp_.asset"; //OG named these caches but they dont behave like caches.
@@ -31,27 +31,27 @@ public class StageBuilder : MonoBehaviour
     
     
 
-    private Stage _currentStage;
-    public Stage CurrentStage
+    private Level _currentLevel;
+    public Level CurrentLevel
     {
         get
         {
-            if (_currentStage == null)
+            if (_currentLevel == null)
             {
-                _currentStage = AssetDatabase.LoadAssetAtPath<Stage>(TempFile);
+                _currentLevel = AssetDatabase.LoadAssetAtPath<Level>(TempFile);
                 
-                if (_currentStage == null)
+                if (_currentLevel == null)
                 {
                     NewStage();
                 }
             }
 
-            return _currentStage;
+            return _currentLevel;
         }
     }
     
-    public int Cols => CurrentStage.Size.x;
-    public int Rows => CurrentStage.Size.y;
+    public int Cols => CurrentLevel.Size.x;
+    public int Rows => CurrentLevel.Size.y;
 
     private void OnEnable()
     {
@@ -72,7 +72,7 @@ public class StageBuilder : MonoBehaviour
     
     private void DrawSceneGUI(SceneView sceneview)
     {
-        if (CurrentStage == null)
+        if (CurrentLevel == null)
         {
             return;
         }
@@ -198,7 +198,7 @@ public class StageBuilder : MonoBehaviour
     {
         GenericMenu menu = new GenericMenu();
 
-        var dot = CurrentStage[vector2Int.x, vector2Int.y];
+        var dot = CurrentLevel[vector2Int.x, vector2Int.y];
 
         foreach (TileType t in Enum.GetValues(typeof(TileType)))
         {
@@ -235,8 +235,8 @@ public class StageBuilder : MonoBehaviour
         {
             var tilePos = new Vector2Int(menuData.Item1, menuData.Item2);
             ExpandBorder(ref tilePos);
-            CurrentStage[tilePos.x, tilePos.y] = menuData.Item3;
-            EditorUtility.SetDirty(_currentStage);
+            CurrentLevel[tilePos.x, tilePos.y] = menuData.Item3;
+            EditorUtility.SetDirty(_currentLevel);
         }
     }
 
@@ -278,11 +278,11 @@ public class StageBuilder : MonoBehaviour
     /// </summary>
     private void DrawTileIcons()
     {
-        for (var y = 0; y < CurrentStage.Size.y; y++)
+        for (var y = 0; y < CurrentLevel.Size.y; y++)
         {
-            for (var x = 0; x < CurrentStage.Size.x; x++)
+            for (var x = 0; x < CurrentLevel.Size.x; x++)
             {
-                var tile = CurrentStage[x, y];
+                var tile = CurrentLevel[x, y];
                 var gridPos = new Vector2Int(x, y);
                 
                 DrawTileIcon(tile, gridPos);
@@ -332,8 +332,8 @@ public class StageBuilder : MonoBehaviour
 
     public void NewStage()
     {
-        _currentStage = Stage.CreateStage();
-        AssetDatabase.CreateAsset(_currentStage, TempFile);
+        _currentLevel = Level.CreateLevel();
+        AssetDatabase.CreateAsset(_currentLevel, TempFile);
         AssetDatabase.SaveAssets();
         
         CreateBackgroundMesh();
@@ -342,57 +342,57 @@ public class StageBuilder : MonoBehaviour
     //TODO add enum direction to prevent repetition
     public void ExpandBottom()
     {
-        CurrentStage.ExpandTop();
-        EditorUtility.SetDirty(CurrentStage);
+        CurrentLevel.ExpandTop();
+        EditorUtility.SetDirty(CurrentLevel);
         CreateBackgroundMesh();
     }
 
     public void ExpandLeft()
     {
-        CurrentStage.ExpandLeft();
-        EditorUtility.SetDirty(CurrentStage);
+        CurrentLevel.ExpandLeft();
+        EditorUtility.SetDirty(CurrentLevel);
         CreateBackgroundMesh();
     }
 
     public void ExpandRight()
     {
-        CurrentStage.ExpandRight();
-        EditorUtility.SetDirty(CurrentStage);
+        CurrentLevel.ExpandRight();
+        EditorUtility.SetDirty(CurrentLevel);
         CreateBackgroundMesh();
     }
 
     public void ExpandTop()
     {
-        CurrentStage.ExpandBottom();
-        EditorUtility.SetDirty(CurrentStage);
+        CurrentLevel.ExpandBottom();
+        EditorUtility.SetDirty(CurrentLevel);
         CreateBackgroundMesh();
     }
 
     public void CollapseTop()
     {
-        CurrentStage.CollapseTop();
-        EditorUtility.SetDirty(CurrentStage);
+        CurrentLevel.CollapseTop();
+        EditorUtility.SetDirty(CurrentLevel);
         CreateBackgroundMesh();
     }
 
     public void CollapseLeft()
     {
-        CurrentStage.CollapseLeft();
-        EditorUtility.SetDirty(CurrentStage);
+        CurrentLevel.CollapseLeft();
+        EditorUtility.SetDirty(CurrentLevel);
         CreateBackgroundMesh();
     }
 
     public void CollapseRight()
     {
-        CurrentStage.CollapseRight();
-        EditorUtility.SetDirty(CurrentStage);
+        CurrentLevel.CollapseRight();
+        EditorUtility.SetDirty(CurrentLevel);
         CreateBackgroundMesh();
     }
 
     public void CollapseBottom()
     {
-        CurrentStage.CollapseBottom();
-        EditorUtility.SetDirty(CurrentStage);
+        CurrentLevel.CollapseBottom();
+        EditorUtility.SetDirty(CurrentLevel);
         CreateBackgroundMesh();
     }
     

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LevelLoader
 {
-    public static void LoadLevelAt(Grid parent, Stage stageData, Vector2Int startingGrid)
+    public static void LoadLevelAt(Grid parent, Level levelData, Vector2Int startingGrid)
     {
         
     }

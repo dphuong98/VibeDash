@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [CustomEditor(typeof(Testspam))]
 public class TestspamEditor : Editor
 {
-    public Stage stageData;
+    [FormerlySerializedAs("stageData")] public Level levelData;
     public Grid parentGrid;
     
     public override void OnInspectorGUI()

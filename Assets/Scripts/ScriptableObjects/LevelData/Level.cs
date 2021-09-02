@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu]
-public class Stage : ScriptableObject
+public class Level : ScriptableObject
 {
     [SerializeField, HideInInspector] private Vector2Int size = new Vector2Int(5, 5);
     [SerializeField, HideInInspector] private List<TileType> tiles = new List<TileType>();
@@ -16,9 +16,9 @@ public class Stage : ScriptableObject
             tiles.Add(TileType.Wall);
     }
 
-    public static Stage CreateStage()
+    public static Level CreateLevel()
     {
-        var newLevel = ScriptableObject.CreateInstance<Stage>();
+        var newLevel = ScriptableObject.CreateInstance<Level>();
         newLevel.Init();
         return newLevel;
     }
