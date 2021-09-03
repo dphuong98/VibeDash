@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,7 +9,8 @@ using UnityEngine;
 public class LevelBuilderEditor : Editor
 {
     //LevelBuilder members
-    private LevelBuilder _levelBuilder;
+    private static readonly string SaveFolder = "Assets/Resources/Levels";
+    private LevelBuilder levelBuilder;
     
     //InspectorGUI members
     private bool dimensionExpaned;
@@ -16,7 +18,7 @@ public class LevelBuilderEditor : Editor
 
     private void OnEnable()
     {
-        _levelBuilder = target as LevelBuilder;
+        levelBuilder = target as LevelBuilder;
     }
 
     private void OnDisable()
@@ -27,139 +29,175 @@ public class LevelBuilderEditor : Editor
     //TODO what does #if UNITY_EDITOR purpose
     public override void OnInspectorGUI()
     {
-        //Stage data
-        GUILayout.Label("Level Info", EditorStyles.boldLabel);
-        GUILayout.Label("Level size: (" + _levelBuilder.CurrentLevel.Size.x + ", " + _levelBuilder.CurrentLevel.Size.y + ")");
-        
-        GUILayoutExt.HorizontalSeparator();
-        GUILayout.Label("File", EditorStyles.boldLabel);
-        GUI.enabled = false;
-        EditorGUILayout.ObjectField("Targeted Level: ", _levelBuilder.CurrentLevel, typeof(Level), true);
-        GUI.enabled = true;
-        GUILayout.BeginHorizontal();
-        {
-            if (GUILayout.Button("New"))
+        #region LevelInfo
+            GUILayout.Label("Level Info", EditorStyles.boldLabel);
+            GUILayout.Label("Level size: (" + levelBuilder.EditingLevel.Size.x + ", " + levelBuilder.EditingLevel.Size.y + ")");
+        #endregion
+
+        #region File
+            GUILayoutExt.HorizontalSeparator();
+            GUILayout.Label("File", EditorStyles.boldLabel);
+            GUI.enabled = false;
+            EditorGUILayout.ObjectField("Loaded Level: ", levelBuilder.LoadedLevel, typeof(Level), true);
+            GUI.enabled = true;
+            GUILayout.BeginHorizontal();
             {
-                _levelBuilder.NewStage();
+                if (GUILayout.Button("New"))
+                {
+                    levelBuilder.NewLevel();
+                }
+                
+                if (GUILayout.Button("Open"))
+                {
+                    var path = EditorUtility.OpenFilePanel("Open", SaveFolder, "asset");
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        if (levelBuilder.Open(FileUtil.GetProjectRelativePath(path)))
+                        {
+                            Debug.LogFormat("Opened {0}", path);
+                        }
+                    }
+                }
+
+                if (GUILayout.Button("Save"))
+                {
+                    levelBuilder.Save();
+                }
+
+                if (GUILayout.Button("Save As"))
+                {
+                    var path = EditorUtility.SaveFilePanel("Save As", SaveFolder, "Level", "asset");
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        levelBuilder.SaveAs(FileUtil.GetProjectRelativePath(path));
+                    }
+                }
+
+                if (GUILayout.Button("Reload"))
+                {
+                    levelBuilder.Reload();
+                }
             }
-        }
-        GUILayout.EndHorizontal();
+            GUILayout.EndHorizontal();
+        #endregion
 
-        GUILayoutExt.HorizontalSeparator();
-        GUILayout.Label("Level Tools", EditorStyles.boldLabel);
-        dimensionExpaned = EditorGUILayout.Foldout(dimensionExpaned, "Expand & Shrink");
-        if (dimensionExpaned)
-        {
-            EditorGUILayout.BeginHorizontal();
-
-            // Expand
-            EditorGUILayout.BeginVertical();
+        #region LevelTools
+            GUILayoutExt.HorizontalSeparator();
+            GUILayout.Label("Level Tools", EditorStyles.boldLabel);
+            dimensionExpaned = EditorGUILayout.Foldout(dimensionExpaned, "Expand & Shrink");
+            if (dimensionExpaned)
             {
-                
-                
                 EditorGUILayout.BeginHorizontal();
+
+                // Expand
+                EditorGUILayout.BeginVertical();
                 {
-                    GUILayout.FlexibleSpace();
-                    if (GUILayout.Button("↑", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                    
+                    
+                    EditorGUILayout.BeginHorizontal();
                     {
-                        _levelBuilder.ExpandBottom();
+                        GUILayout.FlexibleSpace();
+                        if (GUILayout.Button("↑", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                        {
+                            levelBuilder.ExpandBottom();
+                        }
+                        GUILayout.FlexibleSpace();
                     }
-                    GUILayout.FlexibleSpace();
+                    EditorGUILayout.EndHorizontal();
+
+
+                    EditorGUILayout.BeginHorizontal();
+                    {
+                        GUILayout.FlexibleSpace();
+                        //GUILayout.Button();
+                        if (GUILayout.Button("←", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                        {
+                            levelBuilder.ExpandLeft();
+                        }
+                        if (GUILayout.Button("", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                        {
+
+                        }
+                        if (GUILayout.Button("→", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                        {
+                            levelBuilder.ExpandRight();
+                        }
+                        GUILayout.FlexibleSpace();
+                    }
+                    EditorGUILayout.EndHorizontal();
+
+                    EditorGUILayout.BeginHorizontal();
+                    {
+                        GUILayout.FlexibleSpace();
+                        if (GUILayout.Button("↓", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                        {
+                            levelBuilder.ExpandTop();
+                        }
+                        GUILayout.FlexibleSpace();
+                    }
+                    EditorGUILayout.EndHorizontal();
+
+
                 }
-                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.EndVertical();
 
 
-                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.BeginVertical();
+                // Shrink
                 {
-                    GUILayout.FlexibleSpace();
-                    //GUILayout.Button();
-                    if (GUILayout.Button("←", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                    
+                    
+                    EditorGUILayout.BeginHorizontal();
                     {
-                        _levelBuilder.ExpandLeft();
+                        GUILayout.FlexibleSpace();
+                        if (GUILayout.Button("↓", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                        {
+                            levelBuilder.CollapseTop();
+                        }
+                        GUILayout.FlexibleSpace();
                     }
-                    if (GUILayout.Button("", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
-                    {
+                    EditorGUILayout.EndHorizontal();
 
-                    }
-                    if (GUILayout.Button("→", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+
+                    EditorGUILayout.BeginHorizontal();
                     {
-                        _levelBuilder.ExpandRight();
+                        GUILayout.FlexibleSpace();
+                        //GUILayout.Button();
+                        if (GUILayout.Button("→", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                        {
+                            levelBuilder.CollapseLeft();
+                        }
+                        if (GUILayout.Button("", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                        {
+
+                        }
+                        if (GUILayout.Button("←", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                        {
+                            levelBuilder.CollapseRight();
+                        }
+                        GUILayout.FlexibleSpace();
                     }
-                    GUILayout.FlexibleSpace();
+                    EditorGUILayout.EndHorizontal();
+
+                    EditorGUILayout.BeginHorizontal();
+                    {
+                        GUILayout.FlexibleSpace();
+                        if (GUILayout.Button("↑", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                        {
+                            levelBuilder.CollapseBottom();
+                        }
+                        GUILayout.FlexibleSpace();
+                    }
+                    EditorGUILayout.EndHorizontal();
+                    
+                    
                 }
+                EditorGUILayout.EndVertical();
+
                 EditorGUILayout.EndHorizontal();
-
-                EditorGUILayout.BeginHorizontal();
-                {
-                    GUILayout.FlexibleSpace();
-                    if (GUILayout.Button("↓", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
-                    {
-                        _levelBuilder.ExpandTop();
-                    }
-                    GUILayout.FlexibleSpace();
-                }
-                EditorGUILayout.EndHorizontal();
-
-
             }
-            EditorGUILayout.EndVertical();
-
-
-            EditorGUILayout.BeginVertical();
-            // Shrink
-            {
-                
-                
-                EditorGUILayout.BeginHorizontal();
-                {
-                    GUILayout.FlexibleSpace();
-                    if (GUILayout.Button("↓", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
-                    {
-                        _levelBuilder.CollapseTop();
-                    }
-                    GUILayout.FlexibleSpace();
-                }
-                EditorGUILayout.EndHorizontal();
-
-
-                EditorGUILayout.BeginHorizontal();
-                {
-                    GUILayout.FlexibleSpace();
-                    //GUILayout.Button();
-                    if (GUILayout.Button("→", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
-                    {
-                        _levelBuilder.CollapseLeft();
-                    }
-                    if (GUILayout.Button("", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
-                    {
-
-                    }
-                    if (GUILayout.Button("←", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
-                    {
-                        _levelBuilder.CollapseRight();
-                    }
-                    GUILayout.FlexibleSpace();
-                }
-                EditorGUILayout.EndHorizontal();
-
-                EditorGUILayout.BeginHorizontal();
-                {
-                    GUILayout.FlexibleSpace();
-                    if (GUILayout.Button("↑", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
-                    {
-                        _levelBuilder.CollapseBottom();
-                    }
-                    GUILayout.FlexibleSpace();
-                }
-                EditorGUILayout.EndHorizontal();
-                
-                
-            }
-            EditorGUILayout.EndVertical();
-
-            EditorGUILayout.EndHorizontal();
-        }
-        // End dimension foldout
+            // End dimension foldout
+        #endregion
         
         //End OnInspectorGUI
     }

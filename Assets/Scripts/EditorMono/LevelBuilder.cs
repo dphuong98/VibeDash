@@ -28,30 +28,35 @@ public class LevelBuilder : MonoBehaviour
 
     private Grid grid;
     private Vector2Int selectedTile = new Vector2Int(-1, -1);
-    
-    
 
-    private Level _currentLevel;
-    public Level CurrentLevel
+    private Level loadedLevel;
+
+    public Level LoadedLevel
+    {
+        get => loadedLevel;
+    }
+
+    private Level editingLevel;
+    public Level EditingLevel
     {
         get
         {
-            if (_currentLevel == null)
+            if (editingLevel == null)
             {
-                _currentLevel = AssetDatabase.LoadAssetAtPath<Level>(TempFile);
+                Open(TempFile);
                 
-                if (_currentLevel == null)
+                if (editingLevel == null)
                 {
-                    NewStage();
+                    NewLevel();
                 }
             }
 
-            return _currentLevel;
+            return editingLevel;
         }
     }
     
-    public int Cols => CurrentLevel.Size.x;
-    public int Rows => CurrentLevel.Size.y;
+    public int Cols => EditingLevel.Size.x;
+    public int Rows => EditingLevel.Size.y;
 
     private void OnEnable()
     {
@@ -72,7 +77,7 @@ public class LevelBuilder : MonoBehaviour
     
     private void DrawSceneGUI(SceneView sceneview)
     {
-        if (CurrentLevel == null)
+        if (EditingLevel == null)
         {
             return;
         }
@@ -194,15 +199,25 @@ public class LevelBuilder : MonoBehaviour
         newTilePos -= offsetVector;
     }
 
-    private GenericMenu TileMenu(Vector2Int vector2Int)
+    private GenericMenu TileMenu(Vector2Int tilePos)
     {
         GenericMenu menu = new GenericMenu();
 
-        var dot = CurrentLevel[vector2Int.x, vector2Int.y];
-
-        foreach (TileType t in Enum.GetValues(typeof(TileType)))
+        if (tilePos.x == -1 || tilePos.x == Cols || tilePos.y == -1 || tilePos.y == Rows)
         {
-            menu.AddItem(new GUIContent(string.Format("[{1}] {0}", t, GetShortcut(t))), t == dot, OnTileMenuClicked, new Tuple<int, int, TileType>(vector2Int.x, vector2Int.y, t));
+            foreach (TileType t in Enum.GetValues(typeof(TileType)))
+            {
+                menu.AddItem(new GUIContent(string.Format("[{1}] {0}", t, GetShortcut(t))), false, OnTileMenuClicked, new Tuple<int, int, TileType>(tilePos.x, tilePos.y, t));
+            }
+        }
+        else
+        {
+            var dot = EditingLevel[tilePos.x, tilePos.y];
+
+            foreach (TileType t in Enum.GetValues(typeof(TileType)))
+            {
+                menu.AddItem(new GUIContent(string.Format("[{1}] {0}", t, GetShortcut(t))), t == dot, OnTileMenuClicked, new Tuple<int, int, TileType>(tilePos.x, tilePos.y, t));
+            }
         }
 
         //menu.AddSeparator("");
@@ -235,8 +250,8 @@ public class LevelBuilder : MonoBehaviour
         {
             var tilePos = new Vector2Int(menuData.Item1, menuData.Item2);
             ExpandBorder(ref tilePos);
-            CurrentLevel[tilePos.x, tilePos.y] = menuData.Item3;
-            EditorUtility.SetDirty(_currentLevel);
+            EditingLevel[tilePos.x, tilePos.y] = menuData.Item3;
+            EditorUtility.SetDirty(editingLevel);
         }
     }
 
@@ -278,11 +293,11 @@ public class LevelBuilder : MonoBehaviour
     /// </summary>
     private void DrawTileIcons()
     {
-        for (var y = 0; y < CurrentLevel.Size.y; y++)
+        for (var y = 0; y < EditingLevel.Size.y; y++)
         {
-            for (var x = 0; x < CurrentLevel.Size.x; x++)
+            for (var x = 0; x < EditingLevel.Size.x; x++)
             {
-                var tile = CurrentLevel[x, y];
+                var tile = EditingLevel[x, y];
                 var gridPos = new Vector2Int(x, y);
                 
                 DrawTileIcon(tile, gridPos);
@@ -330,10 +345,10 @@ public class LevelBuilder : MonoBehaviour
     }
     
 
-    public void NewStage()
+    public void NewLevel()
     {
-        _currentLevel = Level.CreateLevel();
-        AssetDatabase.CreateAsset(_currentLevel, TempFile);
+        editingLevel = Level.CreateLevel();
+        AssetDatabase.CreateAsset(editingLevel, TempFile);
         AssetDatabase.SaveAssets();
         
         CreateBackgroundMesh();
@@ -342,57 +357,57 @@ public class LevelBuilder : MonoBehaviour
     //TODO add enum direction to prevent repetition
     public void ExpandBottom()
     {
-        CurrentLevel.ExpandTop();
-        EditorUtility.SetDirty(CurrentLevel);
+        EditingLevel.ExpandTop();
+        EditorUtility.SetDirty(EditingLevel);
         CreateBackgroundMesh();
     }
 
     public void ExpandLeft()
     {
-        CurrentLevel.ExpandLeft();
-        EditorUtility.SetDirty(CurrentLevel);
+        EditingLevel.ExpandLeft();
+        EditorUtility.SetDirty(EditingLevel);
         CreateBackgroundMesh();
     }
 
     public void ExpandRight()
     {
-        CurrentLevel.ExpandRight();
-        EditorUtility.SetDirty(CurrentLevel);
+        EditingLevel.ExpandRight();
+        EditorUtility.SetDirty(EditingLevel);
         CreateBackgroundMesh();
     }
 
     public void ExpandTop()
     {
-        CurrentLevel.ExpandBottom();
-        EditorUtility.SetDirty(CurrentLevel);
+        EditingLevel.ExpandBottom();
+        EditorUtility.SetDirty(EditingLevel);
         CreateBackgroundMesh();
     }
 
     public void CollapseTop()
     {
-        CurrentLevel.CollapseTop();
-        EditorUtility.SetDirty(CurrentLevel);
+        EditingLevel.CollapseTop();
+        EditorUtility.SetDirty(EditingLevel);
         CreateBackgroundMesh();
     }
 
     public void CollapseLeft()
     {
-        CurrentLevel.CollapseLeft();
-        EditorUtility.SetDirty(CurrentLevel);
+        EditingLevel.CollapseLeft();
+        EditorUtility.SetDirty(EditingLevel);
         CreateBackgroundMesh();
     }
 
     public void CollapseRight()
     {
-        CurrentLevel.CollapseRight();
-        EditorUtility.SetDirty(CurrentLevel);
+        EditingLevel.CollapseRight();
+        EditorUtility.SetDirty(EditingLevel);
         CreateBackgroundMesh();
     }
 
     public void CollapseBottom()
     {
-        CurrentLevel.CollapseBottom();
-        EditorUtility.SetDirty(CurrentLevel);
+        EditingLevel.CollapseBottom();
+        EditorUtility.SetDirty(EditingLevel);
         CreateBackgroundMesh();
     }
     
@@ -407,5 +422,77 @@ public class LevelBuilder : MonoBehaviour
         var posX = - Cols / 2.0f * grid.cellSize.x;
         var posY = - Rows / 2.0f * grid.cellSize.y;
         grid.transform.position = new Vector3(posX, posY, 0);
+    }
+
+    public void SaveAs(string path)
+    {
+        try
+        {
+            var asset = ScriptableObject.CreateInstance<Level>();
+            asset.CopyFrom(editingLevel);
+            AssetDatabase.CreateAsset(asset, path);
+            AssetDatabase.SaveAssets();
+            loadedLevel = asset;
+
+            gameObject.name = Path.GetFileNameWithoutExtension(path);
+            Debug.LogFormat("Saved level to {0}", path);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogErrorFormat("{0} {1}", ex.Message, ex.StackTrace);
+        }
+    }
+
+    public bool Open(string path)
+    {
+        try
+        {
+            var asset = AssetDatabase.LoadAssetAtPath<Level>(path);
+            if (asset == null)
+            {
+                Debug.LogErrorFormat("Cannot load level asset at {0}", path);
+                return false;
+            }
+            loadedLevel = asset;
+            EditingLevel.CopyFrom(asset);
+            CreateBackgroundMesh();
+            
+            gameObject.name = Path.GetFileNameWithoutExtension(path);
+            Debug.LogFormat("Opened level from {0}", path);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogErrorFormat("Exception when open asset {0} {1} {2}", path, ex.Message, ex.StackTrace);
+        }
+
+        return true;
+    }
+
+    public void Reload()
+    {
+        if (loadedLevel != null)
+        {
+            EditingLevel.CopyFrom(LoadedLevel);
+            EditorUtility.SetDirty(EditingLevel);
+            CreateBackgroundMesh();
+            Debug.Log("Reloaded level");
+        }
+    }
+
+    public void Save()
+    {
+        if (LoadedLevel == null)
+        {
+            Debug.LogError("Loaded Level is NULL");
+            return;
+        }
+
+        LoadedLevel.CopyFrom(EditingLevel);
+
+        EditorUtility.SetDirty(LoadedLevel);
+        EditorUtility.SetDirty(EditingLevel);
+        AssetDatabase.SaveAssets();
+        
+        Debug.LogFormat("Saved level to {0}", LoadedLevel);
     }
 }

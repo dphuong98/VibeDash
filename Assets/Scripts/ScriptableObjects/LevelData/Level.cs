@@ -108,6 +108,12 @@ public class Level : ScriptableObject
         get => tiles[r * size.x + c];
         set => tiles[r * size.x + c] = value;
     }
+
+    public void CopyFrom(Level other)
+    {
+        size = other.size;
+        tiles = new List<TileType>(other.tiles);
+    }
 }
 
 public enum TileType
