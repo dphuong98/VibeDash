@@ -20,4 +20,9 @@ public class Testspam : MonoBehaviour
     {
         Debug.Log(i);
     }
+
+    private void Start()
+    {
+        Debug.Log(GameManager.CurrentLevel);
+    }
 }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -88,59 +89,30 @@ public class LevelBuilder : MonoBehaviour
 
         //Other GUI option
 
-        //Stage info
-
         //DrawSolution
     }
 
     private void HandleKey()
     {
-        /*if (Selection.activeGameObject == gameObject &&
+        if (Selection.activeGameObject == gameObject &&
             Event.current.type == EventType.KeyDown
-            )
+        )
         {
-
-            Level.Dot dot = null;
-
-            if (selection.r >= 0 && selection.r < editingLevel.Dimension.r && selection.c >= 0 && selection.c < editingLevel.Dimension.c)
+            if (TileSelected(out var gridPos))
             {
-                dot = editingLevel[selection.r, selection.c];
-            }
-            else
-            {
-                return;
-            }
-
-            var types = ShortCuts.Where(i => i.Value == Event.current.character).Select(k => k.Key);
-            if (types.Count() > 0)
-            {
-                dot.type = types.First();
-                Event.current.Use();
-                EditorUtility.SetDirty(editingLevel);
-            }
-
-            if (Event.current.character == 'h')
-            {
-                if (dot.type == Level.DotType.Tile || dot.type == Level.DotType.Block || dot.type == Level.DotType.Empty || dot.type == Level.DotType.Redirection)
+                if (gridPos.x == -1 || gridPos.x == Cols || gridPos.y == -1 || gridPos.y == Rows)
                 {
-                    dot.Index = selection;
-                    if (!EditingLevel.IsHint(dot.Index))
-                        EditingLevel.AddHint(selection);
-                    else
-                        EditingLevel.RemoveHint(selection);
-                    Event.current.Use();
-                    EditorUtility.SetDirty(editingLevel);
+                    return;
+                }
+
+                var types = ShortCuts.Where(i => i.Value == Event.current.character);
+
+                if (types.Any())
+                {
+                    EditingLevel[gridPos.x, gridPos.y] = types.First().Key;
                 }
             }
-
-            if (Event.current.character >= '6' && Event.current.character <= '9')
-            {
-                dot.lamp[Event.current.character - '6'] = !dot.lamp[Event.current.character - '6'];
-                Event.current.Use();
-                EditorUtility.SetDirty(editingLevel);
-            }
-
-        }*/
+        }
     }
 
     private void HandleClick()
@@ -148,25 +120,18 @@ public class LevelBuilder : MonoBehaviour
         if (Selection.activeGameObject == this.gameObject &&
             Event.current.type == EventType.MouseDown &&
             Event.current.modifiers == EventModifiers.None &&
-            Event.current.button == 0)
+            TileSelected(out var gridPos))
         {
-            if (TileSelected(out var gridPos))
-            {
-                selectedTile = gridPos;
-            }
-        }
+            selectedTile = gridPos;
 
-        if (Selection.activeGameObject == gameObject &&
-            Event.current.type == EventType.MouseDown &&
-            Event.current.modifiers == EventModifiers.None &&
-            Event.current.button == 1)
-        {
-            if (TileSelected(out var gridPos))
+            if (Event.current.button == 1)
             {
-                selectedTile = gridPos;
+                
                 SceneView.RepaintAll();
                 TileMenu(selectedTile).ShowAsContext();
             }
+            
+            Event.current.Use();
         }
     }
 
@@ -219,28 +184,7 @@ public class LevelBuilder : MonoBehaviour
                 menu.AddItem(new GUIContent(string.Format("[{1}] {0}", t, GetShortcut(t))), t == dot, OnTileMenuClicked, new Tuple<int, int, TileType>(tilePos.x, tilePos.y, t));
             }
         }
-
-        //menu.AddSeparator("");
-        /*menu.AddItem(new GUIContent("Hint [h]"), EditingLevel.IsHint(dot.Index),
-            OnContextHintClicked, new MenuItemData(dot, dot.type));
-
-        menu.AddSeparator("");
-        for (int i = 0; i < dot.lamp.Length; i++)
-        {
-            menu.AddItem(new GUIContent(string.Format("Lamp: {0} [{1}]", SideToString[i], i + 6)), dot.lamp[i],
-                OnContextLampClicked, new MenuItemData(dot, dot.type, i));
-        }
-
-        menu.AddSeparator("");
-        for (int i = 0; i < dot.source.Length; i++)
-        {
-            foreach (Level.LightDirection st in Enum.GetValues(typeof(Level.LightDirection)))
-            {
-                menu.AddItem(new GUIContent("Source " + SideToString[i] + "/" + st.ToString()), st == dot.source[i],
-                    OnContextSourceClicked, new MenuItemData(dot, st, i));
-            }
-        }*/
-
+        
         return menu;
     }
 

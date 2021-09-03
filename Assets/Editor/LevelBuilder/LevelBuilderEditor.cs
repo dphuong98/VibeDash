@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 [CustomEditor(typeof(LevelBuilder))]
@@ -10,6 +11,7 @@ public class LevelBuilderEditor : Editor
 {
     //LevelBuilder members
     private static readonly string SaveFolder = "Assets/Resources/Levels";
+    private static readonly string GameScenePath = "Assets/Scenes/Gameplay.unity";
     private LevelBuilder levelBuilder;
     
     //InspectorGUI members
@@ -197,6 +199,22 @@ public class LevelBuilderEditor : Editor
                 EditorGUILayout.EndHorizontal();
             }
             // End dimension foldout
+        #endregion
+
+        #region Play
+            if (GUILayout.Button("Play"))
+            {
+                if (Application.isPlaying)
+                {
+                    return;
+                }
+
+                GameManager.CurrentLevel = (target as LevelBuilder).EditingLevel;
+                AssetDatabase.SaveAssets();
+                EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
+                EditorSceneManager.OpenScene(GameScenePath);
+                EditorApplication.isPlaying = true;
+            }
         #endregion
         
         //End OnInspectorGUI
