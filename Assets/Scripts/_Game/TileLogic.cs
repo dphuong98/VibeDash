@@ -15,11 +15,16 @@ public static class TileLogic
         while (true)
         {
             currentTilePosition += direction;
+            if (0 > currentTilePosition.x || currentTilePosition.x >= level.Size.x ||
+                0 > currentTilePosition.y || currentTilePosition.y >= level.Size.y)
+                break;
+            
             var currentTileType = level[currentTilePosition.x, currentTilePosition.y];
 
             if (currentTileType == TileType.Wall || currentTileType == TileType.Air)
                 break;
 
+            //Stop at exit
             if (currentTileType == TileType.Road || currentTileType == TileType.Exit || currentTileType == TileType.Entrance)
             {
                 destination = currentTilePosition;

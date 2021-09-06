@@ -15,6 +15,6 @@ public enum TileType
 public static class TileTypeExt {
     public static bool IsWalkable(this TileType type)
     {
-        return type == TileType.Entrance || type == TileType.Road || type == TileType.Exit;
+        return type == TileType.Entrance || type == TileType.Road || type == TileType.Exit || type == TileType.Bridge;
     }
 }
