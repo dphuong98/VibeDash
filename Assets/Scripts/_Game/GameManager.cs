@@ -5,10 +5,8 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public static Level CurrentLevel { get; set; }
-
-    private void Start()
+    private void Awake()
     {
-        //Loading level here
+        LevelLoader.Instance.LoadLevel();
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using UnityEngine;
 
 [CreateAssetMenu]
@@ -14,6 +16,18 @@ public class Level : ScriptableObject
     {
         for (var i = 0; i < size.x * size.y; i++)
             tiles.Add(TileType.Wall);
+    }
+
+    public bool IsClearable()
+    {
+        var g = tiles.GroupBy(i => i);
+
+        if (g.Count(i => i.Key == TileType.Entrance) != 1 || g.Count(i => i.Key == TileType.Exit) != 1) return false;
+        
+        //Pathfinding
+        
+        
+        return true;
     }
 
     public static Level CreateLevel()
@@ -114,11 +128,47 @@ public class Level : ScriptableObject
         size = other.size;
         tiles = new List<TileType>(other.tiles);
     }
-}
 
-public enum TileType
-{
-    Air,
-    Road,
-    Wall,
+    public List<Vector2Int> ShortestPath()
+    {
+        //Directed graphs with arbitrary weights without negative cycles
+        var shortestPath = new List<Vector2Int>();
+
+        //Create graph using tile logic
+        if (tiles.IndexOf(TileType.Entrance) is var tmp && tmp < 0)
+        {
+            //Cant find entrance
+            Debug.Log("Cant find an entrance");
+            return null;
+        }
+        
+        var entrancePos = new Vector2Int(tmp % size.x, tmp / size.x);
+        var graph = new WeightedGraph<Vector2Int>();
+        MapNode(ref graph, entrancePos);
+        graph.PrintGraph();
+
+        //Apply Bellman–Ford algorithm to find the 
+        
+        return shortestPath;
+    }
+
+    private void MapNode(ref WeightedGraph<Vector2Int> graph, Vector2Int node)
+    {
+        var direction = Vector2Int.up;
+
+        if (!this[node.x, node.y].IsWalkable()) return;
+
+        do
+        {
+            if (this.TryMove(node, direction, out var destination, out var weight))
+            {
+                if (graph.Exist(node, destination)) return;
+
+                graph.AddDirected(node, destination, weight);
+                MapNode(ref graph, destination);
+            }
+            
+            direction.RotateClockwise();
+        } while (direction != Vector2Int.up);
+    }
 }

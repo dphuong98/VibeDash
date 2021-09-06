@@ -7,22 +7,13 @@ using UnityEngine;
 
 public class Testspam : MonoBehaviour
 {
-    [SerializeField, HideInInspector] private int i;
-
-    [ContextMenu("SetInt")]
-    public void SetInt()
+    [ContextMenu("Test")]
+    private void Test()
     {
-        i = 3;
-    }
-
-    [ContextMenu("GetInt")]
-    public void GetInt()
-    {
-        Debug.Log(i);
-    }
-
-    private void Start()
-    {
-        Debug.Log(GameManager.CurrentLevel);
+        var graph = new WeightedGraph<Vector2Int>();
+        graph.AddDirected(new Vector2Int(1,2), new Vector2Int(3, 4), 10);
+        graph.AddDirected(new Vector2Int(1,2), new Vector2Int(2, 2), 20);
+        graph.AddDirected(new Vector2Int(2,2), new Vector2Int(3, 4), 30);
+        graph.PrintGraph();
     }
 }

@@ -34,6 +34,12 @@ public class LevelBuilderEditor : Editor
         #region LevelInfo
             GUILayout.Label("Level Info", EditorStyles.boldLabel);
             GUILayout.Label("Level size: (" + levelBuilder.EditingLevel.Size.x + ", " + levelBuilder.EditingLevel.Size.y + ")");
+            if (0 <= levelBuilder.SelectedTile.x && levelBuilder.SelectedTile.x < levelBuilder.Cols &&
+                0 <= levelBuilder.SelectedTile.y && levelBuilder.SelectedTile.y < levelBuilder.Rows)
+            {
+                GUILayout.Label("Selected Tile: (" + (levelBuilder.SelectedTile.x+1) + ", " + (levelBuilder.SelectedTile.y+1) + ")");
+            }
+            else GUILayout.Label("Selected Tile: (0, 0)");
         #endregion
 
         #region File
@@ -204,12 +210,15 @@ public class LevelBuilderEditor : Editor
         #region Play
             if (GUILayout.Button("Play"))
             {
-                if (Application.isPlaying)
+                var level = (target as LevelBuilder).EditingLevel;
+                
+                if (Application.isPlaying || !level.IsClearable())
                 {
+                    Debug.Log("Level is not clearable!");
                     return;
                 }
 
-                GameManager.CurrentLevel = (target as LevelBuilder).EditingLevel;
+                LevelLoader.CurrentLevel = level;
                 AssetDatabase.SaveAssets();
                 EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
                 EditorSceneManager.OpenScene(GameScenePath);

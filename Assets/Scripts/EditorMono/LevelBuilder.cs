@@ -15,23 +15,29 @@ public class LevelBuilder : MonoBehaviour
     //Data
     private static Dictionary<TileType, char> ShortCuts = new Dictionary<TileType, char>()
     {
+        {TileType.Entrance, 'e'},
+        {TileType.Exit, 'x'},
         {TileType.Air, 'a'},
         {TileType.Road, 'r'},
         {TileType.Wall, 'w'},
+        {TileType.Bridge, 'b'},
     };
 
     private static Dictionary<TileType, Color> ColorMap = new Dictionary<TileType, Color>()
     {
+        {TileType.Entrance, new Color(0f, 1f, 1f, 0.5f)},
+        {TileType.Exit, new Color(1f, 0f, 0.03f, 0.77f)},
         { TileType.Air, Color.clear },
-        { TileType.Road, new Color(0f, 1f, 1f, 0.5f) },
-        { TileType.Wall, new Color(0.96f, .25f, .82f, 1) },
+        { TileType.Road,  new Color(0.24f, 0.26f, 0.42f, 0.5f)},
+        { TileType.Wall, new Color(0.96f, 0.38f, 0.83f) },
+        { TileType.Bridge, new Color(0.63f, 0.34f, 0.02f) },
     };
 
     private Grid grid;
-    private Vector2Int selectedTile = new Vector2Int(-1, -1);
-
     private Level loadedLevel;
 
+    public Vector2Int SelectedTile = new Vector2Int(-1, -1);
+    
     public Level LoadedLevel
     {
         get => loadedLevel;
@@ -74,6 +80,12 @@ public class LevelBuilder : MonoBehaviour
     public void Init()
     {
         
+    }
+
+    [ContextMenu("Test")]
+    public void Test()
+    {
+        var tmp = EditingLevel.ShortestPath();
     }
     
     private void DrawSceneGUI(SceneView sceneview)
@@ -122,13 +134,13 @@ public class LevelBuilder : MonoBehaviour
             Event.current.modifiers == EventModifiers.None &&
             TileSelected(out var gridPos))
         {
-            selectedTile = gridPos;
+            SelectedTile = gridPos;
 
             if (Event.current.button == 1)
             {
                 
                 SceneView.RepaintAll();
-                TileMenu(selectedTile).ShowAsContext();
+                TileMenu(SelectedTile).ShowAsContext();
             }
             
             Event.current.Use();
@@ -245,7 +257,7 @@ public class LevelBuilder : MonoBehaviour
                 var gridPos = new Vector2Int(x, y);
                 
                 DrawTileIcon(tile, gridPos);
-                if (selectedTile == gridPos)
+                if (SelectedTile == gridPos)
                     DrawHighLight(gridPos);
             }
         }
@@ -398,7 +410,7 @@ public class LevelBuilder : MonoBehaviour
                 return false;
             }
             loadedLevel = asset;
-            EditingLevel.CopyFrom(asset);
+            editingLevel.CopyFrom(asset);
             CreateBackgroundMesh();
             
             gameObject.name = Path.GetFileNameWithoutExtension(path);
