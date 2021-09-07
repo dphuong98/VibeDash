@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 
 [CreateAssetMenu]
-public class Level : ScriptableObject
+public class Stage : ScriptableObject
 {
     [SerializeField, HideInInspector] private Vector2Int size = new Vector2Int(5, 5);
     [SerializeField, HideInInspector] private List<TileType> tiles = new List<TileType>();
@@ -30,9 +30,9 @@ public class Level : ScriptableObject
         return true;
     }
 
-    public static Level CreateLevel()
+    public static Stage CreateStage()
     {
-        var newLevel = ScriptableObject.CreateInstance<Level>();
+        var newLevel = CreateInstance<Stage>();
         newLevel.Init();
         return newLevel;
     }
@@ -120,10 +120,18 @@ public class Level : ScriptableObject
     public TileType this[int c, int r]
     {
         get => tiles[r * size.x + c];
-        set => tiles[r * size.x + c] = value;
+        set
+        {
+            if (value == TileType.Entrance || value == TileType.Exit)
+            {
+                if (tiles.IndexOf(value) is var tilePos && tilePos != -1) tiles[tilePos] = TileType.Wall;
+            }
+            
+            tiles[r * size.x + c] = value;
+        }
     }
 
-    public void CopyFrom(Level other)
+    public void CopyFrom(Stage other)
     {
         size = other.size;
         tiles = new List<TileType>(other.tiles);

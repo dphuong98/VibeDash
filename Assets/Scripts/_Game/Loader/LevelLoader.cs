@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LevelLoader : Singleton<LevelLoader>
 {
-    public static Level CurrentLevel { get; set; }
+    public static Stage CurrentStage { get; set; }
     
     public void LoadLevel()
     {
