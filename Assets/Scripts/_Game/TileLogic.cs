@@ -32,17 +32,6 @@ public static class TileLogic
                 continue;
             }
 
-            if (currentTileType == TileType.Bridge)
-            {
-                var oneUpPosition = start + direction;
-                if (stage[oneUpPosition.x, oneUpPosition.y] != TileType.Bridge)
-                    break;
-
-                destination = currentTilePosition;
-                weight--;
-                continue;
-            }
-
             break; //Treat unknown tile as wall
         }
         

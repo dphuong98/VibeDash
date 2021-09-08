@@ -9,9 +9,9 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class StageBuilder : MonoBehaviour
 {
-    //Paths
-    private const string TempFile = "Assets/Editor/LevelBuilderTmp/_tmp_.asset"; //OG named these caches but they dont behave like caches.
-    
+    //Path
+    private string levelFolder = "Assets/Resources/Levels/";
+
     //Data
     private static Dictionary<TileType, char> ShortCuts = new Dictionary<TileType, char>()
     {
@@ -20,7 +20,6 @@ public class StageBuilder : MonoBehaviour
         {TileType.Air, 'a'},
         {TileType.Road, 'r'},
         {TileType.Wall, 'w'},
-        {TileType.Bridge, 'b'},
     };
 
     private static Dictionary<TileType, Color> ColorMap = new Dictionary<TileType, Color>()
@@ -30,7 +29,6 @@ public class StageBuilder : MonoBehaviour
         { TileType.Air, Color.clear },
         { TileType.Road,  new Color(0.24f, 0.26f, 0.42f, 0.5f)},
         { TileType.Wall, new Color(0.96f, 0.38f, 0.83f) },
-        { TileType.Bridge, new Color(0.63f, 0.34f, 0.02f) },
     };
 
     private Grid grid;
@@ -53,13 +51,7 @@ public class StageBuilder : MonoBehaviour
     {
         SceneView.duringSceneGui += DrawSceneGUI;
         grid = GetComponentInChildren<Grid>();
-        
-        Open(TempFile);
-        
-        if (editingStage == null)
-        {
-            NewStage();
-        }
+        NewStage();
         
         CreateBackgroundMesh();
     }
@@ -166,25 +158,36 @@ public class StageBuilder : MonoBehaviour
     private GenericMenu TileMenu(Vector2Int tilePos)
     {
         GenericMenu menu = new GenericMenu();
-
+        
+        //Border expand set
         if (tilePos.x == -1 || tilePos.x == Cols || tilePos.y == -1 || tilePos.y == Rows)
         {
             foreach (TileType t in Enum.GetValues(typeof(TileType)))
             {
+                if (t == TileType.Exit)
+                    continue;
                 menu.AddItem(new GUIContent(string.Format("[{1}] {0}", t, GetShortcut(t))), false, OnTileMenuClicked, new Tuple<int, int, TileType>(tilePos.x, tilePos.y, t));
             }
         }
         else
+        //Inside tile set
         {
             var dot = editingStage[tilePos.x, tilePos.y];
 
             foreach (TileType t in Enum.GetValues(typeof(TileType)))
             {
+                if (t == TileType.Exit && !IsOnBorder(tilePos))
+                    continue;
                 menu.AddItem(new GUIContent(string.Format("[{1}] {0}", t, GetShortcut(t))), t == dot, OnTileMenuClicked, new Tuple<int, int, TileType>(tilePos.x, tilePos.y, t));
             }
         }
         
         return menu;
+    }
+
+    private bool IsOnBorder(Vector2Int tilePos)
+    {
+        return 0 == tilePos.x || tilePos.x == Cols - 1 || 0 == tilePos.y || tilePos.y == Rows - 1;
     }
 
     private void OnTileMenuClicked(object userdata)
@@ -291,7 +294,8 @@ public class StageBuilder : MonoBehaviour
     public void NewStage()
     {
         editingStage = Stage.CreateStage();
-        AssetDatabase.CreateAsset(editingStage, TempFile);
+        var tmp = Path.Combine(levelFolder, "_tmp_.asset");
+        AssetDatabase.CreateAsset(editingStage, Path.Combine(levelFolder, "_tmp_.asset"));
         AssetDatabase.SaveAssets();
         
         CreateBackgroundMesh();

@@ -39,38 +39,73 @@ public class Stage : ScriptableObject
 
     public void ExpandTop()
     {
-        for (int r = 0; r < size.x; r++)
+        for (int r = size.x - 1; r >= 0; r--)
         {
-            tiles.Insert(0, TileType.Air);
+            tiles.Insert(0, TileType.Wall);
         }
         size.y++;
+        
+        for (int r = size.x - 1; r >= 0; r--)
+        {
+            if (this[r, 1] == TileType.Exit)
+            {
+                this[r, 0] = TileType.Exit;
+                break;
+            }
+        }
     }
 
     public void ExpandLeft()
     {
         for (int r = 0; r < size.y; r++)
         {
-            tiles.Insert(r * (size.x + 1), TileType.Air);
+            tiles.Insert(r * (size.x + 1), TileType.Wall);
         }
         size.x++;
+        
+        for (int r = 0; r < size.y; r++)
+        {
+            if (this[1, r] == TileType.Exit)
+            {
+                this[0, r] = TileType.Exit;
+                break;
+            }
+        }
     }
 
     public void ExpandRight()
     {
         for (int r = 0; r < size.y; r++)
         {
-            tiles.Insert(size.x + r * (size.x + 1), TileType.Air);
+            tiles.Insert(size.x + r * (size.x + 1), TileType.Wall);
         }
         size.x++;
+
+        for (int r = 0; r < size.y; r++)
+        {
+            if (this[size.x - 2, r] == TileType.Exit)
+            {
+                this[size.x - 1, r] = TileType.Exit;
+                break;
+            }
+        }
     }
 
     public void ExpandBottom()
     {
         for (int r = 0; r < size.x; r++)
         {
-            tiles.Insert(tiles.Count, TileType.Air);
+            tiles.Insert(tiles.Count, TileType.Wall);
         }
         size.y++;
+
+        for (int r = 0; r < size.x; r++)
+        {
+            if (this[r, size.y - 2] == TileType.Exit)
+            {
+                this[r, size.y - 1] = TileType.Exit;
+            }
+        }
     }
 
     public void CollapseTop()
@@ -126,7 +161,6 @@ public class Stage : ScriptableObject
             {
                 if (tiles.IndexOf(value) is var tilePos && tilePos != -1) tiles[tilePos] = TileType.Wall;
             }
-            
             tiles[r * size.x + c] = value;
         }
     }

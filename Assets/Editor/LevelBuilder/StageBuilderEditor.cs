@@ -7,7 +7,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 
 [CustomEditor(typeof(StageBuilder))]
-public class LevelBuilderEditor : Editor
+public class StageBuilderEditor : Editor
 {
     //LevelBuilder members
     private static readonly string SaveFolder = "Assets/Resources/Levels";
