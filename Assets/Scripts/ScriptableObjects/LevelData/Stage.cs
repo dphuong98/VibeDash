@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using UnityEngine;
 
@@ -18,18 +19,6 @@ public class Stage : ScriptableObject
             tiles.Add(TileType.Wall);
     }
 
-    public bool IsClearable()
-    {
-        var g = tiles.GroupBy(i => i);
-
-        if (g.Count(i => i.Key == TileType.Entrance) != 1 || g.Count(i => i.Key == TileType.Exit) != 1) return false;
-        
-        //Pathfinding
-        
-        
-        return true;
-    }
-
     public static Stage CreateStage()
     {
         var newLevel = CreateInstance<Stage>();
@@ -37,7 +26,7 @@ public class Stage : ScriptableObject
         return newLevel;
     }
 
-    public void ExpandTop()
+    public void ExpandBottom()
     {
         for (int r = size.x - 1; r >= 0; r--)
         {
@@ -91,7 +80,7 @@ public class Stage : ScriptableObject
         }
     }
 
-    public void ExpandBottom()
+    public void ExpandTop()
     {
         for (int r = 0; r < size.x; r++)
         {
@@ -157,6 +146,7 @@ public class Stage : ScriptableObject
         get => tiles[r * size.x + c];
         set
         {
+            //Ensure that their could be only one entrance or exit
             if (value == TileType.Entrance || value == TileType.Exit)
             {
                 if (tiles.IndexOf(value) is var tilePos && tilePos != -1) tiles[tilePos] = TileType.Wall;
@@ -171,46 +161,13 @@ public class Stage : ScriptableObject
         tiles = new List<TileType>(other.tiles);
     }
 
-    public List<Vector2Int> ShortestPath()
+    public Vector2Int GetEntrance()
     {
-        //Directed graphs with arbitrary weights without negative cycles
-        var shortestPath = new List<Vector2Int>();
-
-        //Create graph using tile logic
-        if (tiles.IndexOf(TileType.Entrance) is var tmp && tmp < 0)
+        if (tiles.IndexOf(TileType.Entrance) is var tilePos && tilePos != -1)
         {
-            //Cant find entrance
-            Debug.Log("Cant find an entrance");
-            return null;
+            return new Vector2Int(tilePos % size.x, tilePos / size.x);
         }
-        
-        var entrancePos = new Vector2Int(tmp % size.x, tmp / size.x);
-        var graph = new WeightedGraph<Vector2Int>();
-        MapNode(ref graph, entrancePos);
-        graph.PrintGraph();
 
-        //Apply Bellman–Ford algorithm to find the 
-        
-        return shortestPath;
-    }
-
-    private void MapNode(ref WeightedGraph<Vector2Int> graph, Vector2Int node)
-    {
-        var direction = Vector2Int.up;
-
-        if (!this[node.x, node.y].IsWalkable()) return;
-
-        do
-        {
-            if (this.TryMove(node, direction, out var destination, out var weight))
-            {
-                if (graph.Exist(node, destination)) return;
-
-                graph.AddDirected(node, destination, weight);
-                MapNode(ref graph, destination);
-            }
-            
-            direction.RotateClockwise();
-        } while (direction != Vector2Int.up);
+        return -Vector2Int.one;
     }
 }

@@ -15,8 +15,8 @@ public class StageBuilderEditor : Editor
     private StageBuilder stageBuilder;
     
     //InspectorGUI members
-    private bool dimensionExpaned;
-    private Vector2 dimensionButtonSize = new Vector2(30, 30);
+    private bool expandDropdown;
+    private Vector2 expandButtonSize = new Vector2(30, 30);
 
     private void OnEnable()
     {
@@ -40,6 +40,9 @@ public class StageBuilderEditor : Editor
                 GUILayout.Label("Selected Tile: (" + (stageBuilder.SelectedTile.x+1) + ", " + (stageBuilder.SelectedTile.y+1) + ")");
             }
             else GUILayout.Label("Selected Tile: (0, 0)");
+
+            stageBuilder.GraphMode = GUILayout.Toggle(stageBuilder.GraphMode, "GraphMode");
+            stageBuilder.CheatMode = GUILayout.Toggle(stageBuilder.CheatMode, "CheatMode");
         #endregion
 
         #region File
@@ -92,8 +95,8 @@ public class StageBuilderEditor : Editor
         #region LevelTools
             GUILayoutExt.HorizontalSeparator();
             GUILayout.Label("Level Tools", EditorStyles.boldLabel);
-            dimensionExpaned = EditorGUILayout.Foldout(dimensionExpaned, "Expand & Shrink");
-            if (dimensionExpaned)
+            expandDropdown = EditorGUILayout.Foldout(expandDropdown, "Expand & Shrink");
+            if (expandDropdown)
             {
                 EditorGUILayout.BeginHorizontal();
 
@@ -105,7 +108,7 @@ public class StageBuilderEditor : Editor
                     EditorGUILayout.BeginHorizontal();
                     {
                         GUILayout.FlexibleSpace();
-                        if (GUILayout.Button("↑", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                        if (GUILayout.Button("↑", GUILayout.Width(expandButtonSize.x), GUILayout.Height(expandButtonSize.y)))
                         {
                             stageBuilder.ExpandBottom();
                         }
@@ -118,15 +121,15 @@ public class StageBuilderEditor : Editor
                     {
                         GUILayout.FlexibleSpace();
                         //GUILayout.Button();
-                        if (GUILayout.Button("←", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                        if (GUILayout.Button("←", GUILayout.Width(expandButtonSize.x), GUILayout.Height(expandButtonSize.y)))
                         {
                             stageBuilder.ExpandLeft();
                         }
-                        if (GUILayout.Button("", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                        if (GUILayout.Button("", GUILayout.Width(expandButtonSize.x), GUILayout.Height(expandButtonSize.y)))
                         {
 
                         }
-                        if (GUILayout.Button("→", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                        if (GUILayout.Button("→", GUILayout.Width(expandButtonSize.x), GUILayout.Height(expandButtonSize.y)))
                         {
                             stageBuilder.ExpandRight();
                         }
@@ -137,7 +140,7 @@ public class StageBuilderEditor : Editor
                     EditorGUILayout.BeginHorizontal();
                     {
                         GUILayout.FlexibleSpace();
-                        if (GUILayout.Button("↓", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                        if (GUILayout.Button("↓", GUILayout.Width(expandButtonSize.x), GUILayout.Height(expandButtonSize.y)))
                         {
                             stageBuilder.ExpandTop();
                         }
@@ -158,7 +161,7 @@ public class StageBuilderEditor : Editor
                     EditorGUILayout.BeginHorizontal();
                     {
                         GUILayout.FlexibleSpace();
-                        if (GUILayout.Button("↓", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                        if (GUILayout.Button("↓", GUILayout.Width(expandButtonSize.x), GUILayout.Height(expandButtonSize.y)))
                         {
                             stageBuilder.CollapseTop();
                         }
@@ -171,15 +174,15 @@ public class StageBuilderEditor : Editor
                     {
                         GUILayout.FlexibleSpace();
                         //GUILayout.Button();
-                        if (GUILayout.Button("→", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                        if (GUILayout.Button("→", GUILayout.Width(expandButtonSize.x), GUILayout.Height(expandButtonSize.y)))
                         {
                             stageBuilder.CollapseLeft();
                         }
-                        if (GUILayout.Button("", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                        if (GUILayout.Button("", GUILayout.Width(expandButtonSize.x), GUILayout.Height(expandButtonSize.y)))
                         {
 
                         }
-                        if (GUILayout.Button("←", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                        if (GUILayout.Button("←", GUILayout.Width(expandButtonSize.x), GUILayout.Height(expandButtonSize.y)))
                         {
                             stageBuilder.CollapseRight();
                         }
@@ -190,7 +193,7 @@ public class StageBuilderEditor : Editor
                     EditorGUILayout.BeginHorizontal();
                     {
                         GUILayout.FlexibleSpace();
-                        if (GUILayout.Button("↑", GUILayout.Width(dimensionButtonSize.x), GUILayout.Height(dimensionButtonSize.y)))
+                        if (GUILayout.Button("↑", GUILayout.Width(expandButtonSize.x), GUILayout.Height(expandButtonSize.y)))
                         {
                             stageBuilder.CollapseBottom();
                         }
@@ -212,9 +215,8 @@ public class StageBuilderEditor : Editor
             {
                 var level = (target as StageBuilder).EditingStage;
                 
-                if (Application.isPlaying || !level.IsClearable())
+                if (Application.isPlaying)
                 {
-                    Debug.Log("Level is not clearable!");
                     return;
                 }
 

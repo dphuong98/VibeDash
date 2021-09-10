@@ -31,11 +31,17 @@ public class StageBuilder : MonoBehaviour
         { TileType.Wall, new Color(0.96f, 0.38f, 0.83f) },
     };
 
+    //Components
     private Grid grid;
-    private Stage loadedStage;
-
+    
+    //Members
+    private Graph<Vector2Int> graph;
+    
+    public bool CheatMode = false;
+    public bool GraphMode = false;
     public Vector2Int SelectedTile = new Vector2Int(-1, -1);
     
+    private Stage loadedStage;
     public Stage LoadedStage
     {
         get => loadedStage;
@@ -61,12 +67,6 @@ public class StageBuilder : MonoBehaviour
         SceneView.duringSceneGui -= DrawSceneGUI;
     }
 
-    [ContextMenu("Test")]
-    public void Test()
-    {
-        var tmp = editingStage.ShortestPath();
-    }
-    
     private void DrawSceneGUI(SceneView sceneview)
     {
         if (editingStage == null)
@@ -74,13 +74,30 @@ public class StageBuilder : MonoBehaviour
             return;
         }
 
+        DrawGraph();
         DrawTileIcons();
+
         HandleClick();
         HandleKey();
 
         //Other GUI option
 
         //DrawSolution
+    }
+
+    private void DrawGraph()
+    {
+        if (!GraphMode) return;
+        
+        if (graph == null)
+            CreateGraph();
+        
+        graph.IterateEdge((n1, n2) =>
+        {
+            Vector3Int v1 = new Vector3Int(n1.x, n1.y, 0);
+            Vector3Int v2 = new Vector3Int(n2.x, n2.y, 0);
+            Handles.DrawLine(grid.GetCellCenterWorld(v1), grid.GetCellCenterWorld(v2));
+        });
     }
 
     private void HandleKey()
@@ -101,6 +118,7 @@ public class StageBuilder : MonoBehaviour
                 if (types.Any())
                 {
                     editingStage[gridPos.x, gridPos.y] = types.First().Key;
+                    CreateGraph();
                 }
             }
         }
@@ -198,6 +216,7 @@ public class StageBuilder : MonoBehaviour
             ExpandBorder(ref clickedPos);
             editingStage[clickedPos.x, clickedPos.y] = menuData.Item3;
             EditorUtility.SetDirty(editingStage);
+            CreateGraph();
         }
     }
 
@@ -289,6 +308,31 @@ public class StageBuilder : MonoBehaviour
             });
         }
     }
+
+    private void MapNode(ref Graph<Vector2Int> graph, Stage stage, Vector2Int node)
+    {
+        var direction = Vector2Int.up;
+        
+        if (!stage[node.x, node.y].IsWalkable()) return;
+
+        do
+        {
+            if (stage.TryMove(node, direction, out var path))
+            {
+                if (graph.Contains(node, node+direction)) return;
+                
+                graph.AddDirected(node, path.First());
+                for (var i = 0; i < path.Count - 1; i++)
+                {
+                    graph.AddDirected(path[i], path[i+1]);
+                }
+
+                MapNode(ref graph, stage, path.Last());
+            }
+            
+            direction.RotateClockwise();
+        } while (direction != Vector2Int.up);
+    }
     
 
     public void NewStage()
@@ -300,13 +344,13 @@ public class StageBuilder : MonoBehaviour
         
         CreateBackgroundMesh();
     }
-
-    //TODO add enum direction to prevent repetition
+    
     public void ExpandBottom()
     {
-        editingStage.ExpandTop();
+        editingStage.ExpandBottom();
         EditorUtility.SetDirty(editingStage);
         CreateBackgroundMesh();
+        CreateGraph();
     }
 
     public void ExpandLeft()
@@ -314,6 +358,7 @@ public class StageBuilder : MonoBehaviour
         editingStage.ExpandLeft();
         EditorUtility.SetDirty(editingStage);
         CreateBackgroundMesh();
+        CreateGraph();
     }
 
     public void ExpandRight()
@@ -321,13 +366,15 @@ public class StageBuilder : MonoBehaviour
         editingStage.ExpandRight();
         EditorUtility.SetDirty(editingStage);
         CreateBackgroundMesh();
+        CreateGraph();
     }
 
     public void ExpandTop()
     {
-        editingStage.ExpandBottom();
+        editingStage.ExpandTop();
         EditorUtility.SetDirty(editingStage);
         CreateBackgroundMesh();
+        CreateGraph();
     }
 
     public void CollapseTop()
@@ -335,6 +382,7 @@ public class StageBuilder : MonoBehaviour
         editingStage.CollapseTop();
         EditorUtility.SetDirty(editingStage);
         CreateBackgroundMesh();
+        CreateGraph();
     }
 
     public void CollapseLeft()
@@ -342,6 +390,7 @@ public class StageBuilder : MonoBehaviour
         editingStage.CollapseLeft();
         EditorUtility.SetDirty(editingStage);
         CreateBackgroundMesh();
+        CreateGraph();
     }
 
     public void CollapseRight()
@@ -349,6 +398,7 @@ public class StageBuilder : MonoBehaviour
         editingStage.CollapseRight();
         EditorUtility.SetDirty(editingStage);
         CreateBackgroundMesh();
+        CreateGraph();
     }
 
     public void CollapseBottom()
@@ -356,12 +406,23 @@ public class StageBuilder : MonoBehaviour
         editingStage.CollapseBottom();
         EditorUtility.SetDirty(editingStage);
         CreateBackgroundMesh();
+        CreateGraph();
     }
     
     private void CreateBackgroundMesh()
     {
         GetComponent<MeshCollider>().sharedMesh = GetComponent<MeshFilter>().sharedMesh = MeshGenerator.Quad(Cols + 2, Rows + 2, Vector3.back);
         RepositionGrid();
+    }
+
+    private void CreateGraph()
+    {
+        graph = new Graph<Vector2Int>();
+
+        if (editingStage.GetEntrance() is var entrancePos && entrancePos != -Vector2Int.one)
+        {
+            MapNode(ref graph, editingStage, editingStage.GetEntrance());
+        }
     }
 
     private void RepositionGrid()

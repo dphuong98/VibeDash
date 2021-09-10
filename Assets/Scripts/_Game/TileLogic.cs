@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using UnityEditor;
 using UnityEngine;
@@ -7,10 +8,10 @@ using UnityEngine.Tilemaps;
 
 public static class TileLogic
 {
-    public static bool TryMove(this Stage stage, Vector2Int start, Vector2Int direction, out Vector2Int destination, out int weight)
+    public static bool TryMove(this Stage stage, Vector2Int start, Vector2Int direction, out List<Vector2Int> path)
     {
-        var currentTilePosition = destination = start;
-        weight = 0;
+        var currentTilePosition = start;
+        path = new List<Vector2Int>();
 
         while (true)
         {
@@ -23,18 +24,22 @@ public static class TileLogic
 
             if (currentTileType == TileType.Wall || currentTileType == TileType.Air)
                 break;
-
-            //Stop at exit
+            
             if (currentTileType == TileType.Road || currentTileType == TileType.Exit || currentTileType == TileType.Entrance)
             {
-                destination = currentTilePosition;
-                weight++;
+                path.Add(currentTilePosition);
                 continue;
+            }
+
+            //Player fall out of the map
+            if (currentTileType == TileType.Air)
+            {
+                return false;
             }
 
             break; //Treat unknown tile as wall
         }
-        
-        return start != destination;
+
+        return path.Count != 0;
     }
 }
