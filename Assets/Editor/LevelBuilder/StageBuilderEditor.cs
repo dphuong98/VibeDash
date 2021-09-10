@@ -77,7 +77,7 @@ public class StageBuilderEditor : Editor
 
                 if (GUILayout.Button("Save As"))
                 {
-                    var path = EditorUtility.SaveFilePanel("Save As", SaveFolder, "Level", "asset");
+                    var path = EditorUtility.SaveFilePanel("Save As", SaveFolder, "Stage", "asset");
                     if (!string.IsNullOrEmpty(path))
                     {
                         stageBuilder.SaveAs(FileUtil.GetProjectRelativePath(path));
