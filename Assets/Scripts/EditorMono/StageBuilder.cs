@@ -95,7 +95,7 @@ public class StageBuilder : MonoBehaviour
             CreateSolution();
         
         //Draw
-        
+
     }
 
     private void HandleKey()
@@ -307,9 +307,6 @@ public class StageBuilder : MonoBehaviour
         }
     }
 
-    
-    
-
     public void NewStage()
     {
         editingStage = Stage.CreateStage();
@@ -402,6 +399,7 @@ public class StageBuilder : MonoBehaviour
         }
     }
 
+    //TODO refactor this
     private bool MapNode(Graph<Vector2Int> traceGraph, Vector2Int currentNode, out List<List<Vector2Int>> exitPaths)
     {
         exitPaths = new List<List<Vector2Int>>();
@@ -461,31 +459,6 @@ public class StageBuilder : MonoBehaviour
         return exitPaths.Count > 0;
     }
 
-    /*private void MapNode(ref Graph<Vector2Int> graph, Vector2Int node)
-    {
-        if (!editingStage[node.x, node.y].IsWalkable()) return;
-        
-        var direction = Vector2Int.up;
-        
-        do
-        {
-            if (graph.ExistDirectedPath(node, node+direction)) return;
-            
-            if (editingStage.TryMove(node, direction, out var path) && path.Count > 0)
-            {
-                graph.AddDirected(node, path.First());
-                for (var i = 0; i < path.Count - 1; i++)
-                {
-                    graph.AddDirected(path[i], path[i+1]);
-                }
-
-                MapNode(ref graph, path.Last());
-            }
-            
-            direction.RotateClockwise();
-        } while (direction != Vector2Int.up);
-    }*/
-    
     private void RepositionGrid()
     {
         var posX = - Cols / 2.0f * grid.cellSize.x;
