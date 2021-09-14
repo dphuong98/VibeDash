@@ -102,18 +102,13 @@ public class StageBuilder : MonoBehaviour
             var frame = (int)Math.Round(Time.realtimeSinceStartup * SolutionSpeed) % solution.Count;
 
             if (frame == solution.Count - 1) return;
-            
-            var start = new Vector3Int(solution[frame].x, solution[frame].y, 0);
-            var end = new Vector3Int(solution[frame+1].x, solution[frame+1].y, 0);
-            GUILayoutExt.DrawArrow(grid.GetCellCenterWorld(start), grid.GetCellCenterWorld(end), Color.yellow);
+            GUILayoutExt.DrawArrow(grid.GetCellCenterWorld(solution[frame]), grid.GetCellCenterWorld(solution[frame+1]), Color.yellow);
         }
         else
         {
             for (int i = 0; i < solution.Count - 1; i++)
             {
-                var start = new Vector3Int(solution[i].x, solution[i].y, 0);
-                var end = new Vector3Int(solution[i+1].x, solution[i+1].y, 0);
-                GUILayoutExt.DrawPath(grid.GetCellCenterWorld(start), grid.GetCellCenterWorld(end), Color.yellow);
+                GUILayoutExt.DrawPath(grid.GetCellCenterWorld(solution[i]), grid.GetCellCenterWorld(solution[i+1]), Color.yellow);
             }
         }
         
@@ -412,7 +407,7 @@ public class StageBuilder : MonoBehaviour
         if (editingStage.GetEntrance() == -Vector2Int.one || editingStage.GetExit() == -Vector2Int.one)
             return;
         //Brute force
-        //Find all path from entrance to exit
+        //Find all path from entrance to exit -> Get path that covers the most tiles -> Get shortest path from which
         if (MapNode(new Graph<Vector2Int>(), editingStage.GetEntrance(), out var allExitPaths))
         {
             var fullPath = allExitPaths.GroupBy(s => s.Distinct().Count()).Aggregate((i1,i2) => i1.Key > i2.Key ? i1 : i2);
@@ -422,7 +417,7 @@ public class StageBuilder : MonoBehaviour
         }
     }
 
-    //TODO refactor this
+    //TODO can this even be sensibly refactored
     private bool MapNode(Graph<Vector2Int> traceGraph, Vector2Int currentNode, out List<List<Vector2Int>> exitPaths)
     {
         exitPaths = new List<List<Vector2Int>>();
