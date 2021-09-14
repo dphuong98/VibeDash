@@ -23,28 +23,47 @@ public class Graph<T>
             }
         }
     }
-    
-    public bool Contains(T node1, T node2)
+
+    public List<T> GetNeighbors(T node)
     {
-        return adjacencyGroups.TryGetValue(node1, out var nextNodes) && nextNodes.Contains(node2);
+        adjacencyGroups.TryGetValue(node, out var neighbors);
+        return new List<T>(neighbors);
+    }
+    
+    public bool ExistDirectedPath(T node1, T node2)
+    {
+        return adjacencyGroups.TryGetValue(node1, out var neighbors) && neighbors.Contains(node2);
+    }
+
+    public bool ExistUndirectedPath(T node1, T node2)
+    {
+        return ExistDirectedPath(node1, node2) && ExistDirectedPath(node2, node1);
     }
     
     public void AddDirected(T node1, T node2)
     {
-        if (!adjacencyGroups.TryGetValue(node1, out var nextNodes))
+        if (!adjacencyGroups.TryGetValue(node1, out var neighbors))
         {
-            nextNodes = new List<T>();
-            adjacencyGroups.Add(node1, nextNodes);
+            neighbors = new List<T>();
+            adjacencyGroups.Add(node1, neighbors);
         }
 
-        nextNodes.Add(node2);
+        neighbors.Add(node2);
+    }
+
+    public void RemoveDirected(T node1, T node2)
+    {
+        if (adjacencyGroups.TryGetValue(node1, out var neighbors))
+        {
+            neighbors.Remove(node2);
+        }
     }
 
     public void PrintGraph()
     {
         foreach (var node in adjacencyGroups)
         {
-            Debug.Log(node.Key + ": " + string.Join(", ", node.Value.ToArray()));
+            Debug.Log(node.Key + ": " + string.Join(" -- ", node.Value.ToArray()));
         }
     }
 }

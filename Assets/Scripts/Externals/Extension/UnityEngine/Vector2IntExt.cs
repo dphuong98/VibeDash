@@ -10,6 +10,6 @@ public static class Vector2IntExt
         vector.y = vector.x - vector.y;
         vector.x -= vector.y;
 
-        vector.x = -vector.x;
+        vector.y = -vector.y;
     }
 }

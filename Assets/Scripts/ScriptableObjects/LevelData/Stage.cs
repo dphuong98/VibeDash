@@ -170,4 +170,14 @@ public class Stage : ScriptableObject
 
         return -Vector2Int.one;
     }
+    
+    public Vector2Int GetExit()
+    {
+        if (tiles.IndexOf(TileType.Exit) is var tilePos && tilePos != -1)
+        {
+            return new Vector2Int(tilePos % size.x, tilePos / size.x);
+        }
+
+        return -Vector2Int.one;
+    }
 }

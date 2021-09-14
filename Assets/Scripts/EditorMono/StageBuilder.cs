@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using UnityEditor;
 using UnityEngine;
+using Vector3 = UnityEngine.Vector3;
 
 [ExecuteInEditMode]
 public class StageBuilder : MonoBehaviour
@@ -35,10 +37,9 @@ public class StageBuilder : MonoBehaviour
     private Grid grid;
     
     //Members
-    private Graph<Vector2Int> graph;
+    private List<Vector2Int> solution;
     
-    public bool CheatMode = false;
-    public bool GraphMode = false;
+    public bool SolutionMode = false;
     public Vector2Int SelectedTile = new Vector2Int(-1, -1);
     
     private Stage loadedStage;
@@ -57,9 +58,10 @@ public class StageBuilder : MonoBehaviour
     {
         SceneView.duringSceneGui += DrawSceneGUI;
         grid = GetComponentInChildren<Grid>();
-        NewStage();
         
-        CreateBackgroundMesh();
+        if (editingStage == null)
+            NewStage();
+        CreateVisualization();
     }
 
     private void OnDisable()
@@ -73,9 +75,9 @@ public class StageBuilder : MonoBehaviour
         {
             return;
         }
-
-        DrawGraph();
+        
         DrawTileIcons();
+        DrawSolution();
 
         HandleClick();
         HandleKey();
@@ -85,19 +87,15 @@ public class StageBuilder : MonoBehaviour
         //DrawSolution
     }
 
-    private void DrawGraph()
+    private void DrawSolution()
     {
-        if (!GraphMode) return;
+        if (!SolutionMode) return;
         
-        if (graph == null)
-            CreateGraph();
+        if (solution == null)
+            CreateSolution();
         
-        graph.IterateEdge((n1, n2) =>
-        {
-            Vector3Int v1 = new Vector3Int(n1.x, n1.y, 0);
-            Vector3Int v2 = new Vector3Int(n2.x, n2.y, 0);
-            Handles.DrawLine(grid.GetCellCenterWorld(v1), grid.GetCellCenterWorld(v2));
-        });
+        //Draw
+        
     }
 
     private void HandleKey()
@@ -118,7 +116,7 @@ public class StageBuilder : MonoBehaviour
                 if (types.Any())
                 {
                     editingStage[gridPos.x, gridPos.y] = types.First().Key;
-                    CreateGraph();
+                    CreateSolution();
                 }
             }
         }
@@ -216,7 +214,7 @@ public class StageBuilder : MonoBehaviour
             ExpandBorder(ref clickedPos);
             editingStage[clickedPos.x, clickedPos.y] = menuData.Item3;
             EditorUtility.SetDirty(editingStage);
-            CreateGraph();
+            CreateSolution();
         }
     }
 
@@ -309,30 +307,7 @@ public class StageBuilder : MonoBehaviour
         }
     }
 
-    private void MapNode(ref Graph<Vector2Int> graph, Stage stage, Vector2Int node)
-    {
-        var direction = Vector2Int.up;
-        
-        if (!stage[node.x, node.y].IsWalkable()) return;
-
-        do
-        {
-            if (stage.TryMove(node, direction, out var path))
-            {
-                if (graph.Contains(node, node+direction)) return;
-                
-                graph.AddDirected(node, path.First());
-                for (var i = 0; i < path.Count - 1; i++)
-                {
-                    graph.AddDirected(path[i], path[i+1]);
-                }
-
-                MapNode(ref graph, stage, path.Last());
-            }
-            
-            direction.RotateClockwise();
-        } while (direction != Vector2Int.up);
-    }
+    
     
 
     public void NewStage()
@@ -341,72 +316,63 @@ public class StageBuilder : MonoBehaviour
         var tmp = Path.Combine(levelFolder, "_tmp_.asset");
         AssetDatabase.CreateAsset(editingStage, Path.Combine(levelFolder, "_tmp_.asset"));
         AssetDatabase.SaveAssets();
-        
-        CreateBackgroundMesh();
+        CreateVisualization();
     }
     
     public void ExpandBottom()
     {
         editingStage.ExpandBottom();
         EditorUtility.SetDirty(editingStage);
-        CreateBackgroundMesh();
-        CreateGraph();
+        CreateVisualization();
     }
 
     public void ExpandLeft()
     {
         editingStage.ExpandLeft();
         EditorUtility.SetDirty(editingStage);
-        CreateBackgroundMesh();
-        CreateGraph();
+        CreateVisualization();
     }
 
     public void ExpandRight()
     {
         editingStage.ExpandRight();
         EditorUtility.SetDirty(editingStage);
-        CreateBackgroundMesh();
-        CreateGraph();
+        CreateVisualization();
     }
 
     public void ExpandTop()
     {
         editingStage.ExpandTop();
         EditorUtility.SetDirty(editingStage);
-        CreateBackgroundMesh();
-        CreateGraph();
+        CreateVisualization();
     }
 
     public void CollapseTop()
     {
         editingStage.CollapseTop();
         EditorUtility.SetDirty(editingStage);
-        CreateBackgroundMesh();
-        CreateGraph();
+        CreateVisualization();
     }
 
     public void CollapseLeft()
     {
         editingStage.CollapseLeft();
         EditorUtility.SetDirty(editingStage);
-        CreateBackgroundMesh();
-        CreateGraph();
+        CreateVisualization();
     }
 
     public void CollapseRight()
     {
         editingStage.CollapseRight();
         EditorUtility.SetDirty(editingStage);
-        CreateBackgroundMesh();
-        CreateGraph();
+        CreateVisualization();
     }
 
     public void CollapseBottom()
     {
         editingStage.CollapseBottom();
         EditorUtility.SetDirty(editingStage);
-        CreateBackgroundMesh();
-        CreateGraph();
+        CreateVisualization();
     }
     
     private void CreateBackgroundMesh()
@@ -415,16 +381,111 @@ public class StageBuilder : MonoBehaviour
         RepositionGrid();
     }
 
-    private void CreateGraph()
+    private void CreateVisualization()
     {
-        graph = new Graph<Vector2Int>();
+        CreateBackgroundMesh();
+        CreateSolution();
+    }
 
-        if (editingStage.GetEntrance() is var entrancePos && entrancePos != -Vector2Int.one)
+    [ContextMenu("CreateSolution")]
+    private void CreateSolution()
+    {
+        if (editingStage.GetEntrance() == -Vector2Int.one || editingStage.GetExit() == -Vector2Int.one)
+            return;
+        //Brute force
+        //Find all path from entrance to exit
+        if (MapNode(new Graph<Vector2Int>(), editingStage.GetEntrance(), out var allExitPaths))
         {
-            MapNode(ref graph, editingStage, editingStage.GetEntrance());
+            var fullPath = allExitPaths.GroupBy(s => s.Distinct().Count()).Aggregate((i1,i2) => i1.Key > i2.Key ? i1 : i2);
+            var shortestFullPath = fullPath.GroupBy(s => s.Count).Aggregate((i1,i2) => i1.Key < i2.Key ? i1 : i2);
+            solution = shortestFullPath.First();
         }
     }
 
+    private bool MapNode(Graph<Vector2Int> traceGraph, Vector2Int currentNode, out List<List<Vector2Int>> exitPaths)
+    {
+        exitPaths = new List<List<Vector2Int>>();
+        
+        if (editingStage[currentNode.x, currentNode.y] == TileType.Exit)
+            return true;
+
+        var direction = Vector2Int.up;
+
+        do
+        {
+            if (traceGraph.ExistDirectedPath(currentNode, currentNode + direction))
+            {
+                direction.RotateClockwise(); continue;
+            }
+            
+            //Exit path detected
+            if (editingStage.TryMove(currentNode, direction, out var scoutPath))
+            {
+                if (scoutPath.Count == 0)
+                {
+                    direction.RotateClockwise(); continue;
+                }
+                
+                //Trace Stacks
+                traceGraph.AddDirected(currentNode, scoutPath.First());
+                for (int i = 0; i < scoutPath.Count - 1; i++)
+                {
+                    traceGraph.AddDirected(scoutPath[i], scoutPath[i+1]);
+                }
+
+                //Recursion ends when DFS meet an exit. Only return false when exit doesnt exist
+                if (MapNode(traceGraph, scoutPath.Last(), out var scoutPath2))
+                {
+                    if (scoutPath2.Count == 0)
+                    {
+                        exitPaths.Add(scoutPath);
+                    }
+                    
+                    foreach (var i in scoutPath2)
+                    {
+                        exitPaths.Add(scoutPath.Concat(i).ToList());
+                    }
+                }
+
+                //Remove Trace Stacks
+                traceGraph.RemoveDirected(currentNode, scoutPath.First());
+                for (int i = 0; i < scoutPath.Count - 1; i++)
+                {
+                    traceGraph.RemoveDirected(scoutPath[i], scoutPath[i+1]);
+                }
+            }
+            
+            direction.RotateClockwise();
+        } while (direction != Vector2Int.up);
+
+        return exitPaths.Count > 0;
+    }
+
+    /*private void MapNode(ref Graph<Vector2Int> graph, Vector2Int node)
+    {
+        if (!editingStage[node.x, node.y].IsWalkable()) return;
+        
+        var direction = Vector2Int.up;
+        
+        do
+        {
+            if (graph.ExistDirectedPath(node, node+direction)) return;
+            
+            if (editingStage.TryMove(node, direction, out var path) && path.Count > 0)
+            {
+                graph.AddDirected(node, path.First());
+                for (var i = 0; i < path.Count - 1; i++)
+                {
+                    graph.AddDirected(path[i], path[i+1]);
+                }
+
+                MapNode(ref graph, path.Last());
+            }
+            
+            direction.RotateClockwise();
+        } while (direction != Vector2Int.up);
+    }*/
+    
     private void RepositionGrid()
     {
         var posX = - Cols / 2.0f * grid.cellSize.x;
@@ -463,7 +524,7 @@ public class StageBuilder : MonoBehaviour
             }
             loadedStage = asset;
             editingStage.CopyFrom(asset);
-            CreateBackgroundMesh();
+            CreateVisualization();
             
             gameObject.name = Path.GetFileNameWithoutExtension(path);
             Debug.LogFormat("Opened level from {0}", path);

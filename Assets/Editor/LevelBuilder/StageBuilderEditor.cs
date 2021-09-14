@@ -40,9 +40,8 @@ public class StageBuilderEditor : Editor
                 GUILayout.Label("Selected Tile: (" + (stageBuilder.SelectedTile.x+1) + ", " + (stageBuilder.SelectedTile.y+1) + ")");
             }
             else GUILayout.Label("Selected Tile: (0, 0)");
-
-            stageBuilder.GraphMode = GUILayout.Toggle(stageBuilder.GraphMode, "GraphMode");
-            stageBuilder.CheatMode = GUILayout.Toggle(stageBuilder.CheatMode, "CheatMode");
+            
+            stageBuilder.SolutionMode = GUILayout.Toggle(stageBuilder.SolutionMode, "View solution (May cause lag)");
         #endregion
 
         #region File

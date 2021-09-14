@@ -8,6 +8,14 @@ using UnityEngine.Tilemaps;
 
 public static class TileLogic
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="stage"></param>
+    /// <param name="start"></param>
+    /// <param name="direction"></param>
+    /// <param name="path"></param>
+    /// <returns>false if player fell out of the map</returns>
     public static bool TryMove(this Stage stage, Vector2Int start, Vector2Int direction, out List<Vector2Int> path)
     {
         var currentTilePosition = start;
@@ -22,24 +30,31 @@ public static class TileLogic
             
             var currentTileType = stage[currentTilePosition.x, currentTilePosition.y];
 
+            //Player fell out of the map
+            if (currentTileType == TileType.Air)
+            {
+                return false;
+            }
+            
+            //Impassible
             if (currentTileType == TileType.Wall || currentTileType == TileType.Air)
                 break;
-            
-            if (currentTileType == TileType.Road || currentTileType == TileType.Exit || currentTileType == TileType.Entrance)
+
+            if (currentTileType == TileType.Road  || currentTileType == TileType.Entrance)
             {
                 path.Add(currentTilePosition);
                 continue;
             }
-
-            //Player fall out of the map
-            if (currentTileType == TileType.Air)
+            
+            if (currentTileType == TileType.Exit)
             {
-                return false;
+                path.Add(currentTilePosition);
+                return true;
             }
 
             break; //Treat unknown tile as wall
         }
 
-        return path.Count != 0;
+        return true;
     }
 }
