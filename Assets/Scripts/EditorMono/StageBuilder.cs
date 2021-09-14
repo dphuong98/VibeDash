@@ -39,8 +39,10 @@ public class StageBuilder : MonoBehaviour
     
     //Members
     private List<Vector2Int> solution;
-    
+
+    public int SolutionSpeed = 4;
     public bool SolutionMode = false;
+    public bool MovingSolution = true;
     public Vector2Int SelectedTile = new Vector2Int(-1, -1);
     
     private Stage loadedStage;
@@ -95,31 +97,29 @@ public class StageBuilder : MonoBehaviour
         if (solution == null)
             CreateSolution();
         
-        //Draw
-        var speed = 2;
-        var frame = (int)Math.Round(Time.realtimeSinceStartup * speed) % solution.Count;
-        if (frame != solution.Count - 1)
+        if (MovingSolution)
         {
+            var frame = (int)Math.Round(Time.realtimeSinceStartup * SolutionSpeed) % solution.Count;
+
+            if (frame == solution.Count - 1) return;
+            
             var start = new Vector3Int(solution[frame].x, solution[frame].y, 0);
             var end = new Vector3Int(solution[frame+1].x, solution[frame+1].y, 0);
-            DrawArrow(grid.GetCellCenterWorld(start), grid.GetCellCenterWorld(end));
+            GUILayoutExt.DrawArrow(grid.GetCellCenterWorld(start), grid.GetCellCenterWorld(end), Color.yellow);
         }
+        else
+        {
+            for (int i = 0; i < solution.Count - 1; i++)
+            {
+                var start = new Vector3Int(solution[i].x, solution[i].y, 0);
+                var end = new Vector3Int(solution[i+1].x, solution[i+1].y, 0);
+                GUILayoutExt.DrawPath(grid.GetCellCenterWorld(start), grid.GetCellCenterWorld(end), Color.yellow);
+            }
+        }
+        
+        
     }
-
-    //TODO Move to an external class
-    private void DrawArrow(Vector3 start, Vector3 end)
-    {
-        Handles.color = Color.yellow;
-        Handles.DrawLine(start, end);
-        var headLength = (start - end) / 5;
-        var pendicularVector = (Vector2)(start - end);
-        pendicularVector.RotateClockwise();
-        pendicularVector /= 6;
-        var pendicularVector3 = new Vector3(pendicularVector.x, pendicularVector.y, 0);
-        var arrowTriangle = new Vector3[] { end, end + headLength + pendicularVector3, end + headLength - pendicularVector3 };
-        Handles.DrawAAConvexPolygon(arrowTriangle);
-    }
-
+    
     private void HandleKey()
     {
         if (Selection.activeGameObject == gameObject &&
@@ -418,6 +418,7 @@ public class StageBuilder : MonoBehaviour
             var fullPath = allExitPaths.GroupBy(s => s.Distinct().Count()).Aggregate((i1,i2) => i1.Key > i2.Key ? i1 : i2);
             var shortestFullPath = fullPath.GroupBy(s => s.Count).Aggregate((i1,i2) => i1.Key < i2.Key ? i1 : i2);
             solution = shortestFullPath.First();
+            solution.Insert(0, editingStage.GetEntrance());
         }
     }
 

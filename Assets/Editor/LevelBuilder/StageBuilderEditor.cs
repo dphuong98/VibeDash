@@ -41,7 +41,16 @@ public class StageBuilderEditor : Editor
             }
             else GUILayout.Label("Selected Tile: (0, 0)");
             
-            stageBuilder.SolutionMode = GUILayout.Toggle(stageBuilder.SolutionMode, "View solution (May cause lag)");
+            GUILayout.BeginHorizontal();
+            stageBuilder.SolutionMode = GUILayout.Toggle(stageBuilder.SolutionMode, "View solution");
+            GUILayout.FlexibleSpace();
+            stageBuilder.MovingSolution = GUILayout.Toggle(stageBuilder.MovingSolution, "Moving path");
+            GUILayout.FlexibleSpace();
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Speed: ");
+            stageBuilder.SolutionSpeed = EditorGUILayout.IntField(stageBuilder.SolutionSpeed, GUILayout.MaxWidth(64));
+            GUILayout.EndHorizontal();
+            GUILayout.EndHorizontal();
         #endregion
 
         #region File
