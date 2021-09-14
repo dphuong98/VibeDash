@@ -13,7 +13,11 @@ using Vector3 = UnityEngine.Vector3;
 public class StageBuilder : MonoBehaviour
 {
     //Path
-    private string levelFolder = "Assets/Resources/Levels/";
+    private string stageFolder = "Assets/Resources/Levels/Stages";
+    public string StageFolder
+    {
+        get => stageFolder;
+    }
 
     //Data
     private static Dictionary<TileType, char> ShortCuts = new Dictionary<TileType, char>()
@@ -324,8 +328,8 @@ public class StageBuilder : MonoBehaviour
     {
         loadedStage = null;
         editingStage = Stage.CreateStage();
-        var tmp = Path.Combine(levelFolder, "_tmp_.asset");
-        AssetDatabase.CreateAsset(editingStage, Path.Combine(levelFolder, "_tmp_.asset"));
+        var tmp = Path.Combine(stageFolder, "_tmp_.asset");
+        AssetDatabase.CreateAsset(editingStage, Path.Combine(stageFolder, "_tmp_.asset"));
         AssetDatabase.SaveAssets();
         CreateVisualization();
     }

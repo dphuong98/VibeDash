@@ -12,13 +12,12 @@ using UnityEngine;
 public class StageBuilderEditor : Editor
 {
     //LevelBuilder members
-    private static readonly string SaveFolder = "Assets/Resources/Levels";
     private static readonly string GameScenePath = "Assets/Scenes/Gameplay.unity";
     private StageBuilder stageBuilder;
     
     //InspectorGUI members
     private bool expandDropdown;
-    private Vector2 expandButtonSize = new Vector2(30, 30);
+    private readonly Vector2 expandButtonSize = new Vector2(30, 30);
 
     private void OnEnable()
     {
@@ -237,7 +236,7 @@ public class StageBuilderEditor : Editor
 
     private void Open()
     {
-        var path = EditorUtility.OpenFilePanel("Open", SaveFolder, "asset");
+        var path = EditorUtility.OpenFilePanel("Open", stageBuilder.StageFolder, "asset");
         if (!string.IsNullOrEmpty(path))
         {
             if (stageBuilder.Open(FileUtil.GetProjectRelativePath(path)))
@@ -258,14 +257,14 @@ public class StageBuilderEditor : Editor
     private void SaveAs()
     {
         var rx = new Regex(@"(\d+)");
-        var d = new DirectoryInfo(SaveFolder);
+        var d = new DirectoryInfo(stageBuilder.StageFolder);
         var number = d.GetFiles("Stage?.asset").Select(s => rx.Match(s.Name)).Where(s => s.Success).Max(s =>
         {
             int.TryParse(s.Value, out var num);
             return num;
         });
         
-        var path = EditorUtility.SaveFilePanel("Save As", SaveFolder, "Stage"+(number+1), "asset");
+        var path = EditorUtility.SaveFilePanel("Save As", stageBuilder.StageFolder, "Stage"+(number+1), "asset");
         if (!string.IsNullOrEmpty(path))
         {
             stageBuilder.SaveAs(FileUtil.GetProjectRelativePath(path));
