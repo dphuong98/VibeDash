@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -63,33 +65,22 @@ public class StageBuilderEditor : Editor
             {
                 if (GUILayout.Button("New"))
                 {
-                    stageBuilder.NewStage();
+                    NewStage();
                 }
                 
                 if (GUILayout.Button("Open"))
                 {
-                    var path = EditorUtility.OpenFilePanel("Open", SaveFolder, "asset");
-                    if (!string.IsNullOrEmpty(path))
-                    {
-                        if (stageBuilder.Open(FileUtil.GetProjectRelativePath(path)))
-                        {
-                            Debug.LogFormat("Opened {0}", path);
-                        }
-                    }
+                    Open();
                 }
 
                 if (GUILayout.Button("Save"))
                 {
-                    stageBuilder.Save();
+                    Save();
                 }
 
                 if (GUILayout.Button("Save As"))
                 {
-                    var path = EditorUtility.SaveFilePanel("Save As", SaveFolder, "Stage", "asset");
-                    if (!string.IsNullOrEmpty(path))
-                    {
-                        stageBuilder.SaveAs(FileUtil.GetProjectRelativePath(path));
-                    }
+                    SaveAs();
                 }
 
                 if (GUILayout.Button("Reload"))
@@ -118,7 +109,7 @@ public class StageBuilderEditor : Editor
                         GUILayout.FlexibleSpace();
                         if (GUILayout.Button("↑", GUILayout.Width(expandButtonSize.x), GUILayout.Height(expandButtonSize.y)))
                         {
-                            stageBuilder.ExpandBottom();
+                            stageBuilder.ExpandTop();
                         }
                         GUILayout.FlexibleSpace();
                     }
@@ -150,7 +141,7 @@ public class StageBuilderEditor : Editor
                         GUILayout.FlexibleSpace();
                         if (GUILayout.Button("↓", GUILayout.Width(expandButtonSize.x), GUILayout.Height(expandButtonSize.y)))
                         {
-                            stageBuilder.ExpandTop();
+                            stageBuilder.ExpandBottom();
                         }
                         GUILayout.FlexibleSpace();
                     }
@@ -237,5 +228,47 @@ public class StageBuilderEditor : Editor
         #endregion
         
         //End OnInspectorGUI
+    }
+
+    private void NewStage()
+    {
+        stageBuilder.NewStage();
+    }
+
+    private void Open()
+    {
+        var path = EditorUtility.OpenFilePanel("Open", SaveFolder, "asset");
+        if (!string.IsNullOrEmpty(path))
+        {
+            if (stageBuilder.Open(FileUtil.GetProjectRelativePath(path)))
+            {
+                Debug.LogFormat("Opened {0}", path);
+            }
+        }
+    }
+
+    private void Save()
+    {
+        if (stageBuilder.LoadedStage != null)
+            stageBuilder.Save();
+        else
+            SaveAs();
+    }
+
+    private void SaveAs()
+    {
+        var rx = new Regex(@"(\d+)");
+        var d = new DirectoryInfo(SaveFolder);
+        var number = d.GetFiles("Stage?.asset").Select(s => rx.Match(s.Name)).Where(s => s.Success).Max(s =>
+        {
+            int.TryParse(s.Value, out var num);
+            return num;
+        });
+        
+        var path = EditorUtility.SaveFilePanel("Save As", SaveFolder, "Stage"+(number+1), "asset");
+        if (!string.IsNullOrEmpty(path))
+        {
+            stageBuilder.SaveAs(FileUtil.GetProjectRelativePath(path));
+        }
     }
 }

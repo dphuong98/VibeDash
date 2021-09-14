@@ -31,7 +31,7 @@ public class StageBuilder : MonoBehaviour
         {TileType.Exit, new Color(1f, 0f, 0.03f, 0.77f)},
         { TileType.Air, Color.clear },
         { TileType.Road,  new Color(0.24f, 0.26f, 0.42f, 0.5f)},
-        { TileType.Wall, new Color(0.96f, 0.38f, 0.83f) },
+        { TileType.Wall, new Color(0.94f, 0.62f, 0.79f) },
     };
 
     //Components
@@ -92,11 +92,8 @@ public class StageBuilder : MonoBehaviour
 
     private void DrawSolution()
     {
-        if (!SolutionMode) return;
-        
-        if (solution == null)
-            CreateSolution();
-        
+        if (!SolutionMode || solution == null) return;
+
         if (MovingSolution)
         {
             var frame = (int)Math.Round(Time.realtimeSinceStartup * SolutionSpeed) % solution.Count;
@@ -111,8 +108,7 @@ public class StageBuilder : MonoBehaviour
                 GUILayoutExt.DrawPath(grid.GetCellCenterWorld(solution[i]), grid.GetCellCenterWorld(solution[i+1]), Color.yellow);
             }
         }
-        
-        
+
     }
     
     private void HandleKey()
@@ -326,6 +322,7 @@ public class StageBuilder : MonoBehaviour
 
     public void NewStage()
     {
+        loadedStage = null;
         editingStage = Stage.CreateStage();
         var tmp = Path.Combine(levelFolder, "_tmp_.asset");
         AssetDatabase.CreateAsset(editingStage, Path.Combine(levelFolder, "_tmp_.asset"));
@@ -404,8 +401,11 @@ public class StageBuilder : MonoBehaviour
     [ContextMenu("CreateSolution")]
     private void CreateSolution()
     {
-        if (editingStage.GetEntrance() == -Vector2Int.one || editingStage.GetExit() == -Vector2Int.one)
-            return;
+        if (editingStage == null || editingStage.GetEntrance() == -Vector2Int.one || editingStage.GetExit() == -Vector2Int.one)
+        {
+            solution = null; return;
+        }
+            
         //Brute force
         //Find all path from entrance to exit -> Get path that covers the most tiles -> Get shortest path from which
         if (MapNode(new Graph<Vector2Int>(), editingStage.GetEntrance(), out var allExitPaths))

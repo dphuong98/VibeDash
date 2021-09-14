@@ -97,7 +97,7 @@ public class Stage : ScriptableObject
         }
     }
 
-    public void CollapseTop()
+    public void CollapseBottom()
     {
         if (size.y == 0) return;
         
@@ -130,7 +130,7 @@ public class Stage : ScriptableObject
         size.x--;
     }
 
-    public void CollapseBottom()
+    public void CollapseTop()
     {
         if (size.y == 0) return;
         
