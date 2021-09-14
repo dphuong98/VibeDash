@@ -6,6 +6,7 @@ using System.Linq;
 using System.Numerics;
 using UnityEditor;
 using UnityEngine;
+using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
 [ExecuteInEditMode]
@@ -95,7 +96,28 @@ public class StageBuilder : MonoBehaviour
             CreateSolution();
         
         //Draw
+        var speed = 2;
+        var frame = (int)Math.Round(Time.realtimeSinceStartup * speed) % solution.Count;
+        if (frame != solution.Count - 1)
+        {
+            var start = new Vector3Int(solution[frame].x, solution[frame].y, 0);
+            var end = new Vector3Int(solution[frame+1].x, solution[frame+1].y, 0);
+            DrawArrow(grid.GetCellCenterWorld(start), grid.GetCellCenterWorld(end));
+        }
+    }
 
+    //TODO Move to an external class
+    private void DrawArrow(Vector3 start, Vector3 end)
+    {
+        Handles.color = Color.yellow;
+        Handles.DrawLine(start, end);
+        var headLength = (start - end) / 5;
+        var pendicularVector = (Vector2)(start - end);
+        pendicularVector.RotateClockwise();
+        pendicularVector /= 6;
+        var pendicularVector3 = new Vector3(pendicularVector.x, pendicularVector.y, 0);
+        var arrowTriangle = new Vector3[] { end, end + headLength + pendicularVector3, end + headLength - pendicularVector3 };
+        Handles.DrawAAConvexPolygon(arrowTriangle);
     }
 
     private void HandleKey()
