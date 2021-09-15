@@ -24,6 +24,7 @@ public static class TileLogic
         while (true)
         {
             currentTilePosition += direction;
+            //Out of bound
             if (0 > currentTilePosition.x || currentTilePosition.x >= stage.Size.x ||
                 0 > currentTilePosition.y || currentTilePosition.y >= stage.Size.y)
                 break;

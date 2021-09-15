@@ -26,6 +26,11 @@ public class Stage : ScriptableObject
         return newLevel;
     }
 
+    public bool IsOnBorder(Vector2Int tilePos)
+    {
+        return 0 == tilePos.x || tilePos.x == size.x - 1 || 0 == tilePos.y || tilePos.y == size.y - 1;
+    }
+
     public void ExpandBottom()
     {
         for (int r = size.x - 1; r >= 0; r--)

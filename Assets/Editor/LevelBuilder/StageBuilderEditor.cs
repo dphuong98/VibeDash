@@ -12,7 +12,7 @@ using UnityEngine;
 public class StageBuilderEditor : Editor
 {
     //LevelBuilder members
-    private static readonly string GameScenePath = "Assets/Scenes/Gameplay.unity";
+    private const string GameScenePath = "Assets/Scenes/Gameplay.unity";
     private StageBuilder stageBuilder;
     
     //InspectorGUI members
@@ -32,7 +32,7 @@ public class StageBuilderEditor : Editor
     //TODO what does #if UNITY_EDITOR purpose
     public override void OnInspectorGUI()
     {
-        #region LevelInfo
+        #region Info
             GUILayout.Label("Stage Info", EditorStyles.boldLabel);
             GUILayout.Label("Stage size: (" + stageBuilder.EditingStage.Size.x + ", " + stageBuilder.EditingStage.Size.y + ")");
             if (0 <= stageBuilder.SelectedTile.x && stageBuilder.SelectedTile.x < stageBuilder.Cols &&
@@ -58,7 +58,7 @@ public class StageBuilderEditor : Editor
             GUILayoutExt.HorizontalSeparator();
             GUILayout.Label("File", EditorStyles.boldLabel);
             GUI.enabled = false;
-            EditorGUILayout.ObjectField("Loaded Level: ", stageBuilder.LoadedStage, typeof(Stage), true);
+            EditorGUILayout.ObjectField("Loaded Stage: ", stageBuilder.LoadedStage, typeof(Stage), true);
             GUI.enabled = true;
             GUILayout.BeginHorizontal();
             {
@@ -84,7 +84,7 @@ public class StageBuilderEditor : Editor
 
                 if (GUILayout.Button("Reload"))
                 {
-                    stageBuilder.Reload();
+                    Reload();
                 }
             }
             GUILayout.EndHorizontal();
@@ -239,7 +239,7 @@ public class StageBuilderEditor : Editor
         var path = EditorUtility.OpenFilePanel("Open", stageBuilder.StageFolder, "asset");
         if (!string.IsNullOrEmpty(path))
         {
-            if (stageBuilder.Open(FileUtil.GetProjectRelativePath(path)))
+            if (stageBuilder.Open(UnityEditor.FileUtil.GetProjectRelativePath(path)))
             {
                 Debug.LogFormat("Opened {0}", path);
             }
@@ -267,7 +267,12 @@ public class StageBuilderEditor : Editor
         var path = EditorUtility.SaveFilePanel("Save As", stageBuilder.StageFolder, "Stage"+(number+1), "asset");
         if (!string.IsNullOrEmpty(path))
         {
-            stageBuilder.SaveAs(FileUtil.GetProjectRelativePath(path));
+            stageBuilder.SaveAs(UnityEditor.FileUtil.GetProjectRelativePath(path));
         }
+    }
+
+    private void Reload()
+    {
+        stageBuilder.Reload();
     }
 }

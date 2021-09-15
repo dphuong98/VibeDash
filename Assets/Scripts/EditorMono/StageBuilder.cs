@@ -90,8 +90,24 @@ public class StageBuilder : MonoBehaviour
         HandleKey();
 
         //Other GUI option
+    }
+    
+    private void DrawTileIcon(TileType tile, Vector2Int gridPos)
+    {
+        if (ColorMap.TryGetValue(tile, out var color))
+        {
+            var worldPos = grid.GetCellCenterWorld(new Vector3Int(gridPos.x, gridPos.y, 0));
+            Handles.color = color;
 
-        //DrawSolution
+            float iconRadius = 0.45f;
+            Handles.DrawAAConvexPolygon(new Vector3[]
+            {
+                worldPos + new Vector3(-iconRadius, -iconRadius),
+                worldPos + new Vector3(-iconRadius, iconRadius),
+                worldPos + new Vector3(iconRadius, iconRadius),
+                worldPos + new Vector3(iconRadius, -iconRadius),
+            });
+        }
     }
 
     private void DrawSolution()
@@ -115,6 +131,26 @@ public class StageBuilder : MonoBehaviour
 
     }
     
+    private void HandleClick()
+    {
+        if (Selection.activeGameObject == this.gameObject &&
+            Event.current.type == EventType.MouseDown &&
+            Event.current.modifiers == EventModifiers.None &&
+            TileSelected(out var gridPos))
+        {
+            SelectedTile = gridPos;
+
+            if (Event.current.button == 1)
+            {
+                
+                SceneView.RepaintAll();
+                TileMenu(SelectedTile).ShowAsContext();
+            }
+            
+            Event.current.Use();
+        }
+    }
+    
     private void HandleKey()
     {
         if (Selection.activeGameObject == gameObject &&
@@ -136,26 +172,6 @@ public class StageBuilder : MonoBehaviour
                     CreateSolution();
                 }
             }
-        }
-    }
-
-    private void HandleClick()
-    {
-        if (Selection.activeGameObject == this.gameObject &&
-            Event.current.type == EventType.MouseDown &&
-            Event.current.modifiers == EventModifiers.None &&
-            TileSelected(out var gridPos))
-        {
-            SelectedTile = gridPos;
-
-            if (Event.current.button == 1)
-            {
-                
-                SceneView.RepaintAll();
-                TileMenu(SelectedTile).ShowAsContext();
-            }
-            
-            Event.current.Use();
         }
     }
 
@@ -209,18 +225,13 @@ public class StageBuilder : MonoBehaviour
 
             foreach (TileType t in Enum.GetValues(typeof(TileType)))
             {
-                if (t == TileType.Exit && !IsOnBorder(tilePos))
+                if (t == TileType.Exit && !editingStage.IsOnBorder(tilePos))
                     continue;
                 menu.AddItem(new GUIContent(string.Format("[{1}] {0}", t, GetShortcut(t))), t == dot, OnTileMenuClicked, new Tuple<int, int, TileType>(tilePos.x, tilePos.y, t));
             }
         }
         
         return menu;
-    }
-
-    private bool IsOnBorder(Vector2Int tilePos)
-    {
-        return 0 == tilePos.x || tilePos.x == Cols - 1 || 0 == tilePos.y || tilePos.y == Rows - 1;
     }
 
     private void OnTileMenuClicked(object userdata)
@@ -267,10 +278,7 @@ public class StageBuilder : MonoBehaviour
         gridPos = Vector2Int.zero;
         return false;
     }
-
-    /// <summary>
-    /// Draw from (0,0) of grid
-    /// </summary>
+    
     private void DrawTileIcons()
     {
         for (var y = 0; y < editingStage.Size.y; y++)
@@ -306,34 +314,6 @@ public class StageBuilder : MonoBehaviour
         });
     }
 
-    private void DrawTileIcon(TileType tile, Vector2Int gridPos)
-    {
-        if (ColorMap.TryGetValue(tile, out var color))
-        {
-            var worldPos = grid.GetCellCenterWorld(new Vector3Int(gridPos.x, gridPos.y, 0));
-            Handles.color = color;
-
-            float iconRadius = 0.45f;
-            Handles.DrawAAConvexPolygon(new Vector3[]
-            {
-                worldPos + new Vector3(-iconRadius, -iconRadius),
-                worldPos + new Vector3(-iconRadius, iconRadius),
-                worldPos + new Vector3(iconRadius, iconRadius),
-                worldPos + new Vector3(iconRadius, -iconRadius),
-            });
-        }
-    }
-
-    public void NewStage()
-    {
-        loadedStage = null;
-        editingStage = Stage.CreateStage();
-        var tmp = Path.Combine(stageFolder, "_tmp_.asset");
-        AssetDatabase.CreateAsset(editingStage, Path.Combine(stageFolder, "_tmp_.asset"));
-        AssetDatabase.SaveAssets();
-        CreateVisualization();
-    }
-    
     public void ExpandBottom()
     {
         editingStage.ExpandBottom();
@@ -390,16 +370,23 @@ public class StageBuilder : MonoBehaviour
         CreateVisualization();
     }
     
+    private void CreateVisualization()
+    {
+        CreateBackgroundMesh();
+        CreateSolution();
+    }
+    
     private void CreateBackgroundMesh()
     {
         GetComponent<MeshCollider>().sharedMesh = GetComponent<MeshFilter>().sharedMesh = MeshGenerator.Quad(Cols + 2, Rows + 2, Vector3.back);
         RepositionGrid();
     }
-
-    private void CreateVisualization()
+    
+    private void RepositionGrid()
     {
-        CreateBackgroundMesh();
-        CreateSolution();
+        var posX = - Cols / 2.0f * grid.cellSize.x;
+        var posY = - Rows / 2.0f * grid.cellSize.y;
+        grid.transform.position = new Vector3(posX, posY, 0);
     }
 
     [ContextMenu("CreateSolution")]
@@ -481,32 +468,15 @@ public class StageBuilder : MonoBehaviour
         return exitPaths.Count > 0;
     }
 
-    private void RepositionGrid()
+    public void NewStage()
     {
-        var posX = - Cols / 2.0f * grid.cellSize.x;
-        var posY = - Rows / 2.0f * grid.cellSize.y;
-        grid.transform.position = new Vector3(posX, posY, 0);
+        loadedStage = null;
+        editingStage = Stage.CreateStage();
+        AssetDatabase.CreateAsset(editingStage, Path.Combine(stageFolder, "_tmp_.asset"));
+        AssetDatabase.SaveAssets();
+        CreateVisualization();
     }
-
-    public void SaveAs(string path)
-    {
-        try
-        {
-            var asset = ScriptableObject.CreateInstance<Stage>();
-            asset.CopyFrom(editingStage);
-            AssetDatabase.CreateAsset(asset, path);
-            AssetDatabase.SaveAssets();
-            loadedStage = asset;
-
-            gameObject.name = Path.GetFileNameWithoutExtension(path);
-            Debug.LogFormat("Saved level to {0}", path);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogErrorFormat("{0} {1}", ex.Message, ex.StackTrace);
-        }
-    }
-
+    
     public bool Open(string path)
     {
         try
@@ -531,18 +501,7 @@ public class StageBuilder : MonoBehaviour
 
         return true;
     }
-
-    public void Reload()
-    {
-        if (loadedStage != null)
-        {
-            editingStage.CopyFrom(LoadedStage);
-            EditorUtility.SetDirty(editingStage);
-            CreateBackgroundMesh();
-            Debug.Log("Reloaded level");
-        }
-    }
-
+    
     public void Save()
     {
         if (LoadedStage == null)
@@ -558,5 +517,35 @@ public class StageBuilder : MonoBehaviour
         AssetDatabase.SaveAssets();
         
         Debug.LogFormat("Saved level to {0}", LoadedStage);
+    }
+    
+    public void SaveAs(string path)
+    {
+        try
+        {
+            var asset = Stage.CreateStage();
+            asset.CopyFrom(editingStage);
+            AssetDatabase.CreateAsset(asset, path);
+            AssetDatabase.SaveAssets();
+            loadedStage = asset;
+
+            gameObject.name = Path.GetFileNameWithoutExtension(path);
+            Debug.LogFormat("Saved level to {0}", path);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogErrorFormat("{0} {1}", ex.Message, ex.StackTrace);
+        }
+    }
+    
+    public void Reload()
+    {
+        if (loadedStage != null)
+        {
+            editingStage.CopyFrom(LoadedStage);
+            EditorUtility.SetDirty(editingStage);
+            CreateBackgroundMesh();
+            Debug.Log("Reloaded level");
+        }
     }
 }
