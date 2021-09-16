@@ -13,14 +13,11 @@ using Vector3 = UnityEngine.Vector3;
 public class StageBuilder : MonoBehaviour
 {
     //Path
-    private string stageFolder = "Assets/Resources/Levels/Stages";
-    public string StageFolder
-    {
-        get => stageFolder;
-    }
+    private const string stageFolder = "Assets/Resources/Data/Stages";
+    public static string StageFolder => stageFolder;
 
     //Data
-    private static Dictionary<TileType, char> ShortCuts = new Dictionary<TileType, char>()
+    private static readonly Dictionary<TileType, char> ShortCuts = new Dictionary<TileType, char>()
     {
         {TileType.Entrance, 'e'},
         {TileType.Exit, 'x'},
@@ -29,7 +26,7 @@ public class StageBuilder : MonoBehaviour
         {TileType.Wall, 'w'},
     };
 
-    private static Dictionary<TileType, Color> ColorMap = new Dictionary<TileType, Color>()
+    private static readonly Dictionary<TileType, Color> ColorMap = new Dictionary<TileType, Color>()
     {
         {TileType.Entrance, new Color(0f, 1f, 1f, 0.5f)},
         {TileType.Exit, new Color(1f, 0f, 0.03f, 0.77f)},
@@ -48,27 +45,23 @@ public class StageBuilder : MonoBehaviour
     public bool SolutionMode = false;
     public bool MovingSolution = true;
     public Vector2Int SelectedTile = new Vector2Int(-1, -1);
-    
-    private Stage loadedStage;
-    public Stage LoadedStage
-    {
-        get => loadedStage;
-    }
 
-    private Stage editingStage;
-    public Stage EditingStage => editingStage;
+    public Stage LoadedStage { get; private set; }
+    public Stage EditingStage { get; private set; }
 
-    public int Cols => editingStage.Size.x;
-    public int Rows => editingStage.Size.y;
+    public int Cols => EditingStage.Size.x;
+    public int Rows => EditingStage.Size.y;
 
     private void OnEnable()
     {
         SceneView.duringSceneGui += DrawSceneGUI;
         grid = GetComponentInChildren<Grid>();
-        
-        if (editingStage == null)
+
+        if (EditingStage == null)
+        {
             NewStage();
-        CreateVisualization();
+            CreateVisualization();
+        }
     }
 
     private void OnDisable()
@@ -78,11 +71,8 @@ public class StageBuilder : MonoBehaviour
 
     private void DrawSceneGUI(SceneView sceneview)
     {
-        if (editingStage == null)
-        {
-            return;
-        }
-        
+        if (EditingStage == null) return;
+
         DrawTileIcons();
         DrawSolution();
 
@@ -90,24 +80,6 @@ public class StageBuilder : MonoBehaviour
         HandleKey();
 
         //Other GUI option
-    }
-    
-    private void DrawTileIcon(TileType tile, Vector2Int gridPos)
-    {
-        if (ColorMap.TryGetValue(tile, out var color))
-        {
-            var worldPos = grid.GetCellCenterWorld(new Vector3Int(gridPos.x, gridPos.y, 0));
-            Handles.color = color;
-
-            float iconRadius = 0.45f;
-            Handles.DrawAAConvexPolygon(new Vector3[]
-            {
-                worldPos + new Vector3(-iconRadius, -iconRadius),
-                worldPos + new Vector3(-iconRadius, iconRadius),
-                worldPos + new Vector3(iconRadius, iconRadius),
-                worldPos + new Vector3(iconRadius, -iconRadius),
-            });
-        }
     }
 
     private void DrawSolution()
@@ -168,7 +140,7 @@ public class StageBuilder : MonoBehaviour
 
                 if (types.Any())
                 {
-                    editingStage[gridPos.x, gridPos.y] = types.First().Key;
+                    EditingStage[gridPos.x, gridPos.y] = types.First().Key;
                     CreateSolution();
                 }
             }
@@ -221,11 +193,11 @@ public class StageBuilder : MonoBehaviour
         else
         //Inside tile set
         {
-            var dot = editingStage[tilePos.x, tilePos.y];
+            var dot = EditingStage[tilePos.x, tilePos.y];
 
             foreach (TileType t in Enum.GetValues(typeof(TileType)))
             {
-                if (t == TileType.Exit && !editingStage.IsOnBorder(tilePos))
+                if (t == TileType.Exit && !EditingStage.IsOnBorder(tilePos))
                     continue;
                 menu.AddItem(new GUIContent(string.Format("[{1}] {0}", t, GetShortcut(t))), t == dot, OnTileMenuClicked, new Tuple<int, int, TileType>(tilePos.x, tilePos.y, t));
             }
@@ -240,13 +212,13 @@ public class StageBuilder : MonoBehaviour
         {
             var clickedPos = new Vector2Int(menuData.Item1, menuData.Item2);
             ExpandBorder(ref clickedPos);
-            editingStage[clickedPos.x, clickedPos.y] = menuData.Item3;
-            EditorUtility.SetDirty(editingStage);
+            EditingStage[clickedPos.x, clickedPos.y] = menuData.Item3;
+            EditorUtility.SetDirty(EditingStage);
             CreateSolution();
         }
     }
 
-    private char GetShortcut(TileType tile)
+    private static char GetShortcut(TileType tile)
     {
         if (ShortCuts.TryGetValue(tile, out var shortcut))
         {
@@ -281,17 +253,36 @@ public class StageBuilder : MonoBehaviour
     
     private void DrawTileIcons()
     {
-        for (var y = 0; y < editingStage.Size.y; y++)
+        for (var y = 0; y < EditingStage.Size.y; y++)
         {
-            for (var x = 0; x < editingStage.Size.x; x++)
+            for (var x = 0; x < EditingStage.Size.x; x++)
             {
-                var tile = editingStage[x, y];
+                var tile = EditingStage[x, y];
                 var gridPos = new Vector2Int(x, y);
                 
                 DrawTileIcon(tile, gridPos);
                 if (SelectedTile == gridPos)
                     DrawHighLight(gridPos);
             }
+        }
+        
+    }
+    
+    private void DrawTileIcon(TileType tile, Vector2Int gridPos)
+    {
+        if (ColorMap.TryGetValue(tile, out var color))
+        {
+            var worldPos = grid.GetCellCenterWorld(new Vector3Int(gridPos.x, gridPos.y, 0));
+            Handles.color = color;
+
+            float iconRadius = 0.45f;
+            Handles.DrawAAConvexPolygon(new Vector3[]
+            {
+                worldPos + new Vector3(-iconRadius, -iconRadius),
+                worldPos + new Vector3(-iconRadius, iconRadius),
+                worldPos + new Vector3(iconRadius, iconRadius),
+                worldPos + new Vector3(iconRadius, -iconRadius),
+            });
         }
         
     }
@@ -316,57 +307,57 @@ public class StageBuilder : MonoBehaviour
 
     public void ExpandBottom()
     {
-        editingStage.ExpandBottom();
-        EditorUtility.SetDirty(editingStage);
+        EditingStage.ExpandBottom();
+        EditorUtility.SetDirty(EditingStage);
         CreateVisualization();
     }
 
     public void ExpandLeft()
     {
-        editingStage.ExpandLeft();
-        EditorUtility.SetDirty(editingStage);
+        EditingStage.ExpandLeft();
+        EditorUtility.SetDirty(EditingStage);
         CreateVisualization();
     }
 
     public void ExpandRight()
     {
-        editingStage.ExpandRight();
-        EditorUtility.SetDirty(editingStage);
+        EditingStage.ExpandRight();
+        EditorUtility.SetDirty(EditingStage);
         CreateVisualization();
     }
 
     public void ExpandTop()
     {
-        editingStage.ExpandTop();
-        EditorUtility.SetDirty(editingStage);
+        EditingStage.ExpandTop();
+        EditorUtility.SetDirty(EditingStage);
         CreateVisualization();
     }
 
     public void CollapseTop()
     {
-        editingStage.CollapseTop();
-        EditorUtility.SetDirty(editingStage);
+        EditingStage.CollapseTop();
+        EditorUtility.SetDirty(EditingStage);
         CreateVisualization();
     }
 
     public void CollapseLeft()
     {
-        editingStage.CollapseLeft();
-        EditorUtility.SetDirty(editingStage);
+        EditingStage.CollapseLeft();
+        EditorUtility.SetDirty(EditingStage);
         CreateVisualization();
     }
 
     public void CollapseRight()
     {
-        editingStage.CollapseRight();
-        EditorUtility.SetDirty(editingStage);
+        EditingStage.CollapseRight();
+        EditorUtility.SetDirty(EditingStage);
         CreateVisualization();
     }
 
     public void CollapseBottom()
     {
-        editingStage.CollapseBottom();
-        EditorUtility.SetDirty(editingStage);
+        EditingStage.CollapseBottom();
+        EditorUtility.SetDirty(EditingStage);
         CreateVisualization();
     }
     
@@ -392,19 +383,19 @@ public class StageBuilder : MonoBehaviour
     [ContextMenu("CreateSolution")]
     private void CreateSolution()
     {
-        if (editingStage == null || editingStage.GetEntrance() == -Vector2Int.one || editingStage.GetExit() == -Vector2Int.one)
+        if (EditingStage == null || EditingStage.GetEntrance() == -Vector2Int.one || EditingStage.GetExit() == -Vector2Int.one)
         {
             solution = null; return;
         }
             
         //Brute force
         //Find all path from entrance to exit -> Get path that covers the most tiles -> Get shortest path from which
-        if (MapNode(new Graph<Vector2Int>(), editingStage.GetEntrance(), out var allExitPaths))
+        if (MapNode(new Graph<Vector2Int>(), EditingStage.GetEntrance(), out var allExitPaths))
         {
             var fullPath = allExitPaths.GroupBy(s => s.Distinct().Count()).Aggregate((i1,i2) => i1.Key > i2.Key ? i1 : i2);
             var shortestFullPath = fullPath.GroupBy(s => s.Count).Aggregate((i1,i2) => i1.Key < i2.Key ? i1 : i2);
             solution = shortestFullPath.First();
-            solution.Insert(0, editingStage.GetEntrance());
+            solution.Insert(0, EditingStage.GetEntrance());
         }
     }
 
@@ -413,7 +404,7 @@ public class StageBuilder : MonoBehaviour
     {
         exitPaths = new List<List<Vector2Int>>();
         
-        if (editingStage[currentNode.x, currentNode.y] == TileType.Exit)
+        if (EditingStage[currentNode.x, currentNode.y] == TileType.Exit)
             return true;
 
         var direction = Vector2Int.up;
@@ -426,7 +417,7 @@ public class StageBuilder : MonoBehaviour
             }
             
             //Exit path detected
-            if (editingStage.TryMove(currentNode, direction, out var scoutPath))
+            if (EditingStage.TryMove(currentNode, direction, out var scoutPath))
             {
                 if (scoutPath.Count == 0)
                 {
@@ -470,9 +461,9 @@ public class StageBuilder : MonoBehaviour
 
     public void NewStage()
     {
-        loadedStage = null;
-        editingStage = Stage.CreateStage();
-        AssetDatabase.CreateAsset(editingStage, Path.Combine(stageFolder, "_tmp_.asset"));
+        LoadedStage = null;
+        EditingStage = Stage.CreateStage();
+        AssetDatabase.CreateAsset(EditingStage, Path.Combine(stageFolder, "_tmp_.asset"));
         AssetDatabase.SaveAssets();
         CreateVisualization();
     }
@@ -484,15 +475,15 @@ public class StageBuilder : MonoBehaviour
             var asset = AssetDatabase.LoadAssetAtPath<Stage>(path);
             if (asset == null)
             {
-                Debug.LogErrorFormat("Cannot load level asset at {0}", path);
+                Debug.LogErrorFormat("Cannot load stage asset at {0}", path);
                 return false;
             }
-            loadedStage = asset;
-            editingStage.CopyFrom(asset);
+            LoadedStage = asset;
+            EditingStage.CopyFrom(asset);
             CreateVisualization();
             
             gameObject.name = Path.GetFileNameWithoutExtension(path);
-            Debug.LogFormat("Opened level from {0}", path);
+            Debug.LogFormat("Opened stage from {0}", path);
         }
         catch (Exception ex)
         {
@@ -510,13 +501,13 @@ public class StageBuilder : MonoBehaviour
             return;
         }
 
-        LoadedStage.CopyFrom(editingStage);
+        LoadedStage.CopyFrom(EditingStage);
 
         EditorUtility.SetDirty(LoadedStage);
-        EditorUtility.SetDirty(editingStage);
+        EditorUtility.SetDirty(EditingStage);
         AssetDatabase.SaveAssets();
         
-        Debug.LogFormat("Saved level to {0}", LoadedStage);
+        Debug.LogFormat("Saved stage to {0}", LoadedStage);
     }
     
     public void SaveAs(string path)
@@ -524,13 +515,13 @@ public class StageBuilder : MonoBehaviour
         try
         {
             var asset = Stage.CreateStage();
-            asset.CopyFrom(editingStage);
+            asset.CopyFrom(EditingStage);
             AssetDatabase.CreateAsset(asset, path);
             AssetDatabase.SaveAssets();
-            loadedStage = asset;
+            LoadedStage = asset;
 
             gameObject.name = Path.GetFileNameWithoutExtension(path);
-            Debug.LogFormat("Saved level to {0}", path);
+            Debug.LogFormat("Saved stage to {0}", path);
         }
         catch (Exception ex)
         {
@@ -540,12 +531,12 @@ public class StageBuilder : MonoBehaviour
     
     public void Reload()
     {
-        if (loadedStage != null)
+        if (LoadedStage != null)
         {
-            editingStage.CopyFrom(LoadedStage);
-            EditorUtility.SetDirty(editingStage);
-            CreateBackgroundMesh();
-            Debug.Log("Reloaded level");
+            EditingStage.CopyFrom(LoadedStage);
+            EditorUtility.SetDirty(EditingStage);
+            CreateVisualization();
+            Debug.Log("Reloaded stage");
         }
     }
 }

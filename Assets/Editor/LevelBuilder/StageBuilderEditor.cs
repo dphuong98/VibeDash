@@ -11,8 +11,6 @@ using UnityEngine;
 [CustomEditor(typeof(StageBuilder))]
 public class StageBuilderEditor : Editor
 {
-    //LevelBuilder members
-    private const string GameScenePath = "Assets/Scenes/Gameplay.unity";
     private StageBuilder stageBuilder;
     
     //InspectorGUI members
@@ -35,12 +33,13 @@ public class StageBuilderEditor : Editor
         #region Info
             GUILayout.Label("Stage Info", EditorStyles.boldLabel);
             GUILayout.Label("Stage size: (" + stageBuilder.EditingStage.Size.x + ", " + stageBuilder.EditingStage.Size.y + ")");
+            
             if (0 <= stageBuilder.SelectedTile.x && stageBuilder.SelectedTile.x < stageBuilder.Cols &&
                 0 <= stageBuilder.SelectedTile.y && stageBuilder.SelectedTile.y < stageBuilder.Rows)
             {
                 GUILayout.Label("Selected Tile: (" + (stageBuilder.SelectedTile.x+1) + ", " + (stageBuilder.SelectedTile.y+1) + ")");
             }
-            else GUILayout.Label("Selected Tile: (0, 0)");
+            else GUILayout.Label("Selected Tile: (  ,  )");
             
             GUILayout.BeginHorizontal();
             stageBuilder.SolutionMode = GUILayout.Toggle(stageBuilder.SolutionMode, "View solution");
@@ -208,35 +207,17 @@ public class StageBuilderEditor : Editor
             // End dimension foldout
         #endregion
 
-        #region Play
-            if (GUILayout.Button("Play"))
-            {
-                var level = (target as StageBuilder).EditingStage;
-                
-                if (Application.isPlaying)
-                {
-                    return;
-                }
-
-                LevelLoader.CurrentStage = level;
-                AssetDatabase.SaveAssets();
-                EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
-                EditorSceneManager.OpenScene(GameScenePath);
-                EditorApplication.isPlaying = true;
-            }
-        #endregion
-        
         //End OnInspectorGUI
     }
 
-    private void NewStage()
+    public void NewStage()
     {
         stageBuilder.NewStage();
     }
 
-    private void Open()
+    public void Open()
     {
-        var path = EditorUtility.OpenFilePanel("Open", stageBuilder.StageFolder, "asset");
+        var path = EditorUtility.OpenFilePanel("Open", StageBuilder.StageFolder, "asset");
         if (!string.IsNullOrEmpty(path))
         {
             if (stageBuilder.Open(UnityEditor.FileUtil.GetProjectRelativePath(path)))
@@ -246,7 +227,7 @@ public class StageBuilderEditor : Editor
         }
     }
 
-    private void Save()
+    public void Save()
     {
         if (stageBuilder.LoadedStage != null)
             stageBuilder.Save();
@@ -254,24 +235,28 @@ public class StageBuilderEditor : Editor
             SaveAs();
     }
 
-    private void SaveAs()
+    public void SaveAs()
     {
         var rx = new Regex(@"(\d+)");
-        var d = new DirectoryInfo(stageBuilder.StageFolder);
-        var number = d.GetFiles("Stage?.asset").Select(s => rx.Match(s.Name)).Where(s => s.Success).Max(s =>
+        var d = new DirectoryInfo(StageBuilder.StageFolder);
+        var number = 0;
+        if (d.GetFiles("Stage?.asset") is var fileInfos && fileInfos.Count() != 0)
         {
-            int.TryParse(s.Value, out var num);
-            return num;
-        });
+            number = fileInfos.Select(s => rx.Match(s.Name)).Where(s => s.Success).Max(s =>
+            {
+                int.TryParse(s.Value, out var num);
+                return num;
+            });
+        }
         
-        var path = EditorUtility.SaveFilePanel("Save As", stageBuilder.StageFolder, "Stage"+(number+1), "asset");
+        var path = EditorUtility.SaveFilePanel("Save As", StageBuilder.StageFolder, "Stage"+(number+1), "asset");
         if (!string.IsNullOrEmpty(path))
         {
             stageBuilder.SaveAs(UnityEditor.FileUtil.GetProjectRelativePath(path));
         }
     }
 
-    private void Reload()
+    public void Reload()
     {
         stageBuilder.Reload();
     }

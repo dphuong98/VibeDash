@@ -13,7 +13,7 @@ public class Stage : ScriptableObject
 
     public Vector2Int Size => size;
 
-    private void Init()
+    public void Init()
     {
         for (var i = 0; i < size.x * size.y; i++)
             tiles.Add(TileType.Wall);
@@ -21,9 +21,9 @@ public class Stage : ScriptableObject
 
     public static Stage CreateStage()
     {
-        var newLevel = CreateInstance<Stage>();
-        newLevel.Init();
-        return newLevel;
+        var newStage = CreateInstance<Stage>();
+        newStage.Init();
+        return newStage;
     }
 
     public bool IsOnBorder(Vector2Int tilePos)
