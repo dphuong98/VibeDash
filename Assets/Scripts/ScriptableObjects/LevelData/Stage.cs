@@ -6,7 +6,7 @@ using System.Text;
 using UnityEngine;
 
 [CreateAssetMenu]
-public class Stage : ScriptableObject
+public class Stage : ScriptableObject, IInit, ICopiable<Stage>
 {
     [SerializeField, HideInInspector] private Vector2Int size = new Vector2Int(5, 5);
     [SerializeField, HideInInspector] private List<TileType> tiles = new List<TileType>();
@@ -31,6 +31,46 @@ public class Stage : ScriptableObject
         return 0 == tilePos.x || tilePos.x == size.x - 1 || 0 == tilePos.y || tilePos.y == size.y - 1;
     }
 
+    public TileType this[int c, int r]
+    {
+        get => tiles[r * size.x + c];
+        set
+        {
+            //Ensure that their could be only one entrance or exit
+            if (value == TileType.Entrance || value == TileType.Exit)
+            {
+                if (tiles.IndexOf(value) is var tilePos && tilePos != -1) tiles[tilePos] = TileType.Wall;
+            }
+            tiles[r * size.x + c] = value;
+        }
+    }
+
+    public void CopyFrom(Stage other)
+    {
+        size = other.size;
+        tiles = new List<TileType>(other.tiles);
+    }
+
+    public Vector2Int GetEntrance()
+    {
+        if (tiles.IndexOf(TileType.Entrance) is var tilePos && tilePos != -1)
+        {
+            return new Vector2Int(tilePos % size.x, tilePos / size.x);
+        }
+
+        return -Vector2Int.one;
+    }
+    
+    public Vector2Int GetExit()
+    {
+        if (tiles.IndexOf(TileType.Exit) is var tilePos && tilePos != -1)
+        {
+            return new Vector2Int(tilePos % size.x, tilePos / size.x);
+        }
+
+        return -Vector2Int.one;
+    }
+    
     public void ExpandBottom()
     {
         for (int r = size.x - 1; r >= 0; r--)
@@ -144,45 +184,5 @@ public class Stage : ScriptableObject
             tiles.RemoveAt(tiles.Count - 1);
         }
         size.y--;
-    }
-
-    public TileType this[int c, int r]
-    {
-        get => tiles[r * size.x + c];
-        set
-        {
-            //Ensure that their could be only one entrance or exit
-            if (value == TileType.Entrance || value == TileType.Exit)
-            {
-                if (tiles.IndexOf(value) is var tilePos && tilePos != -1) tiles[tilePos] = TileType.Wall;
-            }
-            tiles[r * size.x + c] = value;
-        }
-    }
-
-    public void CopyFrom(Stage other)
-    {
-        size = other.size;
-        tiles = new List<TileType>(other.tiles);
-    }
-
-    public Vector2Int GetEntrance()
-    {
-        if (tiles.IndexOf(TileType.Entrance) is var tilePos && tilePos != -1)
-        {
-            return new Vector2Int(tilePos % size.x, tilePos / size.x);
-        }
-
-        return -Vector2Int.one;
-    }
-    
-    public Vector2Int GetExit()
-    {
-        if (tiles.IndexOf(TileType.Exit) is var tilePos && tilePos != -1)
-        {
-            return new Vector2Int(tilePos % size.x, tilePos / size.x);
-        }
-
-        return -Vector2Int.one;
     }
 }

@@ -12,6 +12,8 @@ public class LevelBuilderEditor : Editor
 {
     private const string GameScenePath = "Assets/Scenes/Gameplay.unity";
     private LevelBuilder levelBuilder;
+
+    private StageBuilder stageBuilderPrefab;
     
     private void OnEnable()
     {
@@ -40,28 +42,50 @@ public class LevelBuilderEditor : Editor
             {
                 if (GUILayout.Button("New"))
                 {
-                    NewLevel();
+                    levelBuilder.NewItem();
                 }
                 
                 if (GUILayout.Button("Open"))
                 {
-                    Open();
+                    levelBuilder.Open();
                 }
 
                 if (GUILayout.Button("Save"))
                 {
-                    Save();
+                    levelBuilder.Save();
                 }
 
                 if (GUILayout.Button("Save As"))
                 {
-                    SaveAs();
+                    levelBuilder.SaveAs();
                 }
 
                 if (GUILayout.Button("Reload"))
                 {
-                    Reload();
+                    levelBuilder.Reload();
                 }
+            }
+            GUILayout.EndHorizontal();
+        #endregion
+        
+        #region LevelTools
+            GUILayoutExt.HorizontalSeparator();
+            GUILayout.Label("Level Tools", EditorStyles.boldLabel);
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("NewStage"))
+            {
+                levelBuilder.NewStage();
+            }
+            
+            if (GUILayout.Button("ImportStage"))
+            {
+                
+            }
+            
+            if (GUILayout.Button("RemoveStage"))
+            {
+                
             }
             GUILayout.EndHorizontal();
         #endregion
@@ -85,56 +109,5 @@ public class LevelBuilderEditor : Editor
         #endregion
         
         //End OnInspectorGUI
-    }
-    
-    public void NewLevel()
-    {
-        levelBuilder.NewLevel();
-    }
-
-    public void Open()
-    {
-        var path = EditorUtility.OpenFilePanel("Open", LevelBuilder.LevelFolder, "asset");
-        if (!string.IsNullOrEmpty(path))
-        {
-            if (levelBuilder.Open(UnityEditor.FileUtil.GetProjectRelativePath(path)))
-            {
-                Debug.LogFormat("Opened {0}", path);
-            }
-        }
-    }
-
-    public void Save()
-    {
-        if (levelBuilder.LoadedLevel != null)
-            levelBuilder.Save();
-        else
-            SaveAs();
-    }
-
-    public void SaveAs()
-    {
-        var rx = new Regex(@"(\d+)");
-        var d = new DirectoryInfo(LevelBuilder.LevelFolder);
-        var number = 0;
-        if (d.GetFiles("Level?.asset") is var fileInfos && fileInfos.Count() != 0)
-        {
-            number = fileInfos.Select(s => rx.Match(s.Name)).Where(s => s.Success).Max(s =>
-            {
-                int.TryParse(s.Value, out var num);
-                return num;
-            });
-        }
-
-        var path = EditorUtility.SaveFilePanel("Save As", LevelBuilder.LevelFolder, "Level"+(number+1), "asset");
-        if (!string.IsNullOrEmpty(path))
-        {
-            levelBuilder.SaveAs(UnityEditor.FileUtil.GetProjectRelativePath(path));
-        }
-    }
-
-    public void Reload()
-    {
-        levelBuilder.Reload();
     }
 }

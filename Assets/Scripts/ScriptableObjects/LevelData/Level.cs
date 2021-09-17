@@ -2,9 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class Level : ScriptableObject
+public class Level : ScriptableObject, IInit, ICopiable<Level>
 {
+    //TODO is this ref?
     [SerializeField, HideInInspector] private Dictionary<Vector2Int, Stage> stages = new Dictionary<Vector2Int, Stage>();
     [SerializeField, HideInInspector] private Dictionary<Stage, Stage> bridges = new Dictionary<Stage, Stage>();
 

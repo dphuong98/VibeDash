@@ -10,7 +10,7 @@ using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
 [ExecuteInEditMode]
-public class StageBuilder : MonoBehaviour
+public class StageBuilder : Builder<Stage>
 {
     //Path
     private const string stageFolder = "Assets/Resources/Data/Stages";
@@ -46,27 +46,29 @@ public class StageBuilder : MonoBehaviour
     public bool MovingSolution = true;
     public Vector2Int SelectedTile = new Vector2Int(-1, -1);
 
-    public Stage LoadedStage { get; private set; }
-    public Stage EditingStage { get; private set; }
+    public Stage LoadedStage => LoadedItem;
+    public Stage EditingStage => EditingItem;
 
-    public int Cols => EditingStage.Size.x;
-    public int Rows => EditingStage.Size.y;
+    public int Cols => EditingItem.Size.x;
+    public int Rows => EditingItem.Size.y;
 
     private void OnEnable()
     {
         SceneView.duringSceneGui += DrawSceneGUI;
-        grid = GetComponentInChildren<Grid>();
-
-        if (EditingStage == null)
-        {
-            NewStage();
-            CreateVisualization();
-        }
+        Init();
     }
 
     private void OnDisable()
     {
         SceneView.duringSceneGui -= DrawSceneGUI;
+    }
+
+    public void Init()
+    {
+        base.Init(stageFolder);
+        grid = GetComponentInChildren<Grid>();
+
+        if (EditingStage == null) NewItem();
     }
 
     private void DrawSceneGUI(SceneView sceneview)
@@ -309,64 +311,58 @@ public class StageBuilder : MonoBehaviour
     {
         EditingStage.ExpandBottom();
         EditorUtility.SetDirty(EditingStage);
-        CreateVisualization();
+        OnReload();
     }
 
     public void ExpandLeft()
     {
         EditingStage.ExpandLeft();
         EditorUtility.SetDirty(EditingStage);
-        CreateVisualization();
+        OnReload();
     }
 
     public void ExpandRight()
     {
         EditingStage.ExpandRight();
         EditorUtility.SetDirty(EditingStage);
-        CreateVisualization();
+        OnReload();
     }
 
     public void ExpandTop()
     {
         EditingStage.ExpandTop();
         EditorUtility.SetDirty(EditingStage);
-        CreateVisualization();
+        OnReload();
     }
 
     public void CollapseTop()
     {
         EditingStage.CollapseTop();
         EditorUtility.SetDirty(EditingStage);
-        CreateVisualization();
+        OnReload();
     }
 
     public void CollapseLeft()
     {
         EditingStage.CollapseLeft();
         EditorUtility.SetDirty(EditingStage);
-        CreateVisualization();
+        OnReload();
     }
 
     public void CollapseRight()
     {
         EditingStage.CollapseRight();
         EditorUtility.SetDirty(EditingStage);
-        CreateVisualization();
+        OnReload();
     }
 
     public void CollapseBottom()
     {
         EditingStage.CollapseBottom();
         EditorUtility.SetDirty(EditingStage);
-        CreateVisualization();
+        OnReload();
     }
-    
-    private void CreateVisualization()
-    {
-        CreateBackgroundMesh();
-        CreateSolution();
-    }
-    
+
     private void CreateBackgroundMesh()
     {
         GetComponent<MeshCollider>().sharedMesh = GetComponent<MeshFilter>().sharedMesh = MeshGenerator.Quad(Cols + 2, Rows + 2, Vector3.back);
@@ -459,84 +455,9 @@ public class StageBuilder : MonoBehaviour
         return exitPaths.Count > 0;
     }
 
-    public void NewStage()
+    protected override void OnReload()
     {
-        LoadedStage = null;
-        EditingStage = Stage.CreateStage();
-        AssetDatabase.CreateAsset(EditingStage, Path.Combine(stageFolder, "_tmp_.asset"));
-        AssetDatabase.SaveAssets();
-        CreateVisualization();
-    }
-    
-    public bool Open(string path)
-    {
-        try
-        {
-            var asset = AssetDatabase.LoadAssetAtPath<Stage>(path);
-            if (asset == null)
-            {
-                Debug.LogErrorFormat("Cannot load stage asset at {0}", path);
-                return false;
-            }
-            LoadedStage = asset;
-            EditingStage.CopyFrom(asset);
-            CreateVisualization();
-            
-            gameObject.name = Path.GetFileNameWithoutExtension(path);
-            Debug.LogFormat("Opened stage from {0}", path);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogErrorFormat("Exception when open asset {0} {1} {2}", path, ex.Message, ex.StackTrace);
-        }
-
-        return true;
-    }
-    
-    public void Save()
-    {
-        if (LoadedStage == null)
-        {
-            Debug.LogError("Loaded Stage is NULL");
-            return;
-        }
-
-        LoadedStage.CopyFrom(EditingStage);
-
-        EditorUtility.SetDirty(LoadedStage);
-        EditorUtility.SetDirty(EditingStage);
-        AssetDatabase.SaveAssets();
-        
-        Debug.LogFormat("Saved stage to {0}", LoadedStage);
-    }
-    
-    public void SaveAs(string path)
-    {
-        try
-        {
-            var asset = Stage.CreateStage();
-            asset.CopyFrom(EditingStage);
-            AssetDatabase.CreateAsset(asset, path);
-            AssetDatabase.SaveAssets();
-            LoadedStage = asset;
-
-            gameObject.name = Path.GetFileNameWithoutExtension(path);
-            Debug.LogFormat("Saved stage to {0}", path);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogErrorFormat("{0} {1}", ex.Message, ex.StackTrace);
-        }
-    }
-    
-    public void Reload()
-    {
-        if (LoadedStage != null)
-        {
-            EditingStage.CopyFrom(LoadedStage);
-            EditorUtility.SetDirty(EditingStage);
-            CreateVisualization();
-            Debug.Log("Reloaded stage");
-        }
+        CreateBackgroundMesh();
+        CreateSolution();
     }
 }

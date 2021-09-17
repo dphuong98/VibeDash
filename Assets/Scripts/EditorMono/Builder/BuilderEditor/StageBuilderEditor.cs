@@ -22,11 +22,6 @@ public class StageBuilderEditor : Editor
         stageBuilder = target as StageBuilder;
     }
 
-    private void OnDisable()
-    {
-        
-    }
-
     //TODO what does #if UNITY_EDITOR purpose
     public override void OnInspectorGUI()
     {
@@ -63,27 +58,27 @@ public class StageBuilderEditor : Editor
             {
                 if (GUILayout.Button("New"))
                 {
-                    NewStage();
+                    stageBuilder.NewItem();
                 }
                 
                 if (GUILayout.Button("Open"))
                 {
-                    Open();
+                    stageBuilder.Open();
                 }
 
                 if (GUILayout.Button("Save"))
                 {
-                    Save();
+                    stageBuilder.Save();
                 }
 
                 if (GUILayout.Button("Save As"))
                 {
-                    SaveAs();
+                    stageBuilder.SaveAs();
                 }
 
                 if (GUILayout.Button("Reload"))
                 {
-                    Reload();
+                    stageBuilder.Reload();
                 }
             }
             GUILayout.EndHorizontal();
@@ -91,7 +86,7 @@ public class StageBuilderEditor : Editor
 
         #region LevelTools
             GUILayoutExt.HorizontalSeparator();
-            GUILayout.Label("Level Tools", EditorStyles.boldLabel);
+            GUILayout.Label("Stage Tools", EditorStyles.boldLabel);
             expandDropdown = EditorGUILayout.Foldout(expandDropdown, "Expand & Shrink");
             if (expandDropdown)
             {
@@ -208,56 +203,5 @@ public class StageBuilderEditor : Editor
         #endregion
 
         //End OnInspectorGUI
-    }
-
-    public void NewStage()
-    {
-        stageBuilder.NewStage();
-    }
-
-    public void Open()
-    {
-        var path = EditorUtility.OpenFilePanel("Open", StageBuilder.StageFolder, "asset");
-        if (!string.IsNullOrEmpty(path))
-        {
-            if (stageBuilder.Open(UnityEditor.FileUtil.GetProjectRelativePath(path)))
-            {
-                Debug.LogFormat("Opened {0}", path);
-            }
-        }
-    }
-
-    public void Save()
-    {
-        if (stageBuilder.LoadedStage != null)
-            stageBuilder.Save();
-        else
-            SaveAs();
-    }
-
-    public void SaveAs()
-    {
-        var rx = new Regex(@"(\d+)");
-        var d = new DirectoryInfo(StageBuilder.StageFolder);
-        var number = 0;
-        if (d.GetFiles("Stage?.asset") is var fileInfos && fileInfos.Count() != 0)
-        {
-            number = fileInfos.Select(s => rx.Match(s.Name)).Where(s => s.Success).Max(s =>
-            {
-                int.TryParse(s.Value, out var num);
-                return num;
-            });
-        }
-        
-        var path = EditorUtility.SaveFilePanel("Save As", StageBuilder.StageFolder, "Stage"+(number+1), "asset");
-        if (!string.IsNullOrEmpty(path))
-        {
-            stageBuilder.SaveAs(UnityEditor.FileUtil.GetProjectRelativePath(path));
-        }
-    }
-
-    public void Reload()
-    {
-        stageBuilder.Reload();
     }
 }
