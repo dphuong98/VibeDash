@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
 [ExecuteInEditMode]
@@ -56,9 +57,13 @@ public class LevelBuilder : Builder<Level>
         }
     }
 
-    public void Import()
+    public void ImportStage()
     {
-        
+        var newStageBuilder = Instantiate(stageBuilderPrefab, new Vector3(0, 0, 0), Quaternion.identity, transform);
+        if (!newStageBuilder.Open())
+        {
+            DestroyImmediate(newStageBuilder.gameObject);
+        }
     }
 
     protected override void OnReload()

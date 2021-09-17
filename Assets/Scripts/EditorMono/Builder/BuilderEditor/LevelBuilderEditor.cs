@@ -80,10 +80,15 @@ public class LevelBuilderEditor : Editor
             
             if (GUILayout.Button("ImportStage"))
             {
-                
+                levelBuilder.ImportStage();
             }
             
             if (GUILayout.Button("RemoveStage"))
+            {
+                
+            }
+            
+            if (GUILayout.Button("DeleteStage"))
             {
                 
             }

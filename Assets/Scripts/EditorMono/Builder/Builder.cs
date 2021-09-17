@@ -110,8 +110,9 @@ public abstract class Builder<T> : MonoBehaviour where T : ScriptableObject, IIn
         catch (Exception ex)
         {
             Debug.LogErrorFormat("{0} {1}", ex.Message, ex.StackTrace);
-            return false;
         }
+
+        return false;
     }
     
     public void Reload()
