@@ -71,11 +71,6 @@ public class LevelBuilderEditor : BuilderEditor<Level>
             {
                 levelBuilder.ImportStage();
             }
-            
-            if (GUILayout.Button("RemoveStage"))
-            {
-                
-            }
             GUILayout.EndHorizontal();
         #endregion
         

@@ -16,9 +16,9 @@ public class LevelBuilder : Builder<Level>
     private MiniStage miniStagePrefab;
 
     //public Stage SelectedStage;
-    
-    public Level LoadedLevel { get; private set; }
-    public Level EditingLevel { get; private set; }
+
+    public Level LoadedLevel => LoadedItem;
+    public Level EditingLevel => EditingItem;
 
     private Dictionary<Vector2Int, StageBuilder> stageBuilders;
     
@@ -45,15 +45,15 @@ public class LevelBuilder : Builder<Level>
         if (EditingLevel == null) return;
 
         //Render and handle bridge connections
-        
+
         //Other GUI option
     }
-
-    public bool ImportStage()
+    
+    public void ImportStage()
     {
         //TODO Refactor this into file loader class
         var path = EditorUtility.OpenFilePanel("Open", StageBuilder.StageFolder, "asset");
-        if (string.IsNullOrEmpty(path)) return false;
+        if (string.IsNullOrEmpty(path)) return;
         
         try
         {
@@ -61,7 +61,7 @@ public class LevelBuilder : Builder<Level>
             if (stage == null)
             {
                 Debug.LogErrorFormat("Cannot load {0} asset at {1}", "Stage", path);
-                return false;
+                return;
             }
             
             var miniStage = Instantiate(miniStagePrefab, Vector3.zero, Quaternion.identity, transform);
@@ -72,13 +72,6 @@ public class LevelBuilder : Builder<Level>
         {
             Debug.LogErrorFormat("Exception when open asset {0} {1} {2}", path, ex.Message, ex.StackTrace);
         }
-
-        return true;
-    }
-
-    public void RemoveStage()
-    {
-        
     }
 
     protected override void OnReload()
