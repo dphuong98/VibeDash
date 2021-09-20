@@ -118,9 +118,9 @@ public class StageBuilder : Builder<Stage>
                 
                 SceneView.RepaintAll();
                 TileMenu(SelectedTile).ShowAsContext();
+                
+                Event.current.Use();
             }
-            
-            Event.current.Use();
         }
     }
     
@@ -241,8 +241,6 @@ public class StageBuilder : Builder<Stage>
                 var worldPos = hitInfo.collider.gameObject.transform.InverseTransformPoint(point);
                 var temp = grid.WorldToCell(worldPos);
                 gridPos = new Vector2Int(temp.x, temp.y);
-
-                Event.current.Use();
 
                 return true;
             }

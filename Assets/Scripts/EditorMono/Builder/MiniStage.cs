@@ -97,9 +97,9 @@ public class MiniStage : MonoBehaviour
             {
                 SceneView.RepaintAll();
                 TileMenu().ShowAsContext();
+                
+                Event.current.Use();
             }
-            
-            Event.current.Use();
         }
     }
     
@@ -115,8 +115,6 @@ public class MiniStage : MonoBehaviour
                 var worldPos = hitInfo.collider.gameObject.transform.InverseTransformPoint(point);
                 var temp = grid.WorldToCell(worldPos);
                 gridPos = new Vector2Int(temp.x, temp.y);
-
-                Event.current.Use();
 
                 return true;
             }
