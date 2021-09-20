@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,12 +16,10 @@ public class LevelBuilder : Builder<Level>
 
     private MiniStage miniStagePrefab;
 
-    //public Stage SelectedStage;
-
     public Level LoadedLevel => LoadedItem;
     public Level EditingLevel => EditingItem;
 
-    private Dictionary<Vector2Int, StageBuilder> stageBuilders;
+    public List<MiniStage> stages;
     
     private void OnEnable()
     {
@@ -48,7 +47,12 @@ public class LevelBuilder : Builder<Level>
 
         //Other GUI option
     }
-    
+
+    private void Update()
+    {
+        stages.RemoveAll(s => s == null);
+    }
+
     public void ImportStage()
     {
         //TODO Refactor this into file loader class
@@ -67,6 +71,7 @@ public class LevelBuilder : Builder<Level>
             var miniStage = Instantiate(miniStagePrefab, Vector3.zero, Quaternion.identity, transform);
             miniStage.SetStage(stage);
             miniStage.name = Path.GetFileNameWithoutExtension(path);
+            stages.Add(miniStage);
         }
         catch (Exception ex)
         {

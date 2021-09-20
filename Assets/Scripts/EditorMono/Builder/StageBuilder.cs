@@ -370,7 +370,7 @@ public class StageBuilder : Builder<Stage>
     {
         var posX = - Cols / 2.0f * grid.cellSize.x;
         var posY = - Rows / 2.0f * grid.cellSize.y;
-        grid.transform.position = new Vector3(posX, posY, 0);
+        grid.transform.localPosition = new Vector3(posX, posY, 0);
     }
 
     [ContextMenu("CreateSolution")]

@@ -10,6 +10,7 @@ public class MiniStage : MonoBehaviour
 {
     public Stage Stage;
     private Grid grid;
+    private MeshFilter meshFilter;
     
     private static readonly Dictionary<TileType, Color> ColorMap = new Dictionary<TileType, Color>()
     {
@@ -22,9 +23,8 @@ public class MiniStage : MonoBehaviour
 
     public void SetStage(Stage stage)
     {
-        this.Stage = stage;
-        GetComponent<MeshCollider>().sharedMesh = GetComponent<MeshFilter>().sharedMesh = MeshGenerator.Quad(stage.Size.x + 2, stage.Size.y + 2, Vector3.back);
-        RepositionGrid();
+        Stage = stage;
+        CreateBackgroundMesh();
     }
 
     private void OnEnable()
@@ -41,6 +41,7 @@ public class MiniStage : MonoBehaviour
     private void Init()
     {
         grid = GetComponentInChildren<Grid>();
+        meshFilter = GetComponentInChildren<MeshFilter>();
     }
 
     private void DrawSceneGUI(SceneView sceneview)
@@ -170,11 +171,22 @@ public class MiniStage : MonoBehaviour
     {
         DestroyImmediate(gameObject);
     }
+
+    [ContextMenu("CreateMesh")]
+    private void CreateBackgroundMesh()
+    {
+        //TODO custom pivot
+        meshFilter.sharedMesh = MeshGenerator.Quad(Stage.Size.x + 2, Stage.Size.y + 2, Vector3.back);
+        var posX = (Stage.Size.x + 2) / 2.0f * grid.cellSize.x;
+        var posY = (Stage.Size.y + 2) / 2.0f * grid.cellSize.y;
+        meshFilter.transform.localPosition = new Vector3(posX, posY, 0);
+        RepositionGrid();
+    }
     
     private void RepositionGrid()
     {
         var posX = - Stage.Size.x / 2.0f * grid.cellSize.x;
         var posY = - Stage.Size.y / 2.0f * grid.cellSize.y;
-        grid.transform.position = new Vector3(posX, posY, 0);
+        grid.transform.localPosition = new Vector3(posX, posY, 0);
     }
 }
