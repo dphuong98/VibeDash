@@ -8,21 +8,15 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 
 [CustomEditor(typeof(LevelBuilder))]
-public class LevelBuilderEditor : Editor
+public class LevelBuilderEditor : BuilderEditor<Level>
 {
     private const string GameScenePath = "Assets/Scenes/Gameplay.unity";
     private LevelBuilder levelBuilder;
 
-    private StageBuilder stageBuilderPrefab;
-    
-    private void OnEnable()
+    private new void OnEnable()
     {
+        base.OnEnable();
         levelBuilder = target as LevelBuilder;
-    }
-
-    private void OnDisable()
-    {
-        
     }
 
     public override void OnInspectorGUI()
@@ -36,33 +30,33 @@ public class LevelBuilderEditor : Editor
             GUILayoutExt.HorizontalSeparator();
             GUILayout.Label("File", EditorStyles.boldLabel);
             GUI.enabled = false;
-            EditorGUILayout.ObjectField("Loaded Stage: ", levelBuilder.LoadedLevel, typeof(Stage), true);
+            EditorGUILayout.ObjectField("Loaded Level: ", levelBuilder.LoadedLevel, typeof(Level), true);
             GUI.enabled = true;
             GUILayout.BeginHorizontal();
             {
                 if (GUILayout.Button("New"))
                 {
-                    levelBuilder.NewItem();
+                    NewItem();
                 }
                 
                 if (GUILayout.Button("Open"))
                 {
-                    levelBuilder.Open();
+                    Open();
                 }
 
                 if (GUILayout.Button("Save"))
                 {
-                    levelBuilder.Save();
+                    Save();
                 }
 
                 if (GUILayout.Button("Save As"))
                 {
-                    levelBuilder.SaveAs();
+                    SaveAs();
                 }
 
                 if (GUILayout.Button("Reload"))
                 {
-                    levelBuilder.Reload();
+                    Reload();
                 }
             }
             GUILayout.EndHorizontal();
@@ -73,22 +67,12 @@ public class LevelBuilderEditor : Editor
             GUILayout.Label("Level Tools", EditorStyles.boldLabel);
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("NewStage"))
-            {
-                levelBuilder.NewStage();
-            }
-            
             if (GUILayout.Button("ImportStage"))
             {
                 levelBuilder.ImportStage();
             }
             
             if (GUILayout.Button("RemoveStage"))
-            {
-                
-            }
-            
-            if (GUILayout.Button("DeleteStage"))
             {
                 
             }

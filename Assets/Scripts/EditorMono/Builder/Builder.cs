@@ -10,18 +10,18 @@ using UnityEngine;
 
 public abstract class Builder<T> : MonoBehaviour where T : ScriptableObject, IInit, ICopiable<T>
 {
-    private string defaultName = typeof(T).ToString();
-    
+    public static string DefaultName { get; } = typeof(T).ToString();
+
     //Path
-    private static string defaultFolder;
-    public static string DefaultFolder => defaultFolder;
-    
+    public static string DefaultFolder { get; private set; }
+
     public T LoadedItem { get; private set; }
     public T EditingItem { get; private set; }
     
     public void Init(string defaultFolder)
     {
-        Builder<T>.defaultFolder = defaultFolder;
+        DefaultFolder = defaultFolder;
+        NewItem();
     }
     
     public void NewItem()
@@ -29,22 +29,22 @@ public abstract class Builder<T> : MonoBehaviour where T : ScriptableObject, IIn
         LoadedItem = default;
         EditingItem = ScriptableObject.CreateInstance<T>();
         EditingItem.Init();
-        AssetDatabase.CreateAsset(EditingItem, Path.Combine(defaultFolder, "_tmp_.asset"));
+        AssetDatabase.CreateAsset(EditingItem, Path.Combine(DefaultFolder, "_tmp_.asset"));
         AssetDatabase.SaveAssets();
         OnReload();
     }
     
-    public bool Open()
+    public bool Open(string path)
     {
-        var path = EditorUtility.OpenFilePanel("Open", StageBuilder.StageFolder, "asset");
         if (string.IsNullOrEmpty(path)) return false;
         
         try
         {
-            var asset = AssetDatabase.LoadAssetAtPath<T>(UnityEditor.FileUtil.GetProjectRelativePath(path));
+            //TODO decoupling
+            var asset = AssetDatabase.LoadAssetAtPath<T>(path);
             if (asset == null)
             {
-                Debug.LogErrorFormat("Cannot load {0} asset at {1}", defaultName, path);
+                Debug.LogErrorFormat("Cannot load {0} asset at {1}", DefaultName, path);
                 return false;
             }
             LoadedItem = asset;
@@ -52,7 +52,7 @@ public abstract class Builder<T> : MonoBehaviour where T : ScriptableObject, IIn
             OnReload();
 
             gameObject.name = Path.GetFileNameWithoutExtension(path);
-            Debug.LogFormat("Opened {0} from {1}", defaultName, path);
+            Debug.LogFormat("Opened {0} from {1}", DefaultName, path);
         }
         catch (Exception ex)
         {
@@ -64,7 +64,7 @@ public abstract class Builder<T> : MonoBehaviour where T : ScriptableObject, IIn
     
     public bool Save()
     {
-        if (LoadedItem == null) return SaveAs();
+        if (LoadedItem == null) return false;
 
         LoadedItem.CopyFrom(EditingItem);
 
@@ -72,26 +72,12 @@ public abstract class Builder<T> : MonoBehaviour where T : ScriptableObject, IIn
         EditorUtility.SetDirty(EditingItem);
         AssetDatabase.SaveAssets();
         
-        Debug.LogFormat("Saved {0} to {1}", defaultName, LoadedItem);
+        Debug.LogFormat("Saved {0} to {1}", DefaultName, LoadedItem);
         return true;
     }
     
-    public bool SaveAs()
+    public bool Save(string path)
     {
-        var rx = new Regex(@"(\d+)");
-        var d = new DirectoryInfo(StageBuilder.StageFolder);
-        var number = 0;
-        if (d.GetFiles(defaultName+"?.asset") is var fileInfos && fileInfos.Count() != 0)
-        {
-            number = fileInfos.Select(s => rx.Match(s.Name)).Where(s => s.Success).Max(s =>
-            {
-                int.TryParse(s.Value, out var num);
-                return num;
-            });
-        }
-        
-        var path = EditorUtility.SaveFilePanel("Save As", StageBuilder.StageFolder, defaultName+(number+1), "asset");
-
         if (string.IsNullOrEmpty(path)) return false;
         
         try
@@ -99,12 +85,12 @@ public abstract class Builder<T> : MonoBehaviour where T : ScriptableObject, IIn
             var asset = ScriptableObject.CreateInstance<T>();
             asset.Init();
             asset.CopyFrom(EditingItem);
-            AssetDatabase.CreateAsset(asset, UnityEditor.FileUtil.GetProjectRelativePath(path));
+            AssetDatabase.CreateAsset(asset, path);
             AssetDatabase.SaveAssets();
             LoadedItem = asset;
 
             gameObject.name = Path.GetFileNameWithoutExtension(path);
-            Debug.LogFormat("Saved {0} to {1}", defaultName, path);
+            Debug.LogFormat("Saved {0} to {1}", DefaultName, path);
             return true;
         }
         catch (Exception ex)
@@ -122,7 +108,7 @@ public abstract class Builder<T> : MonoBehaviour where T : ScriptableObject, IIn
             EditingItem.CopyFrom(LoadedItem);
             EditorUtility.SetDirty(EditingItem);
             OnReload();
-            Debug.LogFormat("Reloaded {0}", defaultName);
+            Debug.LogFormat("Reloaded {0}", DefaultName);
         }
     }
 

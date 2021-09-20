@@ -12,14 +12,15 @@ public class LevelBuilder : Builder<Level>
 {
     //Path
     private const string levelFolder = "Assets/Resources/Data/Levels";
-    public static string LevelFolder => levelFolder;
-    
-    private StageBuilder stageBuilderPrefab;
+
+    private MiniStage miniStagePrefab;
 
     //public Stage SelectedStage;
     
     public Level LoadedLevel { get; private set; }
     public Level EditingLevel { get; private set; }
+
+    private Dictionary<Vector2Int, StageBuilder> stageBuilders;
     
     private void OnEnable()
     {
@@ -32,11 +33,11 @@ public class LevelBuilder : Builder<Level>
         SceneView.duringSceneGui -= DrawSceneGUI;
     }
 
-    public void Init()
+    private void Init()
     {
+        miniStagePrefab = Resources.Load<MiniStage>("Prefabs/Editor/MiniStage");
+        
         base.Init(levelFolder);
-        if (EditingLevel == null) NewItem();
-        stageBuilderPrefab = Resources.Load<StageBuilder>("Prefabs/Editor/StageBuilder");
     }
     
     private void DrawSceneGUI(SceneView sceneview)
@@ -48,22 +49,36 @@ public class LevelBuilder : Builder<Level>
         //Other GUI option
     }
 
-    public void NewStage()
+    public bool ImportStage()
     {
-        var newStageBuilder = Instantiate(stageBuilderPrefab, new Vector3(0, 0, 0), Quaternion.identity, transform);
-        if (!newStageBuilder.SaveAs())
+        //TODO Refactor this into file loader class
+        var path = EditorUtility.OpenFilePanel("Open", StageBuilder.StageFolder, "asset");
+        if (string.IsNullOrEmpty(path)) return false;
+        
+        try
         {
-            DestroyImmediate(newStageBuilder.gameObject);
+            var stage = AssetDatabase.LoadAssetAtPath<Stage>(UnityEditor.FileUtil.GetProjectRelativePath(path));
+            if (stage == null)
+            {
+                Debug.LogErrorFormat("Cannot load {0} asset at {1}", "Stage", path);
+                return false;
+            }
+            
+            var miniStage = Instantiate(miniStagePrefab, Vector3.zero, Quaternion.identity, transform);
+            miniStage.SetStage(stage);
+            miniStage.name = Path.GetFileNameWithoutExtension(path);
         }
+        catch (Exception ex)
+        {
+            Debug.LogErrorFormat("Exception when open asset {0} {1} {2}", path, ex.Message, ex.StackTrace);
+        }
+
+        return true;
     }
 
-    public void ImportStage()
+    public void RemoveStage()
     {
-        var newStageBuilder = Instantiate(stageBuilderPrefab, new Vector3(0, 0, 0), Quaternion.identity, transform);
-        if (!newStageBuilder.Open())
-        {
-            DestroyImmediate(newStageBuilder.gameObject);
-        }
+        
     }
 
     protected override void OnReload()

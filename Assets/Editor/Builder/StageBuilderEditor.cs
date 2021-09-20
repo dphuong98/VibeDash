@@ -9,7 +9,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 
 [CustomEditor(typeof(StageBuilder))]
-public class StageBuilderEditor : Editor
+public class StageBuilderEditor : BuilderEditor<Stage>
 {
     private StageBuilder stageBuilder;
     
@@ -17,9 +17,10 @@ public class StageBuilderEditor : Editor
     private bool expandDropdown;
     private readonly Vector2 expandButtonSize = new Vector2(30, 30);
 
-    private void OnEnable()
+    private new void OnEnable()
     {
-        stageBuilder = target as StageBuilder;
+        base.OnEnable();
+        stageBuilder = builder as StageBuilder;
     }
 
     //TODO what does #if UNITY_EDITOR purpose
@@ -58,27 +59,27 @@ public class StageBuilderEditor : Editor
             {
                 if (GUILayout.Button("New"))
                 {
-                    stageBuilder.NewItem();
+                    NewItem();
                 }
                 
                 if (GUILayout.Button("Open"))
                 {
-                    stageBuilder.Open();
+                    Open();
                 }
 
                 if (GUILayout.Button("Save"))
                 {
-                    stageBuilder.Save();
+                    Save();
                 }
 
                 if (GUILayout.Button("Save As"))
                 {
-                    stageBuilder.SaveAs();
+                    SaveAs();
                 }
 
                 if (GUILayout.Button("Reload"))
                 {
-                    stageBuilder.Reload();
+                    Reload();
                 }
             }
             GUILayout.EndHorizontal();

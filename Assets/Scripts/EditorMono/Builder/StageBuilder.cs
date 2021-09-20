@@ -63,12 +63,11 @@ public class StageBuilder : Builder<Stage>
         SceneView.duringSceneGui -= DrawSceneGUI;
     }
 
-    public void Init()
+    private void Init()
     {
-        base.Init(stageFolder);
         grid = GetComponentInChildren<Grid>();
-
-        if (EditingStage == null) NewItem();
+        
+        base.Init(stageFolder); //This goes last
     }
 
     private void DrawSceneGUI(SceneView sceneview)
