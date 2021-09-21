@@ -237,10 +237,8 @@ public class StageBuilder : Builder<Stage>
         {
             if (hitInfo.collider.gameObject == this.gameObject)
             {
-                Vector3 point = hitInfo.point;
-                var worldPos = hitInfo.collider.gameObject.transform.InverseTransformPoint(point);
-                var temp = grid.WorldToCell(worldPos);
-                gridPos = new Vector2Int(temp.x, temp.y);
+                var gridPos3 = grid.WorldToCell(hitInfo.point);
+                gridPos = new Vector2Int(gridPos3.x, gridPos3.y);
 
                 return true;
             }
@@ -373,83 +371,9 @@ public class StageBuilder : Builder<Stage>
         grid.transform.localPosition = new Vector3(posX, posY, 0);
     }
 
-    [ContextMenu("CreateSolution")]
     private void CreateSolution()
     {
-        if (EditingStage == null || EditingStage.GetEntrance() == -Vector2Int.one || EditingStage.GetExit() == -Vector2Int.one)
-        {
-            solution = null; return;
-        }
-            
-        //Brute force
-        //Find all path from entrance to exit -> Get path that covers the most tiles -> Get shortest path from which
-        if (MapNode(new Graph<Vector2Int>(), EditingStage.GetEntrance(), out var allExitPaths))
-        {
-            var fullPath = allExitPaths.GroupBy(s => s.Distinct().Count()).Aggregate((i1,i2) => i1.Key > i2.Key ? i1 : i2);
-            var shortestFullPath = fullPath.GroupBy(s => s.Count).Aggregate((i1,i2) => i1.Key < i2.Key ? i1 : i2);
-            solution = shortestFullPath.First();
-            solution.Insert(0, EditingStage.GetEntrance());
-        }
-    }
-
-    //TODO can this even be sensibly refactored
-    private bool MapNode(Graph<Vector2Int> traceGraph, Vector2Int currentNode, out List<List<Vector2Int>> exitPaths)
-    {
-        exitPaths = new List<List<Vector2Int>>();
-        
-        if (EditingStage[currentNode.x, currentNode.y] == TileType.Exit)
-            return true;
-
-        var direction = Vector2Int.up;
-
-        do
-        {
-            if (traceGraph.ExistDirectedPath(currentNode, currentNode + direction))
-            {
-                direction.RotateClockwise(); continue;
-            }
-            
-            //Exit path detected
-            if (EditingStage.TryMove(currentNode, direction, out var scoutPath))
-            {
-                if (scoutPath.Count == 0)
-                {
-                    direction.RotateClockwise(); continue;
-                }
-                
-                //Trace Stacks
-                traceGraph.AddDirected(currentNode, scoutPath.First());
-                for (int i = 0; i < scoutPath.Count - 1; i++)
-                {
-                    traceGraph.AddDirected(scoutPath[i], scoutPath[i+1]);
-                }
-
-                //Recursion ends when DFS meet an exit. Only return false when exit doesnt exist
-                if (MapNode(traceGraph, scoutPath.Last(), out var scoutPath2))
-                {
-                    if (scoutPath2.Count == 0)
-                    {
-                        exitPaths.Add(scoutPath);
-                    }
-                    
-                    foreach (var i in scoutPath2)
-                    {
-                        exitPaths.Add(scoutPath.Concat(i).ToList());
-                    }
-                }
-
-                //Remove Trace Stacks
-                traceGraph.RemoveDirected(currentNode, scoutPath.First());
-                for (int i = 0; i < scoutPath.Count - 1; i++)
-                {
-                    traceGraph.RemoveDirected(scoutPath[i], scoutPath[i+1]);
-                }
-            }
-            
-            direction.RotateClockwise();
-        } while (direction != Vector2Int.up);
-
-        return exitPaths.Count > 0;
+        solution = Pathfinding.GetSolution(EditingStage);
     }
 
     protected override void OnReload()

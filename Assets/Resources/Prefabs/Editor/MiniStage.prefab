@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 5450267004517415069}
   - component: {fileID: 6436926983124552686}
   - component: {fileID: 8129797619811895115}
+  - component: {fileID: 2628116675088413989}
   m_Layer: 0
-  m_Name: Shape
+  m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -95,6 +96,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
+--- !u!114 &2628116675088413989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3679970767981754463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d3ade45555b4f54eb9b827888411618, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Stage: {fileID: 0}
 --- !u!1 &5917536920820238496
 GameObject:
   m_ObjectHideFlags: 0
@@ -147,7 +161,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7170596093451154490}
-  - component: {fileID: 7555332441446426158}
   m_Layer: 0
   m_Name: MiniStage
   m_TagString: Untagged
@@ -163,23 +176,10 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7170596093451154494}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7, y: 2, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 7381418558124821853}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7555332441446426158
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7170596093451154494}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d3ade45555b4f54eb9b827888411618, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Stage: {fileID: 11400000, guid: b10b09bee5e688c4393c9f745a0692a0, type: 2}

@@ -91,8 +91,7 @@ public class MiniStage : MonoBehaviour
     {
         if (Selection.activeGameObject == this.gameObject &&
             Event.current.type == EventType.MouseDown &&
-            Event.current.modifiers == EventModifiers.None &&
-            TileSelected(out var gridPos))
+            Event.current.modifiers == EventModifiers.None)
         {
             if (Event.current.button == 1)
             {
@@ -100,11 +99,13 @@ public class MiniStage : MonoBehaviour
                 TileMenu().ShowAsContext();
                 
                 Event.current.Use();
+                return;
             }
         }
+
     }
     
-    private bool TileSelected(out Vector2Int gridPos)
+    public bool TileSelected(out Vector2Int gridPos)
     {
         var worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
 
@@ -112,11 +113,9 @@ public class MiniStage : MonoBehaviour
         {
             if (hitInfo.collider.gameObject == this.gameObject)
             {
-                Vector3 point = hitInfo.point;
-                var worldPos = hitInfo.collider.gameObject.transform.InverseTransformPoint(point);
-                var temp = grid.WorldToCell(worldPos);
-                gridPos = new Vector2Int(temp.x, temp.y);
-
+                var gridPos3 = grid.WorldToCell(hitInfo.point);
+                gridPos = new Vector2Int(gridPos3.x, gridPos3.y);
+                
                 return true;
             }
         }
@@ -175,8 +174,7 @@ public class MiniStage : MonoBehaviour
     [ContextMenu("CreateMesh")]
     private void CreateBackgroundMesh()
     {
-        //TODO custom pivot
-        meshFilter.sharedMesh = MeshGenerator.Quad(Stage.Size.x + 2, Stage.Size.y + 2, Vector3.back);
+        GetComponent<MeshCollider>().sharedMesh = meshFilter.sharedMesh = MeshGenerator.Quad(Stage.Size.x + 2, Stage.Size.y + 2, Vector3.back);
         var posX = (Stage.Size.x + 2) / 2.0f * grid.cellSize.x;
         var posY = (Stage.Size.y + 2) / 2.0f * grid.cellSize.y;
         meshFilter.transform.localPosition = new Vector3(posX, posY, 0);

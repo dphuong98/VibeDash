@@ -19,13 +19,6 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
             tiles.Add(TileType.Wall);
     }
 
-    public static Stage CreateStage()
-    {
-        var newStage = CreateInstance<Stage>();
-        newStage.Init();
-        return newStage;
-    }
-
     public bool IsOnBorder(Vector2Int tilePos)
     {
         return 0 == tilePos.x || tilePos.x == size.x - 1 || 0 == tilePos.y || tilePos.y == size.y - 1;
@@ -51,26 +44,6 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
         tiles = new List<TileType>(other.tiles);
     }
 
-    public Vector2Int GetEntrance()
-    {
-        if (tiles.IndexOf(TileType.Entrance) is var tilePos && tilePos != -1)
-        {
-            return new Vector2Int(tilePos % size.x, tilePos / size.x);
-        }
-
-        return -Vector2Int.one;
-    }
-    
-    public Vector2Int GetExit()
-    {
-        if (tiles.IndexOf(TileType.Exit) is var tilePos && tilePos != -1)
-        {
-            return new Vector2Int(tilePos % size.x, tilePos / size.x);
-        }
-
-        return -Vector2Int.one;
-    }
-    
     public void ExpandBottom()
     {
         for (int r = size.x - 1; r >= 0; r--)
@@ -184,5 +157,25 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
             tiles.RemoveAt(tiles.Count - 1);
         }
         size.y--;
+    }
+    
+    public Vector2Int GetEntrance()
+    {
+        if (tiles.IndexOf(TileType.Entrance) is var tilePos && tilePos != -1)
+        {
+            return new Vector2Int(tilePos % size.x, tilePos / size.x);
+        }
+
+        return -Vector2Int.one;
+    }
+    
+    public Vector2Int GetExit()
+    {
+        if (tiles.IndexOf(TileType.Exit) is var tilePos && tilePos != -1)
+        {
+            return new Vector2Int(tilePos % size.x, tilePos / size.x);
+        }
+
+        return -Vector2Int.one;
     }
 }

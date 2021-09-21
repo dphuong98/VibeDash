@@ -15,13 +15,6 @@ public class Level : ScriptableObject, IInit, ICopiable<Level>
         
     }
     
-    public static Level CreateLevel()
-    {
-        var newLevel = CreateInstance<Level>();
-        newLevel.Init();
-        return newLevel;
-    }
-    
     public void CopyFrom(Level other)
     {
         stages = new Dictionary<Vector2Int, Stage>(other.stages);
