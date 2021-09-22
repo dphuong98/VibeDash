@@ -25,7 +25,7 @@ public class LevelBuilder : Builder<Level>
     private static Vector2Int lastestBridgePart;
     private static Bridge editingBridge;
     
-    public List<MiniStage> stages = new List<MiniStage>();
+    public List<MiniStage> miniStages = new List<MiniStage>();
     public List<Bridge> bridges = new List<Bridge>();
     
     private void OnEnable()
@@ -61,20 +61,36 @@ public class LevelBuilder : Builder<Level>
         //Other GUI option
     }
 
-    private void Update()
+    public override void NewItem()
     {
-        stages.RemoveAll(s => s == null);
+        foreach (Transform child in transform) DestroyImmediate(child.gameObject);
+        
+        base.NewItem();
+    }
+    
+    public override bool Open(string path)
+    {
+        if (!base.Open(path)) return false;
+
+        //Spawn MiniStages
+        foreach (Transform child in transform) DestroyImmediate(child.gameObject);
+
+        var tmp = EditingLevel.GetStages();
+        foreach (var stage in EditingLevel.GetStages())
+        {
+            ImportStage(AssetDatabase.GetAssetPath(stage.Key));
+        }
+        
+        return true;
     }
 
-    public void ImportStage()
+    public void ImportStage(string path)
     {
-        //TODO Refactor this into file loader class
-        var path = EditorUtility.OpenFilePanel("Open", StageBuilder.StageFolder, "asset");
         if (string.IsNullOrEmpty(path)) return;
         
         try
         {
-            var stage = AssetDatabase.LoadAssetAtPath<Stage>(UnityEditor.FileUtil.GetProjectRelativePath(path));
+            var stage = AssetDatabase.LoadAssetAtPath<Stage>(path);
             if (stage == null)
             {
                 Debug.LogErrorFormat("Cannot load {0} asset at {1}", "Stage", path);
@@ -85,12 +101,19 @@ public class LevelBuilder : Builder<Level>
             var miniStage = miniStageObject.GetComponentInChildren<MiniStage>();
             miniStage.SetStage(stage);
             miniStageObject.name = Path.GetFileNameWithoutExtension(path);
-            stages.Add(miniStage);
+            miniStages.Add(miniStage);
         }
         catch (Exception ex)
         {
             Debug.LogErrorFormat("Exception when open asset {0} {1} {2}", path, ex.Message, ex.StackTrace);
         }
+    }
+
+    private void Update()
+    {
+        miniStages.RemoveAll(s => s == null);
+        var stageData = miniStages.ToDictionary(s => s.Stage, s => grid.WorldToCell(s.transform.position).ToVector2Int());
+        EditingLevel.Import(stageData);
     }
 
     private void HandleClick(SceneView sceneView)

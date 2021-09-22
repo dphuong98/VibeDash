@@ -161,8 +161,8 @@ public class MiniStage : MonoBehaviour
 
     private void OpenInStageBuilder(object stage)
     {
-        var stageInstance = stage as Stage;
-        StageBuilderScene.loadStageUponEnable = AssetDatabase.GetAssetPath(stageInstance);
+        var stageObject = stage as Stage;
+        StageBuilderScene.loadStageUponEnable = AssetDatabase.GetAssetPath(stageObject);
         EditorApplication.ExecuteMenuItem("VibeDash/StageBuilder");
     }
     

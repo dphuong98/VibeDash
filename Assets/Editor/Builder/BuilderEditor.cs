@@ -16,24 +16,24 @@ public class BuilderEditor<T> : Editor where T : ScriptableObject, IInit, ICopia
         builder = target as Builder<T>;
     }
 
-    public void NewItem()
+    public virtual void NewItem()
     {
         builder.NewItem();
     }
 
-    public void Open()
+    public virtual void Open()
     {
         var path = EditorUtility.OpenFilePanel("Open", Builder<T>.DefaultFolder, "asset");
         builder.Open(FileUtil.GetProjectRelativePath(path));
     }
 
-    public void Save()
+    public virtual void Save()
     {
         if (!builder.Save())
             SaveAs();
     }
 
-    public void SaveAs()
+    public virtual void SaveAs()
     {
         var rx = new Regex(@"(\d+)");
         var d = new DirectoryInfo(Builder<T>.DefaultFolder);
@@ -51,7 +51,7 @@ public class BuilderEditor<T> : Editor where T : ScriptableObject, IInit, ICopia
         builder.Save(FileUtil.GetProjectRelativePath(path));
     }
 
-    public void Reload()
+    public virtual void Reload()
     {
         builder.Reload();
     }

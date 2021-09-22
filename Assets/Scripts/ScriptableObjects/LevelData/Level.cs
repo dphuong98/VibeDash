@@ -7,7 +7,6 @@ using UnityEngine.EventSystems;
 
 public class Level : ScriptableObject, IInit, ICopiable<Level>
 {
-    //TODO is this ref?
     [SerializeField, HideInInspector] private Dictionary<Stage, Vector2Int> stages = new Dictionary<Stage, Vector2Int>();
 
     public void Init()
@@ -15,28 +14,18 @@ public class Level : ScriptableObject, IInit, ICopiable<Level>
         
     }
 
-    public Dictionary<Stage, Vector2Int> GetStages()
-    {
-        return stages;
-    }
-    
     public void CopyFrom(Level other)
     {
         stages = new Dictionary<Stage, Vector2Int>(other.stages);
     }
 
-    public void AddStage(Stage stage, Vector2Int gridPos)
+    public void Import(Dictionary<Stage, Vector2Int> stages)
     {
-        stages.Add(stage, gridPos);
+        this.stages = new Dictionary<Stage, Vector2Int>(stages);
     }
 
-    public void UpdateStagePosition(Stage stage, Vector2Int gridPos)
+    public Dictionary<Stage, Vector2Int> GetStages()
     {
-        
-    }
-
-    public void RemoveStage(Stage stage)
-    {
-        stages.Remove(stage);
+        return stages;
     }
 }

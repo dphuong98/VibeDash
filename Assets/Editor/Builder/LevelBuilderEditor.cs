@@ -71,7 +71,7 @@ public class LevelBuilderEditor : BuilderEditor<Level>
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("ImportStage"))
             {
-                levelBuilder.ImportStage();
+                ImportStage();
             }
             GUILayout.EndHorizontal();
         #endregion
@@ -95,5 +95,22 @@ public class LevelBuilderEditor : BuilderEditor<Level>
         #endregion
         
         //End OnInspectorGUI
+    }
+
+    public override void NewItem()
+    {
+        levelBuilder.NewItem();
+    }
+
+    public override void Open()
+    {
+        var path = EditorUtility.OpenFilePanel("Open", LevelBuilder.DefaultFolder, "asset");
+        levelBuilder.Open(FileUtil.GetProjectRelativePath(path));
+    }
+
+    private void ImportStage()
+    {
+        var path = EditorUtility.OpenFilePanel("Open", StageBuilder.StageFolder, "asset");
+        levelBuilder.ImportStage(FileUtil.GetProjectRelativePath(path));
     }
 }

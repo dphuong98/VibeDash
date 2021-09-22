@@ -24,7 +24,7 @@ public abstract class Builder<T> : MonoBehaviour where T : ScriptableObject, IIn
         NewItem();
     }
     
-    public void NewItem()
+    public virtual void NewItem()
     {
         LoadedItem = default;
         EditingItem = ScriptableObject.CreateInstance<T>();
@@ -34,7 +34,7 @@ public abstract class Builder<T> : MonoBehaviour where T : ScriptableObject, IIn
         OnReload();
     }
     
-    public bool Open(string path)
+    public virtual bool Open(string path)
     {
         if (string.IsNullOrEmpty(path)) return false;
         
@@ -62,7 +62,7 @@ public abstract class Builder<T> : MonoBehaviour where T : ScriptableObject, IIn
         return true;
     }
     
-    public bool Save()
+    public virtual bool Save()
     {
         if (LoadedItem == null) return false;
 
@@ -76,7 +76,7 @@ public abstract class Builder<T> : MonoBehaviour where T : ScriptableObject, IIn
         return true;
     }
     
-    public bool Save(string path)
+    public virtual bool Save(string path)
     {
         if (string.IsNullOrEmpty(path)) return false;
         
@@ -101,7 +101,7 @@ public abstract class Builder<T> : MonoBehaviour where T : ScriptableObject, IIn
         return false;
     }
     
-    public void Reload()
+    public virtual void Reload()
     {
         if (LoadedItem != null)
         {
