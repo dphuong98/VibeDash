@@ -33,6 +33,7 @@ public class LevelBuilderEditor : BuilderEditor<Level>
             GUILayout.Label("File", EditorStyles.boldLabel);
             GUI.enabled = false;
             EditorGUILayout.ObjectField("Loaded Level: ", levelBuilder.LoadedLevel, typeof(Level), true);
+            EditorGUILayout.ObjectField("Editing Level: ", levelBuilder.EditingLevel, typeof(Level), true);
             GUI.enabled = true;
             GUILayout.BeginHorizontal();
             {

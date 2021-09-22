@@ -115,11 +115,8 @@ public class StageBuilder : Builder<Stage>
 
             if (Event.current.button == 1)
             {
-                
                 SceneView.RepaintAll();
                 TileMenu(SelectedTile).ShowAsContext();
-                
-                Event.current.Use();
             }
         }
     }

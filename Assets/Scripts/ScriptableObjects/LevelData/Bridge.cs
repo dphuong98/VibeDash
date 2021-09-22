@@ -1,11 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public class Bridge
 {
-    public readonly int MaxLength;
-    public List<Vector2Int> bridgeParts;
+    [SerializeField] public readonly int MaxLength;
+    [SerializeField] public List<Vector2Int> bridgeParts;
 
     public Bridge(int maxLength)
     {

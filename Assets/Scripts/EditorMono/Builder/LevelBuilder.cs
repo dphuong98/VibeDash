@@ -25,8 +25,10 @@ public class LevelBuilder : Builder<Level>
     private static Vector2Int lastestBridgePart;
     private static Bridge editingBridge;
     
-    public List<MiniStage> miniStages = new List<MiniStage>();
-    public List<Bridge> bridges = new List<Bridge>();
+    [SerializeField]
+    private List<MiniStage> miniStages;
+    [SerializeField]
+    private List<Bridge> bridges;
     
     private void OnEnable()
     {
@@ -43,6 +45,9 @@ public class LevelBuilder : Builder<Level>
     {
         grid = GetComponent<Grid>();
         miniStagePrefab = Resources.Load<GameObject>("Prefabs/Editor/MiniStage");
+        
+        if (miniStages == null) miniStages = new List<MiniStage>();
+        if (bridges == null) bridges = new List<Bridge>();
         
         base.Init(levelFolder);
     }
@@ -63,28 +68,32 @@ public class LevelBuilder : Builder<Level>
 
     public override void NewItem()
     {
-        foreach (Transform child in transform) DestroyImmediate(child.gameObject);
-        
+        for (int i = transform.childCount - 1; i >= 0; i--)
+            DestroyImmediate(transform.GetChild(i).gameObject);
+        bridges = new List<Bridge>();
+
         base.NewItem();
     }
     
     public override bool Open(string path)
     {
+        NewItem();
+        
         if (!base.Open(path)) return false;
 
-        //Spawn MiniStages
-        foreach (Transform child in transform) DestroyImmediate(child.gameObject);
-
-        var tmp = EditingLevel.GetStages();
-        foreach (var stage in EditingLevel.GetStages())
+        foreach (var stage in EditingLevel.Stages)
         {
-            ImportStage(AssetDatabase.GetAssetPath(stage.Key));
+            var gridPos = new Vector3Int(stage.Value.x, stage.Value.y, 0);
+            var position = grid.CellToWorld(gridPos);
+            ImportStage(AssetDatabase.GetAssetPath(stage.Key), position);
         }
+
+        bridges = EditingLevel.Bridges;
         
         return true;
     }
 
-    public void ImportStage(string path)
+    public void ImportStage(string path, Vector3 position = default)
     {
         if (string.IsNullOrEmpty(path)) return;
         
@@ -96,8 +105,14 @@ public class LevelBuilder : Builder<Level>
                 Debug.LogErrorFormat("Cannot load {0} asset at {1}", "Stage", path);
                 return;
             }
+
+            if (miniStages.Any(s => s.Stage == stage))
+            {
+                Debug.LogError("A level cannot contain the same stage twice");
+                return;
+            }
             
-            var miniStageObject = Instantiate(miniStagePrefab, Vector3.zero, Quaternion.identity, transform);
+            var miniStageObject = Instantiate(miniStagePrefab, position, Quaternion.identity, transform);
             var miniStage = miniStageObject.GetComponentInChildren<MiniStage>();
             miniStage.SetStage(stage);
             miniStageObject.name = Path.GetFileNameWithoutExtension(path);
@@ -112,8 +127,10 @@ public class LevelBuilder : Builder<Level>
     private void Update()
     {
         miniStages.RemoveAll(s => s == null);
-        var stageData = miniStages.ToDictionary(s => s.Stage, s => grid.WorldToCell(s.transform.position).ToVector2Int());
-        EditingLevel.Import(stageData);
+        
+        var stageData =
+            miniStages.ToDictionary(s => s.Stage, s => grid.WorldToCell(s.GetPosition()).ToVector2Int());
+        EditingLevel.Import(stageData, bridges);
     }
 
     private void HandleClick(SceneView sceneView)
@@ -138,7 +155,6 @@ public class LevelBuilder : Builder<Level>
                         editingBridge = new Bridge(Pathfinding.GetMaximumUniqueTile(miniStage.Stage));
                         var mouseGridPos3 = grid.WorldToCell(mousePos);
                         editingBridge.bridgeParts.Add(new Vector2Int(mouseGridPos3.x, mouseGridPos3.y));
-                        Event.current.Use();
                         return;
                     }
             
@@ -150,7 +166,6 @@ public class LevelBuilder : Builder<Level>
                     
                         bridges.Add(editingBridge);
                         editingBridge = null;
-                        Event.current.Use();
                         return;
                     }
                 }
@@ -165,7 +180,6 @@ public class LevelBuilder : Builder<Level>
         if (Event.current.button == 0)
         {
             editingBridge = null;
-            Event.current.Use();
         }
     }
 
@@ -228,10 +242,5 @@ public class LevelBuilder : Builder<Level>
         }
         
         if (mouseGridPos != editingBridge.bridgeParts.Last()) editingBridge.bridgeParts.Add(mouseGridPos);
-    }
-
-    protected override void OnReload()
-    {
-        
     }
 }

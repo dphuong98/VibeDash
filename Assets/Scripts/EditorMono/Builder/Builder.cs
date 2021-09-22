@@ -11,7 +11,7 @@ using UnityEngine;
 public abstract class Builder<T> : MonoBehaviour where T : ScriptableObject, IInit, ICopiable<T>
 {
     public static string DefaultName { get; } = typeof(T).ToString();
-
+    
     //Path
     public static string DefaultFolder { get; private set; }
 
@@ -21,7 +21,7 @@ public abstract class Builder<T> : MonoBehaviour where T : ScriptableObject, IIn
     public void Init(string defaultFolder)
     {
         DefaultFolder = defaultFolder;
-        NewItem();
+        if (EditingItem == null) NewItem();
     }
     
     public virtual void NewItem()

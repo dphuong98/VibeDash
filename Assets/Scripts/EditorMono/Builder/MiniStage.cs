@@ -37,7 +37,7 @@ public class MiniStage : MonoBehaviour
     {
         SceneView.duringSceneGui -= DrawSceneGUI;
     }
-
+    
     private void Init()
     {
         grid = GetComponentInChildren<Grid>();
@@ -97,12 +97,14 @@ public class MiniStage : MonoBehaviour
             {
                 SceneView.RepaintAll();
                 TileMenu().ShowAsContext();
-                
-                Event.current.Use();
-                return;
             }
         }
 
+    }
+
+    public Vector3 GetPosition()
+    {
+        return transform.parent.position;
     }
     
     public bool TileSelected(out Vector2Int gridPos)

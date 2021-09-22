@@ -8,6 +8,10 @@ using UnityEngine.EventSystems;
 public class Level : ScriptableObject, IInit, ICopiable<Level>
 {
     [SerializeField, HideInInspector] private Dictionary<Stage, Vector2Int> stages = new Dictionary<Stage, Vector2Int>();
+    public Dictionary<Stage, Vector2Int> Stages => new Dictionary<Stage, Vector2Int>(stages);
+    
+    [SerializeField, HideInInspector] private List<Bridge> bridges = new List<Bridge>();
+    public List<Bridge> Bridges => new List<Bridge>(bridges);
 
     public void Init()
     {
@@ -16,16 +20,13 @@ public class Level : ScriptableObject, IInit, ICopiable<Level>
 
     public void CopyFrom(Level other)
     {
-        stages = new Dictionary<Stage, Vector2Int>(other.stages);
+        this.stages = new Dictionary<Stage, Vector2Int>(other.stages);
+        this.bridges = new List<Bridge>(other.bridges);
     }
 
-    public void Import(Dictionary<Stage, Vector2Int> stages)
+    public void Import(Dictionary<Stage, Vector2Int> stages, List<Bridge> bridges)
     {
         this.stages = new Dictionary<Stage, Vector2Int>(stages);
-    }
-
-    public Dictionary<Stage, Vector2Int> GetStages()
-    {
-        return stages;
+        this.bridges = new List<Bridge>(bridges);
     }
 }
