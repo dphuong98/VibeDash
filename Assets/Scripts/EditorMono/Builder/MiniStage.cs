@@ -168,7 +168,7 @@ public class MiniStage : MonoBehaviour
     
     private void RemoveSelf()
     {
-        DestroyImmediate(gameObject);
+        DestroyImmediate(transform.parent.gameObject);
     }
 
     [ContextMenu("CreateMesh")]

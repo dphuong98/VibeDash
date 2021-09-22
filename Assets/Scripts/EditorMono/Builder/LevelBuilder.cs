@@ -25,7 +25,8 @@ public class LevelBuilder : Builder<Level>
     private static Vector2Int lastestBridgePart;
     private static Bridge editingBridge;
     
-    public List<MiniStage> stages;
+    public List<MiniStage> stages = new List<MiniStage>();
+    public List<Bridge> bridges = new List<Bridge>();
     
     private void OnEnable()
     {
@@ -53,7 +54,8 @@ public class LevelBuilder : Builder<Level>
         HandleClick(sceneView);
 
         //Render and handle bridge connections
-        RenderBridgeBuilder();
+        DrawBridge();
+        DrawBridgeBuilder();
         HandleBridgeBuilding(sceneView);
 
         //Other GUI option
@@ -79,10 +81,11 @@ public class LevelBuilder : Builder<Level>
                 return;
             }
             
-            var miniStage = Instantiate(miniStagePrefab, Vector3.zero, Quaternion.identity, transform);
-            miniStage.GetComponentInChildren<MiniStage>().SetStage(stage);
-            miniStage.name = Path.GetFileNameWithoutExtension(path);
-            stages.Add(miniStage.GetComponentInChildren<MiniStage>());
+            var miniStageObject = Instantiate(miniStagePrefab, Vector3.zero, Quaternion.identity, transform);
+            var miniStage = miniStageObject.GetComponentInChildren<MiniStage>();
+            miniStage.SetStage(stage);
+            miniStageObject.name = Path.GetFileNameWithoutExtension(path);
+            stages.Add(miniStage);
         }
         catch (Exception ex)
         {
@@ -93,47 +96,54 @@ public class LevelBuilder : Builder<Level>
     private void HandleClick(SceneView sceneView)
     {
         if (Event.current.type != EventType.MouseDown ||
-            Event.current.modifiers != EventModifiers.None ||
-            Event.current.button != 0) return;
-        
-        //Function that return any ministage it hits
-        //Function that check grid hit on that stage
+            Event.current.modifiers != EventModifiers.None)
+            return;
+                
         if (RaycastMiniStage(out var miniStage) &&
             miniStage.TileSelected(out var gridPos))
         {
             var stage = miniStage.Stage;
             var mousePos = sceneView.SceneViewToWorld();
 
-            if (0 <= gridPos.x && gridPos.x < stage.Size.x && 0 <= gridPos.y && gridPos.y < stage.Size.y)
+            //Left mouse clicked
+            if (Event.current.button == 0)
             {
-                if (editingBridge == null && stage[gridPos.x, gridPos.y] == TileType.Exit)
+                if (0 <= gridPos.x && gridPos.x < stage.Size.x && 0 <= gridPos.y && gridPos.y < stage.Size.y)
                 {
-                    editingBridge = new Bridge(Pathfinding.GetMaximumUniqueTile(miniStage.Stage));
-                    var mouseGridPos3 = grid.WorldToCell(mousePos);
-                    editingBridge.bridgeParts.Add(new Vector2Int(mouseGridPos3.x, mouseGridPos3.y));
-                    Event.current.Use();
-                    return;
-                }
+                    if (editingBridge == null && stage[gridPos.x, gridPos.y] == TileType.Exit)
+                    {
+                        editingBridge = new Bridge(Pathfinding.GetMaximumUniqueTile(miniStage.Stage));
+                        var mouseGridPos3 = grid.WorldToCell(mousePos);
+                        editingBridge.bridgeParts.Add(new Vector2Int(mouseGridPos3.x, mouseGridPos3.y));
+                        Event.current.Use();
+                        return;
+                    }
             
-                if (editingBridge != null && stage[gridPos.x, gridPos.y] == TileType.Entrance)
-                {
-                    //End bridge and append to scriptable
-                    var mouseGridPos3 = grid.WorldToCell(mousePos);
-                    editingBridge.bridgeParts.Add(new Vector2Int(mouseGridPos3.x, mouseGridPos3.y));
+                    if (editingBridge != null && stage[gridPos.x, gridPos.y] == TileType.Entrance)
+                    {
+                        //End bridge and append to scriptable
+                        var mouseGridPos3 = grid.WorldToCell(mousePos);
+                        editingBridge.bridgeParts.Add(new Vector2Int(mouseGridPos3.x, mouseGridPos3.y));
                     
-                    
-                    Event.current.Use();
-                    return;
+                        bridges.Add(editingBridge);
+                        editingBridge = null;
+                        Event.current.Use();
+                        return;
+                    }
                 }
             }
+
+            if (Event.current.button == 1)
+            {
+                
+            }
         }
-        
-        editingBridge = null;
-        Event.current.Use();
-        
-        //Click on objectives
-        
-        //Click on non-objectives
+
+        if (Event.current.button == 0)
+        {
+            editingBridge = null;
+            Event.current.Use();
+        }
     }
 
     private bool RaycastMiniStage(out MiniStage miniStage)
@@ -153,7 +163,7 @@ public class LevelBuilder : Builder<Level>
         return false;
     }
 
-    private void RenderBridgeBuilder()
+    private void DrawBridgeBuilder()
     {
         if (editingBridge == null) return;
 
@@ -161,6 +171,17 @@ public class LevelBuilder : Builder<Level>
         for (int i = 0; i < editingBridge.bridgeParts.Count - 1; i++)
         {
             Handles.DrawLine(grid.GetCellCenterWorld(editingBridge.bridgeParts[i]), (grid.GetCellCenterWorld(editingBridge.bridgeParts[i+1])));
+        }
+    }
+
+    private void DrawBridge()
+    {
+        foreach (var bridge in bridges)
+        {
+            for (int i = 0; i < bridge.bridgeParts.Count - 1; i++)
+            {
+                Handles.DrawLine(grid.GetCellCenterWorld(bridge.bridgeParts[i]), (grid.GetCellCenterWorld(bridge.bridgeParts[i+1])));
+            }
         }
     }
 
