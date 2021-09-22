@@ -46,8 +46,8 @@ public class LevelBuilder : Builder<Level>
         grid = GetComponent<Grid>();
         miniStagePrefab = Resources.Load<GameObject>("Prefabs/Editor/MiniStage");
         
-        if (miniStages == null) miniStages = new List<MiniStage>();
-        if (bridges == null) bridges = new List<Bridge>();
+        miniStages = new List<MiniStage>();
+        bridges = new List<Bridge>();
         
         base.Init(levelFolder);
     }
@@ -70,6 +70,8 @@ public class LevelBuilder : Builder<Level>
     {
         for (int i = transform.childCount - 1; i >= 0; i--)
             DestroyImmediate(transform.GetChild(i).gameObject);
+        
+        miniStages = new List<MiniStage>();
         bridges = new List<Bridge>();
 
         base.NewItem();
@@ -88,7 +90,7 @@ public class LevelBuilder : Builder<Level>
             ImportStage(AssetDatabase.GetAssetPath(stage.Key), position);
         }
 
-        bridges = EditingLevel.Bridges;
+        bridges = new List<Bridge>(EditingLevel.Bridges);
         
         return true;
     }
