@@ -13,6 +13,7 @@ public abstract class Builder<T> : MonoBehaviour where T : ScriptableObject, IIn
     public static string DefaultName { get; } = typeof(T).ToString();
     
     //Path
+    //TODO This static variable is shared between derived
     public static string DefaultFolder { get; private set; }
 
     public T LoadedItem { get; private set; }

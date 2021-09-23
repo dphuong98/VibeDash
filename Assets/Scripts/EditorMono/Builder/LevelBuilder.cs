@@ -95,6 +95,27 @@ public class LevelBuilder : Builder<Level>
         return true;
     }
 
+    public override bool Save()
+    {
+        ApplyChanges();
+        return base.Save();
+    }
+
+    public override bool Save(string path)
+    {
+        ApplyChanges();
+        return base.Save(path);
+    }
+
+    private void ApplyChanges()
+    {
+        miniStages.RemoveAll(s => s == null);
+        
+        var stageData =
+            miniStages.ToDictionary(s => s.Stage, s => grid.WorldToCell(s.GetPosition()).ToVector2Int());
+        EditingLevel.Import(stageData, bridges);
+    }
+
     public void ImportStage(string path, Vector3 position = default)
     {
         if (string.IsNullOrEmpty(path)) return;
@@ -124,15 +145,6 @@ public class LevelBuilder : Builder<Level>
         {
             Debug.LogErrorFormat("Exception when open asset {0} {1} {2}", path, ex.Message, ex.StackTrace);
         }
-    }
-
-    private void Update()
-    {
-        miniStages.RemoveAll(s => s == null);
-        
-        var stageData =
-            miniStages.ToDictionary(s => s.Stage, s => grid.WorldToCell(s.GetPosition()).ToVector2Int());
-        EditingLevel.Import(stageData, bridges);
     }
 
     private void HandleClick(SceneView sceneView)
@@ -228,10 +240,7 @@ public class LevelBuilder : Builder<Level>
     {
         //Get current grid tile relative to bridge start
         if (editingBridge == null) return;
-        
-        Debug.Log("Bridge building: " + (editingBridge != null));
-        Debug.Log("Bridge length: " + (editingBridge?.bridgeParts.Count));
-        
+
         var mousePos = sceneView.SceneViewToWorld();
         var mouseGridPos3 = grid.WorldToCell(mousePos);
         var mouseGridPos = new Vector2Int(mouseGridPos3.x, mouseGridPos3.y);

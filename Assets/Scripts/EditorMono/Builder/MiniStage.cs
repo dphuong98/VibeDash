@@ -140,7 +140,7 @@ public class MiniStage : MonoBehaviour
     private void ChangeStage()
     {
         //TODO Refactor this into file loader class
-        var path = EditorUtility.OpenFilePanel("Open", StageBuilder.StageFolder, "asset");
+        var path = EditorUtility.OpenFilePanel("Open", StageBuilder.DefaultFolder, "asset");
         if (string.IsNullOrEmpty(path)) return;
         
         try

@@ -67,7 +67,7 @@ public class StageBuilder : Builder<Stage>
     {
         grid = GetComponentInChildren<Grid>();
         
-        base.Init(stageFolder); //This goes last
+        base.Init(stageFolder);
     }
 
     private void DrawSceneGUI(SceneView sceneview)
