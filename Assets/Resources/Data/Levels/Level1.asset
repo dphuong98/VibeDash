@@ -10,23 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7b600e0df47ceb74ca2d142a423ef708, type: 3}
-  m_Name: Level8
+  m_Name: Level1
   m_EditorClassIdentifier: 
+  stageItems:
+  - {fileID: 11400000, guid: d63eeb36f09311e4580e2250363be3f4, type: 2}
+  - {fileID: 11400000, guid: bb50c6f9ab09f6e469d9acdad12afa87, type: 2}
+  stagesPositions:
+  - {x: 0, y: 0}
+  - {x: -2, y: 9}
   bridges:
   - bridgeParts:
     - {x: 5, y: 5}
     - {x: 5, y: 6}
     - {x: 5, y: 7}
     - {x: 5, y: 8}
-    - {x: 6, y: 8}
-    - {x: 7, y: 8}
-    - {x: 8, y: 8}
-    - {x: 9, y: 8}
-    - {x: 10, y: 8}
-    - {x: 11, y: 8}
-    - {x: 12, y: 8}
-    - {x: 13, y: 8}
-    - {x: 14, y: 8}
-    - {x: 14, y: 9}
-    - {x: 14, y: 10}
-    - {x: 14, y: 10}
+    - {x: 5, y: 9}
+    - {x: 5, y: 10}
+    - {x: 5, y: 10}

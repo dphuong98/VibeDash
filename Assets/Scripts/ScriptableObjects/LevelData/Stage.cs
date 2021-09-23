@@ -1,11 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
 using UnityEngine;
 
-[CreateAssetMenu]
+[Serializable]
 public class Stage : ScriptableObject, IInit, ICopiable<Stage>
 {
     [SerializeField, HideInInspector] private Vector2Int size = new Vector2Int(5, 5);

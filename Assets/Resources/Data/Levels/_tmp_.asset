@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b600e0df47ceb74ca2d142a423ef708, type: 3}
   m_Name: _tmp_
   m_EditorClassIdentifier: 
+  stageItems: []
+  stagesPositions: []
   bridges: []
