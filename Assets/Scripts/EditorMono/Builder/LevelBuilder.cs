@@ -46,8 +46,8 @@ public class LevelBuilder : Builder<Level>
         grid = GetComponent<Grid>();
         miniStagePrefab = Resources.Load<GameObject>("Prefabs/Editor/MiniStage");
         
-        miniStages = new List<MiniStage>();
-        bridges = new List<Bridge>();
+        if (miniStages == null) miniStages = new List<MiniStage>();
+        if (bridges == null) bridges = new List<Bridge>();
         
         base.Init(levelFolder);
     }
@@ -68,29 +68,18 @@ public class LevelBuilder : Builder<Level>
 
     public override void NewItem()
     {
-        for (int i = transform.childCount - 1; i >= 0; i--)
-            DestroyImmediate(transform.GetChild(i).gameObject);
-        
-        miniStages = new List<MiniStage>();
-        bridges = new List<Bridge>();
+        WipeScene();
 
         base.NewItem();
     }
     
     public override bool Open(string path)
     {
-        NewItem();
+        WipeScene();
         
         if (!base.Open(path)) return false;
 
-        foreach (var stage in EditingLevel.Stages)
-        {
-            var gridPos = new Vector3Int(stage.Value.x, stage.Value.y, 0);
-            var position = grid.CellToWorld(gridPos);
-            ImportStage(AssetDatabase.GetAssetPath(stage.Key), position);
-        }
-
-        bridges = new List<Bridge>(EditingLevel.Bridges);
+        PopulateScene();
         
         return true;
     }
@@ -105,6 +94,34 @@ public class LevelBuilder : Builder<Level>
     {
         ApplyChanges();
         return base.Save(path);
+    }
+
+    public override void Reload()
+    {
+        WipeScene();
+        base.Reload();
+        PopulateScene();
+    }
+
+    private void WipeScene()
+    {
+        for (int i = transform.childCount - 1; i >= 0; i--)
+            DestroyImmediate(transform.GetChild(i).gameObject);
+        
+        miniStages = new List<MiniStage>();
+        bridges = new List<Bridge>();
+    }
+
+    private void PopulateScene()
+    {
+        foreach (var stage in EditingLevel.Stages)
+        {
+            var gridPos = new Vector3Int(stage.Value.x, stage.Value.y, 0);
+            var position = grid.CellToWorld(gridPos);
+            ImportStage(AssetDatabase.GetAssetPath(stage.Key), position);
+        }
+
+        bridges = new List<Bridge>(EditingLevel.Bridges);
     }
 
     private void ApplyChanges()
@@ -152,26 +169,30 @@ public class LevelBuilder : Builder<Level>
         if (Event.current.type != EventType.MouseDown ||
             Event.current.modifiers != EventModifiers.None)
             return;
-                
-        if (RaycastMiniStage(out var miniStage) &&
-            miniStage.TileSelected(out var gridPos))
+        
+        if (Event.current.button == 0)
         {
-            var stage = miniStage.Stage;
-            var mousePos = sceneView.SceneViewToWorld();
-
-            //Left mouse clicked
-            if (Event.current.button == 0)
+            if (RaycastMiniStage(out var miniStage) &&
+                miniStage.TileSelected(out var gridPos))
             {
+                var stage = miniStage.Stage;
+                var mousePos = sceneView.SceneViewToWorld();
+                
                 if (0 <= gridPos.x && gridPos.x < stage.Size.x && 0 <= gridPos.y && gridPos.y < stage.Size.y)
                 {
-                    if (editingBridge == null && stage[gridPos.x, gridPos.y] == TileType.Exit)
+                    if (stage[gridPos.x, gridPos.y] == TileType.Exit)
                     {
                         editingBridge = new Bridge(Pathfinding.GetMaximumUniqueTile(miniStage.Stage));
                         var mouseGridPos3 = grid.WorldToCell(mousePos);
                         editingBridge.bridgeParts.Add(new Vector2Int(mouseGridPos3.x, mouseGridPos3.y));
                         return;
                     }
-            
+                    
+                    if (editingBridge != null && editingBridge.bridgeParts.Count > editingBridge.MaxLength)
+                    {
+                        editingBridge = null;
+                    }
+                    
                     if (editingBridge != null && stage[gridPos.x, gridPos.y] == TileType.Entrance)
                     {
                         //End bridge and append to scriptable
@@ -184,17 +205,10 @@ public class LevelBuilder : Builder<Level>
                     }
                 }
             }
-
-            if (Event.current.button == 1)
-            {
-                
-            }
-        }
-
-        if (Event.current.button == 0)
-        {
+            
             editingBridge = null;
         }
+
     }
 
     private bool RaycastMiniStage(out MiniStage miniStage)
@@ -217,6 +231,10 @@ public class LevelBuilder : Builder<Level>
     private void DrawBridgeBuilder()
     {
         if (editingBridge == null) return;
+        
+        if (editingBridge.bridgeParts.Count > editingBridge.MaxLength)
+            Handles.color = Color.red;
+        else Handles.color = Color.green;
 
         //Render current bridge
         for (int i = 0; i < editingBridge.bridgeParts.Count - 1; i++)
@@ -227,6 +245,7 @@ public class LevelBuilder : Builder<Level>
 
     private void DrawBridge()
     {
+        Handles.color = Color.yellow;
         foreach (var bridge in bridges)
         {
             for (int i = 0; i < bridge.bridgeParts.Count - 1; i++)

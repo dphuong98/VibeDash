@@ -133,6 +133,11 @@ public class LevelBuilderEditor : BuilderEditor<Level>
         levelBuilder.Save(FileUtil.GetProjectRelativePath(path));
     }
 
+    public override void Reload()
+    {
+        levelBuilder.Reload();
+    }
+
     private void ImportStage()
     {
         var path = EditorUtility.OpenFilePanel("Open", StageBuilder.StageFolder, "asset");
