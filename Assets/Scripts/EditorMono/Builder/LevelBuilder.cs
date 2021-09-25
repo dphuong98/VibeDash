@@ -25,9 +25,7 @@ public class LevelBuilder : Builder<Level>
     private static Vector2Int lastestBridgePart;
     private static Bridge editingBridge;
     
-    [SerializeField]
     private List<MiniStage> miniStages;
-    [SerializeField]
     private List<Bridge> bridges;
     
     private void OnEnable()
@@ -230,13 +228,21 @@ public class LevelBuilder : Builder<Level>
 
     private void DrawBridgeBuilder()
     {
-        if (editingBridge == null) return;
+        if (editingBridge == null)
+        {
+            //Render exit blinking
+            
+            return;
+        }
         
         if (editingBridge.bridgeParts.Count > editingBridge.MaxLength)
             Handles.color = Color.red;
         else Handles.color = Color.green;
+        
+        //Render entrance for bridge end
+        
 
-        //Render current bridge
+        //Render editing bridge
         for (int i = 0; i < editingBridge.bridgeParts.Count - 1; i++)
         {
             Handles.DrawLine(grid.GetCellCenterWorld(editingBridge.bridgeParts[i]), (grid.GetCellCenterWorld(editingBridge.bridgeParts[i+1])));

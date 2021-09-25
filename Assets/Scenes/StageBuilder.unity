@@ -263,13 +263,13 @@ PrefabInstance:
     - target: {fileID: 2613842165087503930, guid: 4d5826c11b458334cb9509aed19a4ee3,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.5
+      value: -3
       objectReference: {fileID: 0}
     - target: {fileID: 2613842165508376240, guid: 4d5826c11b458334cb9509aed19a4ee3,
         type: 3}
       propertyPath: m_Mesh
       value: 
-      objectReference: {fileID: 2000701930}
+      objectReference: {fileID: 1965992130}
     - target: {fileID: 2613842165508376241, guid: 4d5826c11b458334cb9509aed19a4ee3,
         type: 3}
       propertyPath: m_RootOrder
@@ -334,16 +334,31 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Mesh
       value: 
-      objectReference: {fileID: 2000701930}
+      objectReference: {fileID: 1965992130}
     - target: {fileID: 2613842165508376245, guid: 4d5826c11b458334cb9509aed19a4ee3,
         type: 3}
       propertyPath: m_Name
-      value: Stage1
+      value: Stage2
       objectReference: {fileID: 0}
     - target: {fileID: 2613842165508376245, guid: 4d5826c11b458334cb9509aed19a4ee3,
         type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2613842165508376254, guid: 4d5826c11b458334cb9509aed19a4ee3,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2613842165508376254, guid: 4d5826c11b458334cb9509aed19a4ee3,
+        type: 3}
+      propertyPath: SelectedTile.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2613842165508376254, guid: 4d5826c11b458334cb9509aed19a4ee3,
+        type: 3}
+      propertyPath: SelectedTile.y
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4d5826c11b458334cb9509aed19a4ee3, type: 3}
@@ -452,13 +467,13 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!43 &2000701930
+--- !u!43 &1965992130
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Custom Quad (11,7)
+  m_Name: Custom Quad (11,8)
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -470,7 +485,7 @@ Mesh:
     vertexCount: 4
     localAABB:
       m_Center: {x: 0, y: 0, z: 0}
-      m_Extent: {x: 5.5, y: 3.5, z: 0}
+      m_Extent: {x: 5.5, y: 4, z: 0}
   m_Shapes:
     vertices: []
     shapes: []
@@ -549,7 +564,7 @@ Mesh:
       format: 0
       dimension: 0
     m_DataSize: 96
-    _typelessdata: 0000b0c0000060c0000000000000000000000000000080bf0000b040000060c0000000000000000000000000000080bf0000b04000006040000000000000000000000000000080bf0000b0c000006040000000000000000000000000000080bf
+    _typelessdata: 0000b0c0000080c0000000000000000000000000000080bf0000b040000080c0000000000000000000000000000080bf0000b04000008040000000000000000000000000000080bf0000b0c000008040000000000000000000000000000080bf
   m_CompressedMesh:
     m_Vertices:
       m_NumItems: 0
@@ -604,7 +619,7 @@ Mesh:
     m_UVInfo: 0
   m_LocalAABB:
     m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 5.5, y: 3.5, z: 0}
+    m_Extent: {x: 5.5, y: 4, z: 0}
   m_MeshUsageFlags: 0
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 

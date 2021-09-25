@@ -45,6 +45,7 @@ public class StageBuilder : Builder<Stage>
     public bool SolutionMode = false;
     public bool MovingSolution = true;
     public Vector2Int SelectedTile = new Vector2Int(-1, -1);
+    public Color SolutionColor = Color.yellow;
 
     public Stage LoadedStage => LoadedItem;
     public Stage EditingStage => EditingItem;
@@ -92,18 +93,56 @@ public class StageBuilder : Builder<Stage>
             var frame = (int)Math.Round(Time.realtimeSinceStartup * SolutionSpeed) % solution.Count;
 
             if (frame == solution.Count - 1) return;
-            GUILayoutExt.DrawArrow(grid.GetCellCenterWorld(solution[frame]), grid.GetCellCenterWorld(solution[frame+1]), Color.yellow);
+            GUILayoutExt.DrawArrow(grid.GetCellCenterWorld(solution[frame]), grid.GetCellCenterWorld(solution[frame+1]), SolutionColor);
         }
         else
         {
             for (int i = 0; i < solution.Count - 1; i++)
             {
-                GUILayoutExt.DrawPath(grid.GetCellCenterWorld(solution[i]), grid.GetCellCenterWorld(solution[i+1]), Color.yellow);
+                var currentPath = grid.GetCellCenterWorld(solution[i+1]) - grid.GetCellCenterWorld(solution[i]);
+                var nextPath =
+                    i + 2 == solution.Count ? default : grid.GetCellCenterWorld(solution[i+2]) - grid.GetCellCenterWorld(solution[i+1]);
+                var sideOffset = currentPath.RotateClockwiseXY().normalized * grid.cellSize.y / 10;
+                var lengthOffset = currentPath.normalized * sideOffset.magnitude * 2;
+
+                //Straight or deadend
+                if (currentPath == nextPath || nextPath == default)
+                {
+                    GUILayoutExt.DrawPath(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset, grid.GetCellCenterWorld(solution[i+1]) + sideOffset + lengthOffset, SolutionColor);
+                }
+
+                //U-turn
+                if (currentPath == -nextPath) //TODO float tolerance
+                {
+                    var gapLength = currentPath.RotateClockwiseXY() / 5;
+                    GUILayoutExt.DrawLine(grid.GetCellCenterWorld(solution[i+1]) - sideOffset - lengthOffset, grid.GetCellCenterWorld(solution[i+1]) - sideOffset - lengthOffset + gapLength, SolutionColor);
+                    GUILayoutExt.DrawPath(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset, grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset, SolutionColor);
+                }
+                
+                //Right turn
+                if (nextPath == currentPath.RotateClockwiseXY())
+                {
+                    var appendOffset = currentPath.RotateClockwiseXY().normalized * sideOffset.magnitude;
+                    GUILayoutExt.DrawPath(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset, grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset / 2, SolutionColor);
+                    GUILayoutExt.DrawLine(grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset / 2, grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset / 2 + appendOffset , SolutionColor);
+                }
+                
+                //Left turn
+                if (nextPath == currentPath.RotateCounterClockwiseXY())
+                {
+                    var appendOffset = currentPath.RotateCounterClockwiseXY().normalized * sideOffset.magnitude * 3;
+                    GUILayoutExt.DrawPath(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset, grid.GetCellCenterWorld(solution[i+1]) + sideOffset + lengthOffset / 2, SolutionColor);
+                    GUILayoutExt.DrawLine(grid.GetCellCenterWorld(solution[i+1]) + sideOffset + lengthOffset / 2, grid.GetCellCenterWorld(solution[i+1]) + sideOffset + lengthOffset / 2 + appendOffset , SolutionColor);
+                }
+                
+                //Entering intersection
+                
+                //Exiting intersection
             }
         }
 
     }
-    
+
     private void HandleClick()
     {
         if (Selection.activeGameObject == this.gameObject &&
@@ -226,6 +265,7 @@ public class StageBuilder : Builder<Stage>
         return ' ';
     }
 
+    //TODO refactor
     private bool TileSelected(out Vector2Int gridPos)
     {
         var worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);

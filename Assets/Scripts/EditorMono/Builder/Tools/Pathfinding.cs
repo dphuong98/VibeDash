@@ -46,7 +46,7 @@ public static class Pathfinding
         {
             if (traceGraph.ExistDirectedPath(currentNode, currentNode + direction))
             {
-                direction.RotateClockwise(); continue;
+                direction = direction.RotateClockwise(); continue;
             }
             
             //Exit path detected
@@ -54,7 +54,7 @@ public static class Pathfinding
             {
                 if (scoutPath.Count == 0)
                 {
-                    direction.RotateClockwise(); continue;
+                    direction = direction.RotateClockwise(); continue;
                 }
                 
                 //Trace Stacks
@@ -86,7 +86,7 @@ public static class Pathfinding
                 }
             }
             
-            direction.RotateClockwise();
+            direction = direction.RotateClockwise();
         } while (direction != Vector2Int.up);
 
         return exitPaths.Count > 0;
