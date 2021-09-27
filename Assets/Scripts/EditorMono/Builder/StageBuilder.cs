@@ -88,7 +88,7 @@ public class StageBuilder : Builder<Stage>
 
     private void DrawSolution()
     {
-        if (!SolutionMode || solution == null) return;
+        if (!SolutionMode || solution == null || solution.Count < 2) return;
 
         if (MovingSolution)
         {
@@ -99,7 +99,11 @@ public class StageBuilder : Builder<Stage>
         }
         else
         {
-            for (int i = 0; i < solution.Count - 1; i++)
+            //TODO refactor this into smaller classes
+            var tracePath = new List<Vector2Int>();
+            tracePath.Add(solution[0]);
+            
+            for (var i = 0; i < solution.Count - 1; i++)
             {
                 var currentPath = grid.GetCellCenterWorld(solution[i+1]) - grid.GetCellCenterWorld(solution[i]);
                 var nextPath =
@@ -109,31 +113,39 @@ public class StageBuilder : Builder<Stage>
                 
                 //Entering cross: draw large overpass over 2 lines
                 if (currentPath == nextPath &&
-                    Pathfinding.ExistDirectedPath(solution, solution[i + 1] + currentPath.RotateClockwiseXY().ToVector2Int(), solution[i + 1], solution[i + 1] + currentPath.RotateCounterClockwiseXY().ToVector2Int()) ||
-                    Pathfinding.ExistDirectedPath(solution, solution[i + 1] + currentPath.RotateCounterClockwiseXY().ToVector2Int(), solution[i + 1], solution[i + 1] + currentPath.RotateClockwiseXY().ToVector2Int())
+                    Pathfinding.ExistDirectedPath(tracePath,
+                        solution[i + 1] + currentPath.RotateClockwiseXY().ToVector2Int(), solution[i + 1],
+                        solution[i + 1] + currentPath.RotateCounterClockwiseXY().ToVector2Int()) ||
+                    Pathfinding.ExistDirectedPath(tracePath,
+                        solution[i + 1] + currentPath.RotateCounterClockwiseXY().ToVector2Int(), solution[i + 1],
+                        solution[i + 1] + currentPath.RotateClockwiseXY().ToVector2Int())
                 )
                 {
                     HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset,
                         grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset, SolutionColor);
                     HandlesExt.DrawSimpleArc(grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset,
                         grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset, SolutionColor);
+                    tracePath.Add(solution[i+1]);
                     continue;
                 }
 
                 //Overpass then turn left
                 if (currentPath == nextPath &&
-                    Pathfinding.ExistDirectedPath(solution, solution[i + 1] + currentPath.RotateClockwiseXY().ToVector2Int(), solution[i + 1], solution[i])
+                    Pathfinding.ExistDirectedPath(tracePath,
+                        solution[i + 1] + currentPath.RotateClockwiseXY().ToVector2Int(), solution[i + 1], solution[i])
                 )
                 {
                     HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset,
                         grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset, SolutionColor);
                     HandlesExt.DrawSimpleArc(grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset,
                         grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset, SolutionColor);
+                    tracePath.Add(solution[i+1]);
                     continue;
                 }
 
                 if (nextPath == currentPath.RotateCounterClockwiseXY() &&
-                    Pathfinding.ExistDirectedPath(solution, solution[i + 2], solution[i + 1], solution[i + 1] - nextPath.ToVector2Int())
+                    Pathfinding.ExistDirectedPath(tracePath, solution[i + 2], solution[i + 1],
+                        solution[i + 1] - nextPath.ToVector2Int())
                 )
                 {
                     var gapLength = currentPath.RotateCounterClockwiseXY() / 3;
@@ -144,30 +156,36 @@ public class StageBuilder : Builder<Stage>
                     HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset / 2,
                         grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset / 2 + gapLength,
                         SolutionColor);
+                    tracePath.Add(solution[i+1]);
                     continue;
                 }
-                
+
                 //Left turn then overpass
                 if (currentPath == nextPath &&
-                    Pathfinding.ExistDirectedPath(solution, solution[i + 2], solution[i + 1], solution[i + 1] + currentPath.RotateClockwiseXY().ToVector2Int())
+                    Pathfinding.ExistDirectedPath(tracePath, solution[i + 2], solution[i + 1],
+                        solution[i + 1] + currentPath.RotateClockwiseXY().ToVector2Int())
                 )
                 {
                     HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset,
                         grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset, SolutionColor);
                     HandlesExt.DrawSimpleArc(grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset,
                         grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset, SolutionColor);
+                    tracePath.Add(solution[i+1]);
                     continue;
                 }
 
                 if (nextPath == currentPath.RotateCounterClockwiseXY() &&
-                    Pathfinding.ExistDirectedPath(solution, solution[i+1] + currentPath.ToVector2Int(), solution[i+1], solution[i])
+                    Pathfinding.ExistDirectedPath(tracePath, solution[i + 1] + currentPath.ToVector2Int(),
+                        solution[i + 1], solution[i])
                 )
                 {
                     var gapLength = currentPath.RotateCounterClockwiseXY() / 3.3f;
                     HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset,
                         grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset / 2, SolutionColor);
                     HandlesExt.DrawSimpleArc(grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset / 2,
-                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset / 2 + gapLength, SolutionColor);
+                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset / 2 + gapLength,
+                        SolutionColor);
+                    tracePath.Add(solution[i+1]);
                     continue;
                 }
 
@@ -176,6 +194,7 @@ public class StageBuilder : Builder<Stage>
                 {
                     HandlesExt.DrawPath(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset,
                         grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset, SolutionColor);
+                    tracePath.Add(solution[i+1]);
                     continue;
                 }
 
@@ -188,9 +207,10 @@ public class StageBuilder : Builder<Stage>
                         SolutionColor);
                     HandlesExt.DrawPath(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset,
                         grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset, SolutionColor);
+                    tracePath.Add(solution[i+1]);
                     continue;
                 }
-                
+
                 //Left turn
                 if (nextPath == currentPath.RotateCounterClockwiseXY())
                 {
@@ -200,6 +220,7 @@ public class StageBuilder : Builder<Stage>
                     HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset / 2,
                         grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset / 2 + appendOffset,
                         SolutionColor);
+                    tracePath.Add(solution[i+1]);
                     continue;
                 }
 
@@ -212,6 +233,7 @@ public class StageBuilder : Builder<Stage>
                     HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset / 2,
                         grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset / 2 + appendOffset,
                         SolutionColor);
+                    tracePath.Add(solution[i+1]);
                     continue;
                 }
             }

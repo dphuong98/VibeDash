@@ -19,7 +19,7 @@ public class HandlesExt
         Handles.DrawLine(start, end);
         var headLength = (start - end).normalized * size;
         var perpendicularVector = (start - end).RotateClockwiseXY().normalized * size;
-        var arrowTip = start + (end - start) / 3;
+        var arrowTip = start + (end - start).normalized / 3;
         var arrowTriangle = new [] { arrowTip, arrowTip + headLength + perpendicularVector, arrowTip + headLength - perpendicularVector };
         Handles.DrawAAConvexPolygon(arrowTriangle);
     }

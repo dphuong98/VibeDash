@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -103,6 +104,7 @@ public static class Pathfinding
             var match = true;
             for (var i = 1; i < subPath.Length; i++)
             {
+                if (point + i >= path.Count) return false;
                 if (path[point + i] != subPath[i]) match = false;
             }
 
