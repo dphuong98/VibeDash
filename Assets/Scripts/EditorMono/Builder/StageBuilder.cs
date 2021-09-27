@@ -109,10 +109,8 @@ public class StageBuilder : Builder<Stage>
                 
                 //Entering cross: draw large overpass over 2 lines
                 if (currentPath == nextPath &&
-                    Pathfinding.ExistPath(solution, solution[i + 1],
-                        solution[i + 1] + currentPath.RotateClockwiseXY().ToVector2Int()) &&
-                    Pathfinding.ExistPath(solution, solution[i + 1],
-                        solution[i + 1] + currentPath.RotateCounterClockwiseXY().ToVector2Int())
+                    Pathfinding.ExistDirectedPath(solution, solution[i + 1] + currentPath.RotateClockwiseXY().ToVector2Int(), solution[i + 1], solution[i + 1] + currentPath.RotateCounterClockwiseXY().ToVector2Int()) ||
+                    Pathfinding.ExistDirectedPath(solution, solution[i + 1] + currentPath.RotateCounterClockwiseXY().ToVector2Int(), solution[i + 1], solution[i + 1] + currentPath.RotateClockwiseXY().ToVector2Int())
                 )
                 {
                     HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset,
@@ -124,10 +122,7 @@ public class StageBuilder : Builder<Stage>
 
                 //Overpass then turn left
                 if (currentPath == nextPath &&
-                    Pathfinding.ExistDirectedPath(solution,
-                        solution[i + 1] + currentPath.RotateClockwiseXY().ToVector2Int(), solution[i + 1]) &&
-                    Pathfinding.ExistDirectedPath(solution, solution[i + 1],
-                        solution[i + 1] - currentPath.ToVector2Int())
+                    Pathfinding.ExistDirectedPath(solution, solution[i + 1] + currentPath.RotateClockwiseXY().ToVector2Int(), solution[i + 1], solution[i])
                 )
                 {
                     HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset,
@@ -138,9 +133,7 @@ public class StageBuilder : Builder<Stage>
                 }
 
                 if (nextPath == currentPath.RotateCounterClockwiseXY() &&
-                    Pathfinding.ExistDirectedPath(solution, solution[i + 1],
-                        solution[i + 1] - nextPath.ToVector2Int()) &&
-                    Pathfinding.ExistDirectedPath(solution, solution[i + 1] + nextPath.ToVector2Int(), solution[i + 1])
+                    Pathfinding.ExistDirectedPath(solution, solution[i + 2], solution[i + 1], solution[i + 1] - nextPath.ToVector2Int())
                 )
                 {
                     var gapLength = currentPath.RotateCounterClockwiseXY() / 3;
@@ -156,8 +149,7 @@ public class StageBuilder : Builder<Stage>
                 
                 //Left turn then overpass
                 if (currentPath == nextPath &&
-                    Pathfinding.ExistDirectedPath(solution, solution[i + 1] + currentPath.ToVector2Int(), solution[i + 1]) &&
-                    Pathfinding.ExistDirectedPath(solution, solution[i + 1], solution[i + 1] + currentPath.RotateClockwiseXY().ToVector2Int())
+                    Pathfinding.ExistDirectedPath(solution, solution[i + 2], solution[i + 1], solution[i + 1] + currentPath.RotateClockwiseXY().ToVector2Int())
                 )
                 {
                     HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset,
@@ -168,8 +160,7 @@ public class StageBuilder : Builder<Stage>
                 }
 
                 if (nextPath == currentPath.RotateCounterClockwiseXY() &&
-                    Pathfinding.ExistDirectedPath(solution, solution[i+1], solution[i]) &&
-                    Pathfinding.ExistDirectedPath(solution, solution[i+1] + currentPath.ToVector2Int(), solution[i+1])
+                    Pathfinding.ExistDirectedPath(solution, solution[i+1] + currentPath.ToVector2Int(), solution[i+1], solution[i])
                 )
                 {
                     var gapLength = currentPath.RotateCounterClockwiseXY() / 3.3f;
