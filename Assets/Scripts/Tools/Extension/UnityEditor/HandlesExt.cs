@@ -37,13 +37,15 @@ public class HandlesExt
 
     public static void DrawSimpleArc(Vector3 start, Vector3 end, Color color)
     {
-        var center = (start + end) / 2;
+        var offsetRatio = 0.3f;
+        var centerOffset = (end - start).RotateClockwiseXY().normalized * (end - start).magnitude * offsetRatio;
+        centerOffset.x = Math.Abs(centerOffset.x);
+        centerOffset.y = -Math.Abs(centerOffset.y);
+        var center = (start + end) / 2 + centerOffset;
         var normal = Vector3.back;
-        var from = start - end;
-        from.x = Math.Abs(from.x);
-        from.y = Math.Abs(from.y);
-        var angle = 180;
-        var radius = (start - end).magnitude / 2;
+        var from = start.x < end.x ? start - center : end - center;
+        var angle = (float)(Math.Atan(1 / ( 2 * offsetRatio)) * (180/Math.PI) * 2);
+        var radius = from.magnitude;
         Handles.DrawWireArc(center, normal, from, angle, radius); 
     }
 }
