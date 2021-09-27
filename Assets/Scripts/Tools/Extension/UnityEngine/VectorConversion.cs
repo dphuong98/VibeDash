@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -24,6 +25,16 @@ public static class VectorConversion
         return new Vector3Int(vector2.x, vector2.y, 0);
     }
     
+    /// <summary>
+    /// z is removed, x & y is rounded using Math.Round
+    /// </summary>
+    /// <param name="vector3"></param>
+    /// <returns></returns>
+    public static Vector2Int ToVector2Int(this Vector3 vector3)
+    {
+        return new Vector2Int((int)Math.Round(vector3.x), (int)Math.Round(vector3.y));
+    }
+
     /// <summary>
     /// z is removed
     /// </summary>

@@ -37,9 +37,15 @@ public static class TileLogic
                 return false;
             }
             
-            //Impassible
-            if (currentTileType == TileType.Wall || currentTileType == TileType.Air)
+            //Impassibles
+            if (currentTileType == TileType.Wall)
                 break;
+
+            if (currentTileType == TileType.Stop)
+            {
+                path.Add(currentTilePosition);
+                break;
+            }
 
             if (currentTileType == TileType.Road  || currentTileType == TileType.Entrance)
             {

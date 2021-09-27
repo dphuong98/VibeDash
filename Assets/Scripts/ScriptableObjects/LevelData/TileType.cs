@@ -9,6 +9,7 @@ public enum TileType
     Air,
     Road,
     Wall,
+    Stop,
 }
 
 public static class TileTypeExt {

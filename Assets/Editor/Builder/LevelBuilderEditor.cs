@@ -66,7 +66,7 @@ public class LevelBuilderEditor : BuilderEditor<Level>
         #endregion
         
         #region LevelTools
-            GUILayoutExt.HorizontalSeparator();
+        GUILayoutExt.HorizontalSeparator();
             GUILayout.Label("Level Tools", EditorStyles.boldLabel);
 
             GUILayout.BeginHorizontal();

@@ -24,15 +24,17 @@ public class StageBuilder : Builder<Stage>
         {TileType.Air, 'a'},
         {TileType.Road, 'r'},
         {TileType.Wall, 'w'},
+        {TileType.Stop, 's'}
     };
 
     private static readonly Dictionary<TileType, Color> ColorMap = new Dictionary<TileType, Color>()
     {
         {TileType.Entrance, new Color(0f, 1f, 1f, 0.5f)},
         {TileType.Exit, new Color(1f, 0f, 0.03f, 0.77f)},
-        { TileType.Air, Color.clear },
-        { TileType.Road,  new Color(0.24f, 0.26f, 0.42f, 0.5f)},
-        { TileType.Wall, new Color(0.94f, 0.62f, 0.79f) },
+        {TileType.Air, Color.clear},
+        {TileType.Road,  new Color(0.24f, 0.26f, 0.42f, 0.5f)},
+        {TileType.Wall, new Color(0.94f, 0.62f, 0.79f)},
+        {TileType.Stop, new Color(1f, 0.62f, 0.27f)}
     };
 
     //Components
@@ -93,7 +95,7 @@ public class StageBuilder : Builder<Stage>
             var frame = (int)Math.Round(Time.realtimeSinceStartup * SolutionSpeed) % solution.Count;
 
             if (frame == solution.Count - 1) return;
-            GUILayoutExt.DrawArrow(grid.GetCellCenterWorld(solution[frame]), grid.GetCellCenterWorld(solution[frame+1]), SolutionColor);
+            HandlesExt.DrawArrow(grid.GetCellCenterWorld(solution[frame]), grid.GetCellCenterWorld(solution[frame+1]), SolutionColor);
         }
         else
         {
@@ -104,40 +106,51 @@ public class StageBuilder : Builder<Stage>
                     i + 2 == solution.Count ? default : grid.GetCellCenterWorld(solution[i+2]) - grid.GetCellCenterWorld(solution[i+1]);
                 var sideOffset = currentPath.RotateClockwiseXY().normalized * grid.cellSize.y / 10;
                 var lengthOffset = currentPath.normalized * sideOffset.magnitude * 2;
+                
+                //Entering cross: draw large overpass over 2 lines
+                if (currentPath == nextPath &&
+                    Pathfinding.ExistPath(solution, solution[i+1], solution[i+1] + currentPath.RotateClockwiseXY().ToVector2Int()) &&
+                    Pathfinding.ExistPath(solution, solution[i+1], solution[i+1] + currentPath.RotateCounterClockwiseXY().ToVector2Int())
+                    )
+                {
+                    HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset, grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset, SolutionColor);
+                    HandlesExt.DrawSimpleArc(grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset, grid.GetCellCenterWorld(solution[i+1]) + sideOffset + lengthOffset, SolutionColor);
+                    continue;
+                }
 
                 //Straight or deadend
                 if (currentPath == nextPath || nextPath == default)
                 {
-                    GUILayoutExt.DrawPath(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset, grid.GetCellCenterWorld(solution[i+1]) + sideOffset + lengthOffset, SolutionColor);
+                    HandlesExt.DrawPath(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset, grid.GetCellCenterWorld(solution[i+1]) + sideOffset + lengthOffset, SolutionColor);
+                    continue;
                 }
 
                 //U-turn
                 if (currentPath == -nextPath) //TODO float tolerance
                 {
                     var gapLength = currentPath.RotateClockwiseXY() / 5;
-                    GUILayoutExt.DrawLine(grid.GetCellCenterWorld(solution[i+1]) - sideOffset - lengthOffset, grid.GetCellCenterWorld(solution[i+1]) - sideOffset - lengthOffset + gapLength, SolutionColor);
-                    GUILayoutExt.DrawPath(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset, grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset, SolutionColor);
+                    HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i+1]) - sideOffset - lengthOffset, grid.GetCellCenterWorld(solution[i+1]) - sideOffset - lengthOffset + gapLength, SolutionColor);
+                    HandlesExt.DrawPath(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset, grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset, SolutionColor);
+                    continue;
                 }
                 
                 //Right turn
                 if (nextPath == currentPath.RotateClockwiseXY())
                 {
                     var appendOffset = currentPath.RotateClockwiseXY().normalized * sideOffset.magnitude;
-                    GUILayoutExt.DrawPath(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset, grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset / 2, SolutionColor);
-                    GUILayoutExt.DrawLine(grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset / 2, grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset / 2 + appendOffset , SolutionColor);
+                    HandlesExt.DrawPath(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset, grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset / 2, SolutionColor);
+                    HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset / 2, grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset / 2 + appendOffset , SolutionColor);
+                    continue;
                 }
                 
                 //Left turn
                 if (nextPath == currentPath.RotateCounterClockwiseXY())
                 {
                     var appendOffset = currentPath.RotateCounterClockwiseXY().normalized * sideOffset.magnitude * 3;
-                    GUILayoutExt.DrawPath(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset, grid.GetCellCenterWorld(solution[i+1]) + sideOffset + lengthOffset / 2, SolutionColor);
-                    GUILayoutExt.DrawLine(grid.GetCellCenterWorld(solution[i+1]) + sideOffset + lengthOffset / 2, grid.GetCellCenterWorld(solution[i+1]) + sideOffset + lengthOffset / 2 + appendOffset , SolutionColor);
+                    HandlesExt.DrawPath(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset, grid.GetCellCenterWorld(solution[i+1]) + sideOffset + lengthOffset / 2, SolutionColor);
+                    HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i+1]) + sideOffset + lengthOffset / 2, grid.GetCellCenterWorld(solution[i+1]) + sideOffset + lengthOffset / 2 + appendOffset , SolutionColor);
+                    continue;
                 }
-                
-                //Entering intersection
-                
-                //Exiting intersection
             }
         }
 

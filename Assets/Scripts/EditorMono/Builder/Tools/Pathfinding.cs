@@ -91,4 +91,24 @@ public static class Pathfinding
 
         return exitPaths.Count > 0;
     }
+
+    public static bool ExistPath(List<Vector2Int> path, Vector2Int start, Vector2Int end)
+    {
+        var startTileOccurences = path.Where(s => s == start).Select(s => path.IndexOf(s));
+
+        foreach (var point in startTileOccurences)
+        {
+            if (point + 1 < path.Count && path[point + 1] == end)
+            {
+                return true;
+            }
+
+            if (point - 1 >= 0 && path[point - 1] == end)
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
 }
