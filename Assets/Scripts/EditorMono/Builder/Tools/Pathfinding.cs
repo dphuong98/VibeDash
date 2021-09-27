@@ -91,12 +91,13 @@ public static class Pathfinding
 
         return exitPaths.Count > 0;
     }
-
+    
+    /// <returns>true if there is a line of any direction connecting start and end</returns>
     public static bool ExistPath(List<Vector2Int> path, Vector2Int start, Vector2Int end)
     {
-        var startTileOccurences = path.Where(s => s == start).Select(s => path.IndexOf(s));
+        var startTileOccurrences = path.Where(s => s == start).Select(s => path.IndexOf(s));
 
-        foreach (var point in startTileOccurences)
+        foreach (var point in startTileOccurrences)
         {
             if (point + 1 < path.Count && path[point + 1] == end)
             {
@@ -104,6 +105,22 @@ public static class Pathfinding
             }
 
             if (point - 1 >= 0 && path[point - 1] == end)
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /// <returns>true if there is a line with the direction from start to end</returns>
+    public static bool ExistDirectedPath(List<Vector2Int> path, Vector2Int start, Vector2Int end)
+    {
+        var startTileOccurrences = path.Where(s => s == start).Select(s => path.IndexOf(s));
+
+        foreach (var point in startTileOccurrences)
+        {
+            if (point + 1 < path.Count && path[point + 1] == end)
             {
                 return true;
             }

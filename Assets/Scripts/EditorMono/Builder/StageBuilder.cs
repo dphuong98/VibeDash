@@ -118,6 +118,29 @@ public class StageBuilder : Builder<Stage>
                     continue;
                 }
 
+                //Overpass then turn left
+                if (currentPath == nextPath &&
+                    Pathfinding.ExistDirectedPath(solution, solution[i+1] + currentPath.RotateClockwiseXY().ToVector2Int(), solution[i+1]) &&
+                    Pathfinding.ExistDirectedPath(solution, solution[i+1], solution[i+1] - currentPath.ToVector2Int())
+                    )
+                {
+                    HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset, grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset, SolutionColor);
+                    HandlesExt.DrawSimpleArc(grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset, grid.GetCellCenterWorld(solution[i+1]) + sideOffset + lengthOffset, SolutionColor);
+                    continue;
+                }
+                
+                if (nextPath == currentPath.RotateCounterClockwiseXY() &&
+                    Pathfinding.ExistDirectedPath(solution, solution[i+1], solution[i+1] - nextPath.ToVector2Int()) &&
+                    Pathfinding.ExistDirectedPath(solution, solution[i+1] + nextPath.ToVector2Int(), solution[i+1])
+                )
+                {
+                    var gapLength = currentPath.RotateCounterClockwiseXY() / 3;
+                    HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset, grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset, SolutionColor);
+                    HandlesExt.DrawSimpleArc(grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset, grid.GetCellCenterWorld(solution[i+1]) + sideOffset + lengthOffset / 2, SolutionColor);
+                    HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i+1]) + sideOffset + lengthOffset / 2, grid.GetCellCenterWorld(solution[i+1]) + sideOffset + lengthOffset / 2 + gapLength, SolutionColor);
+                    continue;
+                }
+
                 //Straight or deadend
                 if (currentPath == nextPath || nextPath == default)
                 {
@@ -134,21 +157,31 @@ public class StageBuilder : Builder<Stage>
                     continue;
                 }
                 
-                //Right turn
-                if (nextPath == currentPath.RotateClockwiseXY())
+                //Left turn then overpass
+                if (nextPath == currentPath.RotateCounterClockwiseXY() &&
+                    Pathfinding.ExistDirectedPath(solution, solution[i+1], solution[i]) &&
+                    Pathfinding.ExistDirectedPath(solution, solution[i+1] + currentPath.ToVector2Int(), solution[i+1])
+                    )
                 {
-                    var appendOffset = currentPath.RotateClockwiseXY().normalized * sideOffset.magnitude;
-                    HandlesExt.DrawPath(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset, grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset / 2, SolutionColor);
-                    HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset / 2, grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset / 2 + appendOffset , SolutionColor);
+                    
                     continue;
                 }
-                
+
                 //Left turn
                 if (nextPath == currentPath.RotateCounterClockwiseXY())
                 {
                     var appendOffset = currentPath.RotateCounterClockwiseXY().normalized * sideOffset.magnitude * 3;
                     HandlesExt.DrawPath(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset, grid.GetCellCenterWorld(solution[i+1]) + sideOffset + lengthOffset / 2, SolutionColor);
                     HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i+1]) + sideOffset + lengthOffset / 2, grid.GetCellCenterWorld(solution[i+1]) + sideOffset + lengthOffset / 2 + appendOffset , SolutionColor);
+                    continue;
+                }
+                
+                //Right turn
+                if (nextPath == currentPath.RotateClockwiseXY())
+                {
+                    var appendOffset = currentPath.RotateClockwiseXY().normalized * sideOffset.magnitude;
+                    HandlesExt.DrawPath(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset, grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset / 2, SolutionColor);
+                    HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset / 2, grid.GetCellCenterWorld(solution[i+1]) + sideOffset - lengthOffset / 2 + appendOffset , SolutionColor);
                     continue;
                 }
             }
