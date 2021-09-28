@@ -104,6 +104,8 @@ public class StageBuilder : Builder<Stage>
 
             for (var i = 0; i < solution.Count - 1; i++)
             {
+                if (i + 2 < solution.Count && Pathfinding.ExistDirectedPath(tracePath, solution[i], solution[i+1], solution[i+2])) continue;
+
                 var currentPath = grid.GetCellCenterWorld(solution[i+1]) - grid.GetCellCenterWorld(solution[i]);
                 var nextPath =
                     i + 2 == solution.Count ? default : grid.GetCellCenterWorld(solution[i+2]) - grid.GetCellCenterWorld(solution[i+1]);

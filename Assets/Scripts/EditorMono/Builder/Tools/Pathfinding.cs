@@ -42,16 +42,6 @@ public static class Pathfinding
         if (stage[currentNode.x, currentNode.y] == TileType.Exit)
             return true;
 
-        if (currentNode == new Vector2Int(1, 2))
-        {
-            Debug.Log("here");
-        }
-        
-        if (currentNode == new Vector2Int(6, 7))
-        {
-            Debug.Log("here");
-        }
-        
         var direction = Vector2Int.up;
 
         do
