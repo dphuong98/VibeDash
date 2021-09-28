@@ -38,7 +38,7 @@ public class BuilderEditor<T> : Editor where T : ScriptableObject, IInit, ICopia
         var rx = new Regex(@"(\d+)");
         var d = new DirectoryInfo(Builder<T>.DefaultFolder);
         var number = 0;
-        if (d.GetFiles(Builder<T>.DefaultName+"?.asset") is var fileInfos && fileInfos.Count() != 0)
+        if (d.GetFiles(Builder<T>.DefaultName+"??.asset") is var fileInfos && fileInfos.Count() != 0)
         {
             number = fileInfos.Select(s => rx.Match(s.Name)).Where(s => s.Success).Max(s =>
             {

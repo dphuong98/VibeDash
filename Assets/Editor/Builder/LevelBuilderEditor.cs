@@ -120,7 +120,7 @@ public class LevelBuilderEditor : BuilderEditor<Level>
         var rx = new Regex(@"(\d+)");
         var d = new DirectoryInfo(LevelBuilder.DefaultFolder);
         var number = 0;
-        if (d.GetFiles(LevelBuilder.DefaultName+"?.asset") is var fileInfos && fileInfos.Count() != 0)
+        if (d.GetFiles(LevelBuilder.DefaultName+"??.asset") is var fileInfos && fileInfos.Count() != 0)
         {
             number = fileInfos.Select(s => rx.Match(s.Name)).Where(s => s.Success).Max(s =>
             {

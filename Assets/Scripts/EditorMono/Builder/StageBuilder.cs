@@ -100,9 +100,8 @@ public class StageBuilder : Builder<Stage>
         else
         {
             //TODO refactor this into smaller classes
-            var tracePath = new List<Vector2Int>();
-            tracePath.Add(solution[0]);
-            
+            var tracePath = new List<Vector2Int> {solution[0]};
+
             for (var i = 0; i < solution.Count - 1; i++)
             {
                 var currentPath = grid.GetCellCenterWorld(solution[i+1]) - grid.GetCellCenterWorld(solution[i]);
