@@ -39,11 +39,13 @@ public class HandlesExt
     {
         var offsetRatio = 0.3f;
         var centerOffset = (end - start).RotateClockwiseXY().normalized * (end - start).magnitude * offsetRatio;
-        centerOffset.x = Math.Abs(centerOffset.x);
+        centerOffset.x = -Math.Abs(centerOffset.x);
         centerOffset.y = -Math.Abs(centerOffset.y);
         var center = (start + end) / 2 + centerOffset;
         var normal = Vector3.back;
-        var from = start.x < end.x ? start - center : end - center;
+        var from = new Vector3();
+        if (start.y == end.y) from = start.x < end.x ? start - center : end - center;
+        if (start.x == end.x) from = start.y < end.y ? end - center : start - center;
         var angle = (float)(Math.Atan(1 / ( 2 * offsetRatio)) * (180/Math.PI) * 2);
         var radius = from.magnitude;
         Handles.DrawWireArc(center, normal, from, angle, radius); 
