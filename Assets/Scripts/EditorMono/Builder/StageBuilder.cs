@@ -511,6 +511,7 @@ public class StageBuilder : Builder<Stage>
         grid.transform.localPosition = new Vector3(posX, posY, 0);
     }
 
+    [ContextMenu("CreateSolution")]
     private void CreateSolution()
     {
         solution = Pathfinding.GetSolution(EditingStage);

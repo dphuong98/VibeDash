@@ -24,9 +24,10 @@ public static class Pathfinding
         //Find all path from entrance to exit -> Get path that covers the most tiles -> Get shortest path from which
         if (MapNode(stage, new Graph<Vector2Int>(), stage.GetEntrance(), out var allExitPaths))
         {
+            var tmp = allExitPaths.GroupBy(s => s.Distinct().Count());
             var fullPath = allExitPaths.GroupBy(s => s.Distinct().Count()).Aggregate((i1,i2) => i1.Key > i2.Key ? i1 : i2);
             var shortestFullPath = fullPath.GroupBy(s => s.Count).Aggregate((i1,i2) => i1.Key < i2.Key ? i1 : i2);
-            solution = shortestFullPath.First();
+            solution = new List<Vector2Int>(shortestFullPath.First());
             solution.Insert(0, stage.GetEntrance());
         }
 
@@ -41,15 +42,20 @@ public static class Pathfinding
         if (stage[currentNode.x, currentNode.y] == TileType.Exit)
             return true;
 
+        if (currentNode == new Vector2Int(1, 2))
+        {
+            Debug.Log("here");
+        }
+        
+        if (currentNode == new Vector2Int(6, 7))
+        {
+            Debug.Log("here");
+        }
+        
         var direction = Vector2Int.up;
 
         do
         {
-            if (traceGraph.ExistDirectedPath(currentNode, currentNode + direction))
-            {
-                direction = direction.RotateClockwise(); continue;
-            }
-            
             //Exit path detected
             if (stage.TryMove(currentNode, direction, out var scoutPath))
             {
@@ -58,12 +64,13 @@ public static class Pathfinding
                     direction = direction.RotateClockwise(); continue;
                 }
                 
-                //Trace Stacks
-                traceGraph.AddDirected(currentNode, scoutPath.First());
-                for (int i = 0; i < scoutPath.Count - 1; i++)
+                if (scoutPath.Count != 0 && traceGraph.ExistDirectedPath(currentNode, scoutPath.Last()))
                 {
-                    traceGraph.AddDirected(scoutPath[i], scoutPath[i+1]);
+                    direction = direction.RotateClockwise(); continue;
                 }
+
+                //Trace Stacks
+                traceGraph.AddDirected(currentNode, scoutPath.Last());
 
                 //Recursion ends when DFS meet an exit. Only return false when exit doesnt exist
                 if (MapNode(stage, traceGraph, scoutPath.Last(), out var scoutPath2))
@@ -80,11 +87,7 @@ public static class Pathfinding
                 }
 
                 //Remove Trace Stacks
-                traceGraph.RemoveDirected(currentNode, scoutPath.First());
-                for (int i = 0; i < scoutPath.Count - 1; i++)
-                {
-                    traceGraph.RemoveDirected(scoutPath[i], scoutPath[i+1]);
-                }
+                traceGraph.RemoveDirected(currentNode, scoutPath.Last());
             }
             
             direction = direction.RotateClockwise();
