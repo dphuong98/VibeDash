@@ -111,13 +111,16 @@ public class StageBuilder : Builder<Stage>
                 var lengthOffset = currentPath.normalized * sideOffset.magnitude * 2;
                 
                 //Entering cross: draw large overpass over 2 lines
-                if (currentPath == nextPath &&
-                    Pathfinding.ExistDirectedPath(tracePath,
+                if (currentPath == nextPath && 
+                        (
+                        Pathfinding.ExistDirectedPath(tracePath,
                         solution[i + 1] + currentPath.RotateClockwiseXY().ToVector2Int(), solution[i + 1],
-                        solution[i + 1] + currentPath.RotateCounterClockwiseXY().ToVector2Int()) ||
-                    Pathfinding.ExistDirectedPath(tracePath,
+                                    solution[i + 1] + currentPath.RotateCounterClockwiseXY().ToVector2Int()) 
+                        ||
+                        Pathfinding.ExistDirectedPath(tracePath,
                         solution[i + 1] + currentPath.RotateCounterClockwiseXY().ToVector2Int(), solution[i + 1],
-                        solution[i + 1] + currentPath.RotateClockwiseXY().ToVector2Int())
+                                    solution[i + 1] + currentPath.RotateClockwiseXY().ToVector2Int())
+                        )
                 )
                 {
                     HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset,
