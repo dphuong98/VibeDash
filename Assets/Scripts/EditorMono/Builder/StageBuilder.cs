@@ -41,6 +41,7 @@ public class StageBuilder : Builder<Stage>
     private Grid grid;
     
     //Members
+    private bool pastSolutionMode = false;
     private List<Vector2Int> solution;
 
     public int SolutionSpeed = 4;
@@ -76,6 +77,9 @@ public class StageBuilder : Builder<Stage>
     private void DrawSceneGUI(SceneView sceneview)
     {
         if (EditingStage == null) return;
+        
+        if (!pastSolutionMode) CreateSolution();
+        pastSolutionMode = SolutionMode;
 
         DrawTileIcons();
         DrawSolution();
@@ -516,7 +520,7 @@ public class StageBuilder : Builder<Stage>
     [ContextMenu("CreateSolution")]
     private void CreateSolution()
     {
-        solution = Pathfinding.GetSolution(EditingStage);
+        if (SolutionMode) solution = Pathfinding.GetSolution(EditingStage);
     }
 
     protected override void OnReload()
