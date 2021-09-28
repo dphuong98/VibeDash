@@ -235,11 +235,12 @@ public class StageBuilder : Builder<Stage>
                     tracePath.Add(solution[i+1]);
                     continue;
                 }
+                
+                //Number path order
             }
         }
 
     }
-
     private void HandleClick()
     {
         if (Selection.activeGameObject == this.gameObject &&
@@ -274,6 +275,8 @@ public class StageBuilder : Builder<Stage>
 
                 if (types.Any())
                 {
+                    if (types.First().Key == TileType.Exit && !EditingStage.IsOnBorder(gridPos)) return;
+                    
                     EditingStage[gridPos.x, gridPos.y] = types.First().Key;
                     CreateSolution();
                 }
