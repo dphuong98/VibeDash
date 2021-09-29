@@ -38,7 +38,7 @@ public class StageBuilderEditor : BuilderEditor<Stage>
             else GUILayout.Label("Selected Tile: (  ,  )");
             
             GUILayout.BeginHorizontal();
-            stageBuilder.SolutionMode = GUILayout.Toggle(stageBuilder.SolutionMode, "View solution");
+            stageBuilder.SolutionMode = GUILayout.Toggle(stageBuilder.SolutionMode, "View solution (turn off if lag)");
             GUILayout.FlexibleSpace();
             stageBuilder.MovingSolution = GUILayout.Toggle(stageBuilder.MovingSolution, "Moving path");
             GUILayout.FlexibleSpace();

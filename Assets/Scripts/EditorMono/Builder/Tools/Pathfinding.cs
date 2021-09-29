@@ -90,7 +90,7 @@ public static class Pathfinding
     /// <returns>true if there is a line with the direction from start to end</returns>
     public static bool ExistDirectedPath(List<Vector2Int> path, params Vector2Int[] subPath)
     {
-        var startNodeOccurrences = path.Where(s => s == subPath[0]).Select(s => path.IndexOf(s));
+        var startNodeOccurrences = path.IndicesOf(subPath[0]);
 
         foreach (var nodeIndex in startNodeOccurrences)
         {
@@ -115,7 +115,7 @@ public static class Pathfinding
     {
         var nextNodes = new List<Vector2Int>();
 
-        var currentNodeOccurrences = path.Where(s => s == subPath[0]).Select(s => path.IndexOf(s));
+        var currentNodeOccurrences = path.IndicesOf(subPath[0]);
         foreach (var nodeIndex in currentNodeOccurrences)
         {
             var match = true;
