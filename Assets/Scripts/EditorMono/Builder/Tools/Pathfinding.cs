@@ -90,20 +90,47 @@ public static class Pathfinding
     /// <returns>true if there is a line with the direction from start to end</returns>
     public static bool ExistDirectedPath(List<Vector2Int> path, params Vector2Int[] subPath)
     {
-        var startTileOccurrences = path.Where(s => s == subPath[0]).Select(s => path.IndexOf(s));
+        var startNodeOccurrences = path.Where(s => s == subPath[0]).Select(s => path.IndexOf(s));
 
-        foreach (var point in startTileOccurrences)
+        foreach (var nodeIndex in startNodeOccurrences)
         {
             var match = true;
             for (var i = 1; i < subPath.Length; i++)
             {
-                if (point + i >= path.Count) return false;
-                if (path[point + i] != subPath[i]) match = false;
+                if (nodeIndex + i >= path.Count) return false;
+                if (path[nodeIndex + i] != subPath[i])
+                {
+                    match = false;
+                    break;
+                }
             }
 
             if (match) return true;
         }
         
         return false;
+    }
+
+    public static List<Vector2Int> GetNextNodes(List<Vector2Int> path, params Vector2Int[] subPath)
+    {
+        var nextNodes = new List<Vector2Int>();
+
+        var currentNodeOccurrences = path.Where(s => s == subPath[0]).Select(s => path.IndexOf(s));
+        foreach (var nodeIndex in currentNodeOccurrences)
+        {
+            var match = true;
+            for (var i = 1; i < subPath.Length; i++)
+            {
+                if (nodeIndex + i + 1 >= path.Count || path[nodeIndex + i] != subPath[i])
+                {
+                    match = false;
+                    break;
+                }
+            }
+
+            if (match) nextNodes.Add(path[nodeIndex + subPath.Length]);
+        }
+
+        return nextNodes;
     }
 }
