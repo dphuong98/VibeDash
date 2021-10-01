@@ -7,12 +7,28 @@ using System.Text;
 using UnityEngine;
 
 [Serializable]
+public struct Portal
+{
+    public Vector2Int Entrance;
+    public Vector2Int Exit;
+
+    public Portal(Vector2Int portalEntrance, Vector2Int portalExit)
+    {
+        this.Entrance = portalEntrance;
+        this.Exit = portalExit;
+    }
+}
+
+[Serializable]
 public class Stage : ScriptableObject, IInit, ICopiable<Stage>
 {
+    //TODO purge vector2int in this class
     [SerializeField, HideInInspector] private Vector2Int size = new Vector2Int(5, 5);
     [SerializeField, HideInInspector] private List<TileType> tiles = new List<TileType>();
+    [SerializeField, HideInInspector] private List<Portal> portalPairs = new List<Portal>();
 
     public Vector2Int Size => size;
+    public List<Portal> PortalPairs => new List<Portal>(portalPairs);
 
     public void Init()
     {
@@ -30,11 +46,35 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
         get => tiles[r * size.x + c];
         set
         {
+            // //Destroy portals on tile position
+            foreach (var portal in portalPairs.Where(portal => portal.Entrance == new Vector2Int(c, r) || portal.Exit == new Vector2Int(c, r)))
+            {
+                var portal_ = portal;
+                portalPairs.Remove(portal);
+                tiles[portal_.Entrance.y * size.x + portal_.Entrance.x] = TileType.Wall;
+                if (portal_.Exit != -Vector2Int.one)
+                    tiles[portal_.Exit.y * size.x + portal_.Exit.x] = TileType.Wall;
+                break;
+            }
+            
             //Ensure that their could be only one entrance or exit
             if (value == TileType.Entrance || value == TileType.Exit)
             {
                 if (tiles.IndexOf(value) is var tilePos && tilePos != -1) tiles[tilePos] = TileType.Wall;
             }
+
+            if (value == TileType.PortalEntrance)
+            {
+                OpenPortal(new Vector2Int(c, r));
+            }
+            
+            if (value == TileType.PortalExit)
+            {
+                if (PortalPending())
+                    ClosePortal(new Vector2Int(c, r));
+                else return;
+            }
+            
             tiles[r * size.x + c] = value;
         }
     }
@@ -43,6 +83,39 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
     {
         size = other.size;
         tiles = new List<TileType>(other.tiles);
+        portalPairs = new List<Portal>(other.portalPairs);
+    }
+
+    public void OpenPortal(Vector2Int portalEntrance)
+    {
+        CancelPortal();
+        portalPairs.Add(new Portal(portalEntrance, -Vector2Int.one));
+    }
+
+    public void CancelPortal()
+    {
+        if (PortalPending())
+        {
+            var item1 = portalPairs.Last().Entrance;
+            tiles[item1.y * size.x + item1.x]  = TileType.Wall;
+            portalPairs.RemoveAt(portalPairs.Count - 1);
+        }
+    }
+    
+    public void ClosePortal(Vector2Int portalExit)
+    {
+        if (PortalPending())
+        {
+            var item1 = portalPairs.Last().Entrance;
+            portalPairs.Add(new Portal(item1, portalExit));
+            portalPairs.RemoveAt(portalPairs.Count - 2);
+        }
+    }
+
+    public bool PortalPending()
+    {
+        return portalPairs.Any() &&
+               portalPairs.Last().Exit == -Vector2Int.one;
     }
 
     public void ExpandBottom()

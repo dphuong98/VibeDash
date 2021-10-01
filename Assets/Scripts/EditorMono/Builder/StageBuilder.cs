@@ -24,7 +24,9 @@ public class StageBuilder : Builder<Stage>
         {TileType.Air, 'a'},
         {TileType.Road, 'r'},
         {TileType.Wall, 'w'},
-        {TileType.Stop, 's'}
+        {TileType.Stop, 's'},
+        {TileType.PortalEntrance, 'n'},
+        {TileType.PortalExit, 'i'}
     };
 
     private static readonly Dictionary<TileType, Color> ColorMap = new Dictionary<TileType, Color>()
@@ -34,7 +36,9 @@ public class StageBuilder : Builder<Stage>
         {TileType.Air, Color.clear},
         {TileType.Road,  new Color(0.24f, 0.26f, 0.42f, 0.5f)},
         {TileType.Wall, new Color(0.94f, 0.62f, 0.79f)},
-        {TileType.Stop, new Color(1f, 0.62f, 0.27f)}
+        {TileType.Stop, new Color(1f, 0.62f, 0.27f)},
+        {TileType.PortalEntrance, new Color(0.24f, 1f, 0.23f)},
+        {TileType.PortalExit, new Color(0.64f, 0.73f, 1f)}
     };
 
     //Components
@@ -319,9 +323,7 @@ public class StageBuilder : Builder<Stage>
                 if (types.Any())
                 {
                     if (types.First().Key == TileType.Exit && !EditingStage.IsOnBorder(gridPos)) return;
-                    
-                    EditingStage[gridPos.x, gridPos.y] = types.First().Key;
-                    CreateSolution();
+                    SetTileData(gridPos.x, gridPos.y, types.First().Key);
                 }
             }
         }
@@ -392,10 +394,15 @@ public class StageBuilder : Builder<Stage>
         {
             var clickedPos = new Vector2Int(menuData.Item1, menuData.Item2);
             ExpandBorder(ref clickedPos);
-            EditingStage[clickedPos.x, clickedPos.y] = menuData.Item3;
-            EditorUtility.SetDirty(EditingStage);
-            CreateSolution();
+            SetTileData(clickedPos.x, clickedPos.y, menuData.Item3);
         }
+    }
+
+    private void SetTileData(int x, int y, TileType type)
+    {
+        EditingStage[x, y] = type;
+        EditorUtility.SetDirty(EditingStage);
+        CreateSolution();
     }
 
     private static char GetShortcut(TileType tile)
@@ -417,9 +424,7 @@ public class StageBuilder : Builder<Stage>
         {
             if (hitInfo.collider.gameObject == this.gameObject)
             {
-                var gridPos3 = grid.WorldToCell(hitInfo.point);
-                gridPos = new Vector2Int(gridPos3.x, gridPos3.y);
-
+                gridPos =  grid.WorldToCell(hitInfo.point).ToVector2Int();
                 return true;
             }
         }
