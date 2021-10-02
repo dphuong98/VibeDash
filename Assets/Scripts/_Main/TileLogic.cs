@@ -46,6 +46,34 @@ public static class TileLogic
                 path.Add(currentTilePosition);
                 break;
             }
+            
+            if (currentTileType == TileType.PortalBlue)
+            {
+                path.Add(currentTilePosition);
+                
+                //If exit does not exist act as stop
+                var portal = stage.PortalPairs.Where(s => s.Blue == currentTilePosition);
+                if (portal.Any() && portal.First().Orange != -Vector2Int.one)
+                {
+                    path.Add(portal.First().Orange);
+                }
+                
+                break;
+            }
+            
+            if (currentTileType == TileType.PortalOrange)
+            {
+                path.Add(currentTilePosition);
+                
+                //If there is no portal act as stop
+                var portal = stage.PortalPairs.Where(s => s.Orange == currentTilePosition);
+                if (portal.Any() && portal.First().Blue != -Vector2Int.one)
+                {
+                    path.Add(portal.First().Blue);
+                }
+                
+                break;
+            }
 
             if (currentTileType == TileType.Road  || currentTileType == TileType.Entrance)
             {

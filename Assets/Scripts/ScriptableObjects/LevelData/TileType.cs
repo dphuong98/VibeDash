@@ -10,8 +10,8 @@ public enum TileType
     Road,
     Wall,
     Stop,
-    PortalEntrance,
-    PortalExit
+    PortalBlue,
+    PortalOrange
 }
 
 public static class TileTypeExt {

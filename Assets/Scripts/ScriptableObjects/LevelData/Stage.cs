@@ -5,17 +5,18 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [Serializable]
 public struct Portal
 {
-    public Vector2Int Entrance;
-    public Vector2Int Exit;
+    [FormerlySerializedAs("Entrance")] public Vector2Int Blue;
+    [FormerlySerializedAs("Exit")] public Vector2Int Orange;
 
-    public Portal(Vector2Int portalEntrance, Vector2Int portalExit)
+    public Portal(Vector2Int portalBlue, Vector2Int portalOrange)
     {
-        this.Entrance = portalEntrance;
-        this.Exit = portalExit;
+        this.Blue = portalBlue;
+        this.Orange = portalOrange;
     }
 }
 
@@ -47,13 +48,13 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
         set
         {
             // //Destroy portals on tile position
-            foreach (var portal in portalPairs.Where(portal => portal.Entrance == new Vector2Int(c, r) || portal.Exit == new Vector2Int(c, r)))
+            foreach (var portal in portalPairs.Where(portal => portal.Blue == new Vector2Int(c, r) || portal.Orange == new Vector2Int(c, r)))
             {
                 var portal_ = portal;
                 portalPairs.Remove(portal);
-                tiles[portal_.Entrance.y * size.x + portal_.Entrance.x] = TileType.Wall;
-                if (portal_.Exit != -Vector2Int.one)
-                    tiles[portal_.Exit.y * size.x + portal_.Exit.x] = TileType.Wall;
+                tiles[portal_.Blue.y * size.x + portal_.Blue.x] = TileType.Wall;
+                if (portal_.Orange != -Vector2Int.one)
+                    tiles[portal_.Orange.y * size.x + portal_.Orange.x] = TileType.Wall;
                 break;
             }
             
@@ -63,12 +64,12 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
                 if (tiles.IndexOf(value) is var tilePos && tilePos != -1) tiles[tilePos] = TileType.Wall;
             }
 
-            if (value == TileType.PortalEntrance)
+            if (value == TileType.PortalBlue)
             {
                 OpenPortal(new Vector2Int(c, r));
             }
             
-            if (value == TileType.PortalExit)
+            if (value == TileType.PortalOrange)
             {
                 if (PortalPending())
                     ClosePortal(new Vector2Int(c, r));
@@ -96,7 +97,7 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
     {
         if (PortalPending())
         {
-            var item1 = portalPairs.Last().Entrance;
+            var item1 = portalPairs.Last().Blue;
             tiles[item1.y * size.x + item1.x]  = TileType.Wall;
             portalPairs.RemoveAt(portalPairs.Count - 1);
         }
@@ -106,7 +107,7 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
     {
         if (PortalPending())
         {
-            var item1 = portalPairs.Last().Entrance;
+            var item1 = portalPairs.Last().Blue;
             portalPairs.Add(new Portal(item1, portalExit));
             portalPairs.RemoveAt(portalPairs.Count - 2);
         }
@@ -115,7 +116,7 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
     public bool PortalPending()
     {
         return portalPairs.Any() &&
-               portalPairs.Last().Exit == -Vector2Int.one;
+               portalPairs.Last().Orange == -Vector2Int.one;
     }
 
     public void ExpandBottom()

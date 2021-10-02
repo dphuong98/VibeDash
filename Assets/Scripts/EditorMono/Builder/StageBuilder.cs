@@ -25,8 +25,8 @@ public class StageBuilder : Builder<Stage>
         {TileType.Road, 'r'},
         {TileType.Wall, 'w'},
         {TileType.Stop, 's'},
-        {TileType.PortalEntrance, 'n'},
-        {TileType.PortalExit, 'i'}
+        {TileType.PortalBlue, 'n'},
+        {TileType.PortalOrange, 'i'}
     };
 
     private static readonly Dictionary<TileType, Color> ColorMap = new Dictionary<TileType, Color>()
@@ -37,8 +37,8 @@ public class StageBuilder : Builder<Stage>
         {TileType.Road,  new Color(0.24f, 0.26f, 0.42f, 0.5f)},
         {TileType.Wall, new Color(0.94f, 0.62f, 0.79f)},
         {TileType.Stop, new Color(1f, 0.62f, 0.27f)},
-        {TileType.PortalEntrance, new Color(0.24f, 1f, 0.23f)},
-        {TileType.PortalExit, new Color(0.64f, 0.73f, 1f)}
+        {TileType.PortalBlue, new Color(0.24f, 1f, 0.23f)},
+        {TileType.PortalOrange, new Color(0.64f, 0.73f, 1f)}
     };
 
     //Components
@@ -89,7 +89,7 @@ public class StageBuilder : Builder<Stage>
 
         DrawTileIcons();
         DrawSolution();
-        DrawPortalTooltip();
+        DrawPortalConnection();
 
         HandleClick();
         HandleKey();
@@ -97,14 +97,14 @@ public class StageBuilder : Builder<Stage>
         //Other GUI option
     }
 
-    private void DrawPortalTooltip()
+    private void DrawPortalConnection()
     {
         Handles.color = PortalColor;
         var portals = EditingStage.PortalPairs;
         foreach (var portal in portals)
         {
-            if (portal.Exit == -Vector2Int.one) continue;
-            Handles.DrawLine(grid.GetCellCenterWorld(portal.Entrance), grid.GetCellCenterWorld(portal.Exit));
+            if (portal.Orange == -Vector2Int.one) continue;
+            Handles.DrawLine(grid.GetCellCenterWorld(portal.Blue), grid.GetCellCenterWorld(portal.Orange));
         }
     }
 
@@ -132,7 +132,7 @@ public class StageBuilder : Builder<Stage>
                 var sideOffset = currentPath.RotateClockwiseXY().normalized * grid.cellSize.y / 10;
                 var lengthOffset = currentPath.normalized * sideOffset.magnitude * 2;
 
-                //Label path order
+                //Label path order when branch. WARNING: Place before prevent duplication
                 if (nextPath != default && Pathfinding.ExistDirectedPath(tracePath, solution[i], solution[i+1]))
                 {
                     var nextNodes = Pathfinding.GetNextNodes(tracePath, solution[i], solution[i + 1]);
@@ -170,7 +170,7 @@ public class StageBuilder : Builder<Stage>
                     continue;
                 }
 
-                //Entering cross: draw large overpass over 2 lines
+                //Entering cross intersection: draw large overpass over 2 lines
                 if (currentPath == nextPath &&
                         (
                         Pathfinding.ExistDirectedPath(tracePath,
