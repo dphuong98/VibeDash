@@ -48,11 +48,13 @@ public class StageBuilder : Builder<Stage>
     private bool pastSolutionMode = false;
     private List<Vector2Int> solution;
 
+    public bool MovingSolution = true;
     public int SolutionSpeed = 4;
     public bool SolutionMode = false;
-    public bool MovingSolution = true;
-    public Vector2Int SelectedTile = new Vector2Int(-1, -1);
     public Color SolutionColor = Color.yellow;
+    public Color PortalColor = Color.yellow;
+    
+    public Vector2Int SelectedTile = new Vector2Int(-1, -1);
 
     public Stage LoadedStage => LoadedItem;
     public Stage EditingStage => EditingItem;
@@ -87,11 +89,23 @@ public class StageBuilder : Builder<Stage>
 
         DrawTileIcons();
         DrawSolution();
+        DrawPortalTooltip();
 
         HandleClick();
         HandleKey();
 
         //Other GUI option
+    }
+
+    private void DrawPortalTooltip()
+    {
+        Handles.color = PortalColor;
+        var portals = EditingStage.PortalPairs;
+        foreach (var portal in portals)
+        {
+            if (portal.Exit == -Vector2Int.one) continue;
+            Handles.DrawLine(grid.GetCellCenterWorld(portal.Entrance), grid.GetCellCenterWorld(portal.Exit));
+        }
     }
 
     private void DrawSolution()
