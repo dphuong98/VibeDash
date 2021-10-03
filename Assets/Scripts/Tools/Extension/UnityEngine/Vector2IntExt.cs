@@ -25,4 +25,9 @@ public static class Vector2IntExt
         
         return vector;
     }
+
+    public static bool IsAdjacent(this Vector2Int v1, Vector2Int v2)
+    {
+        return (v1 - v2).magnitude == 1;
+    }
 }

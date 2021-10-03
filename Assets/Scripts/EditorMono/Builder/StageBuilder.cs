@@ -25,22 +25,24 @@ public class StageBuilder : Builder<Stage>
         {TileType.Road, 'r'},
         {TileType.Wall, 'w'},
         {TileType.Stop, 's'},
-        {TileType.PortalBlue, 'n'},
-        {TileType.PortalOrange, 'i'}
+        {TileType.PortalBlue, 'b'},
+        {TileType.PortalOrange, 'o'}
     };
 
-    private static readonly Dictionary<TileType, Color> ColorMap = new Dictionary<TileType, Color>()
+    private static readonly Dictionary<TileType, Color> BackgroundColorMap = new Dictionary<TileType, Color>()
     {
-        {TileType.Entrance, new Color(0f, 1f, 1f, 0.5f)},
-        {TileType.Exit, new Color(1f, 0f, 0.03f, 0.77f)},
+        {TileType.Entrance, new Color(0.39f, 0.74f, 1f)},
+        {TileType.Exit, new Color(1f, 0.26f, 0.19f, 0.77f)},
         {TileType.Air, Color.clear},
-        {TileType.Road,  new Color(0.24f, 0.26f, 0.42f, 0.5f)},
+        {TileType.Road,  new Color(0.63f, 0.63f, 0.63f)},
         {TileType.Wall, new Color(0.94f, 0.62f, 0.79f)},
-        {TileType.Stop, new Color(1f, 0.62f, 0.27f)},
-        {TileType.PortalBlue, new Color(0.24f, 1f, 0.23f)},
-        {TileType.PortalOrange, new Color(0.64f, 0.73f, 1f)}
+        {TileType.Stop, new Color(0.63f, 0.63f, 0.63f)},
+        {TileType.PortalBlue, new Color(0.63f, 0.63f, 0.63f)},
+        {TileType.PortalOrange, new Color(0.63f, 0.63f, 0.63f)}
     };
 
+    private static readonly Dictionary<TileType, Texture> IconMap = new Dictionary<TileType, Texture>();
+    
     //Components
     private Grid grid;
     
@@ -48,12 +50,11 @@ public class StageBuilder : Builder<Stage>
     private bool pastSolutionMode = false;
     private List<Vector2Int> solution;
 
+    private readonly Color solutionColor = new Color(1f, 0.97f, 0.11f);
     public bool MovingSolution = true;
     public int SolutionSpeed = 4;
     public bool SolutionMode = false;
-    public Color SolutionColor = Color.yellow;
-    public Color PortalColor = Color.yellow;
-    
+
     public Vector2Int SelectedTile = new Vector2Int(-1, -1);
 
     public Stage LoadedStage => LoadedItem;
@@ -76,6 +77,11 @@ public class StageBuilder : Builder<Stage>
     private void Init()
     {
         grid = GetComponentInChildren<Grid>();
+        IconMap[TileType.Entrance] = Resources.Load<Texture>("Icons/Entrance");
+        IconMap[TileType.Exit] = Resources.Load<Texture>("Icons/Exit");
+        IconMap[TileType.PortalBlue] = Resources.Load<Texture>("Icons/PortalBlue");
+        IconMap[TileType.PortalOrange] = Resources.Load<Texture>("Icons/PortalOrange");
+        IconMap[TileType.Stop] = Resources.Load<Texture>("Icons/Stop");
         
         base.Init(stageFolder);
     }
@@ -89,25 +95,13 @@ public class StageBuilder : Builder<Stage>
 
         DrawTileIcons();
         DrawSolution();
-        DrawPortalConnection();
 
         HandleClick();
         HandleKey();
 
         //Other GUI option
     }
-
-    private void DrawPortalConnection()
-    {
-        Handles.color = PortalColor;
-        var portals = EditingStage.PortalPairs;
-        foreach (var portal in portals)
-        {
-            if (portal.Orange == -Vector2Int.one) continue;
-            Handles.DrawLine(grid.GetCellCenterWorld(portal.Blue), grid.GetCellCenterWorld(portal.Orange));
-        }
-    }
-
+    
     private void DrawSolution()
     {
         if (!SolutionMode || solution == null || solution.Count < 2) return;
@@ -117,7 +111,7 @@ public class StageBuilder : Builder<Stage>
             var frame = (int)Math.Round(Time.realtimeSinceStartup * SolutionSpeed) % solution.Count;
 
             if (frame == solution.Count - 1) return;
-            HandlesExt.DrawArrow(grid.GetCellCenterWorld(solution[frame]), grid.GetCellCenterWorld(solution[frame+1]), SolutionColor);
+            HandlesExt.DrawArrow(grid.GetCellCenterWorld(solution[frame]), grid.GetCellCenterWorld(solution[frame+1]), solutionColor);
         }
         else
         {
@@ -184,9 +178,9 @@ public class StageBuilder : Builder<Stage>
                 )
                 {
                     HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset,
-                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset, SolutionColor);
+                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset, solutionColor);
                     HandlesExt.DrawSimpleArc(grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset,
-                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset, SolutionColor);
+                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset, solutionColor);
                     tracePath.Add(solution[i+1]);
                     continue;
                 }
@@ -198,9 +192,9 @@ public class StageBuilder : Builder<Stage>
                 )
                 {
                     HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset,
-                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset, SolutionColor);
+                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset, solutionColor);
                     HandlesExt.DrawSimpleArc(grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset,
-                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset, SolutionColor);
+                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset, solutionColor);
                     tracePath.Add(solution[i+1]);
                     continue;
                 }
@@ -212,12 +206,12 @@ public class StageBuilder : Builder<Stage>
                 {
                     var gapLength = currentPath.RotateCounterClockwiseXY() / 3;
                     HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset,
-                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset, SolutionColor);
+                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset, solutionColor);
                     HandlesExt.DrawSimpleArc(grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset,
-                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset / 2, SolutionColor);
+                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset / 2, solutionColor);
                     HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset / 2,
                         grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset / 2 + gapLength,
-                        SolutionColor);
+                        solutionColor);
                     tracePath.Add(solution[i+1]);
                     continue;
                 }
@@ -229,9 +223,9 @@ public class StageBuilder : Builder<Stage>
                 )
                 {
                     HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset,
-                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset, SolutionColor);
+                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset, solutionColor);
                     HandlesExt.DrawSimpleArc(grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset,
-                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset, SolutionColor);
+                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset, solutionColor);
                     tracePath.Add(solution[i+1]);
                     continue;
                 }
@@ -243,19 +237,20 @@ public class StageBuilder : Builder<Stage>
                 {
                     var gapLength = currentPath.RotateCounterClockwiseXY() / 3.3f;
                     HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset,
-                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset / 2, SolutionColor);
+                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset / 2, solutionColor);
                     HandlesExt.DrawSimpleArc(grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset / 2,
                         grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset / 2 + gapLength,
-                        SolutionColor);
+                        solutionColor);
                     tracePath.Add(solution[i+1]);
                     continue;
                 }
 
                 //Straight or deadend
-                if (currentPath == nextPath || nextPath == default)
+                if (currentPath == nextPath || nextPath == default ||
+                    (nextPath != default && !solution[i+1].IsAdjacent(solution[i+2])))
                 {
                     HandlesExt.DrawPath(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset,
-                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset, SolutionColor);
+                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset, solutionColor);
                     tracePath.Add(solution[i+1]);
                     continue;
                 }
@@ -266,9 +261,9 @@ public class StageBuilder : Builder<Stage>
                     var gapLength = currentPath.RotateClockwiseXY() / 5;
                     HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i + 1]) - sideOffset - lengthOffset,
                         grid.GetCellCenterWorld(solution[i + 1]) - sideOffset - lengthOffset + gapLength,
-                        SolutionColor);
+                        solutionColor);
                     HandlesExt.DrawPath(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset,
-                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset, SolutionColor);
+                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset, solutionColor);
                     tracePath.Add(solution[i+1]);
                     continue;
                 }
@@ -278,10 +273,10 @@ public class StageBuilder : Builder<Stage>
                 {
                     var appendOffset = currentPath.RotateCounterClockwiseXY().normalized * sideOffset.magnitude * 3;
                     HandlesExt.DrawPath(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset,
-                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset / 2, SolutionColor);
+                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset / 2, solutionColor);
                     HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset / 2,
                         grid.GetCellCenterWorld(solution[i + 1]) + sideOffset + lengthOffset / 2 + appendOffset,
-                        SolutionColor);
+                        solutionColor);
                     tracePath.Add(solution[i+1]);
                     continue;
                 }
@@ -291,10 +286,10 @@ public class StageBuilder : Builder<Stage>
                 {
                     var appendOffset = currentPath.RotateClockwiseXY().normalized * sideOffset.magnitude;
                     HandlesExt.DrawPath(grid.GetCellCenterWorld(solution[i]) + sideOffset + lengthOffset,
-                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset / 2, SolutionColor);
+                        grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset / 2, solutionColor);
                     HandlesExt.DrawLine(grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset / 2,
                         grid.GetCellCenterWorld(solution[i + 1]) + sideOffset - lengthOffset / 2 + appendOffset,
-                        SolutionColor);
+                        solutionColor);
                     tracePath.Add(solution[i+1]);
                     continue;
                 }
@@ -337,6 +332,7 @@ public class StageBuilder : Builder<Stage>
                 if (types.Any())
                 {
                     if (types.First().Key == TileType.Exit && !EditingStage.IsOnBorder(gridPos)) return;
+                    if (types.First().Key == TileType.PortalOrange && !EditingStage.PortalPending()) return;
                     SetTileData(gridPos.x, gridPos.y, types.First().Key);
                 }
             }
@@ -395,6 +391,9 @@ public class StageBuilder : Builder<Stage>
             {
                 if (t == TileType.Exit && !EditingStage.IsOnBorder(tilePos))
                     continue;
+                if (t == TileType.PortalOrange && !EditingStage.PortalPending())
+                    continue;
+                
                 menu.AddItem(new GUIContent(string.Format("[{1}] {0}", t, GetShortcut(t))), t == dot, OnTileMenuClicked, new Tuple<int, int, TileType>(tilePos.x, tilePos.y, t));
             }
         }
@@ -466,12 +465,13 @@ public class StageBuilder : Builder<Stage>
     
     private void DrawTileIcon(TileType tile, Vector2Int gridPos)
     {
-        if (ColorMap.TryGetValue(tile, out var color))
-        {
-            var worldPos = grid.GetCellCenterWorld(new Vector3Int(gridPos.x, gridPos.y, 0));
-            Handles.color = color;
+        float iconRadius = 0.45f;
+        var worldPos = grid.GetCellCenterWorld(new Vector3Int(gridPos.x, gridPos.y, 0));
 
-            float iconRadius = 0.45f;
+        if (BackgroundColorMap.TryGetValue(tile, out var color))
+        {
+            Handles.color = color;
+            
             Handles.DrawAAConvexPolygon(new Vector3[]
             {
                 worldPos + new Vector3(-iconRadius, -iconRadius),
@@ -481,6 +481,21 @@ public class StageBuilder : Builder<Stage>
             });
         }
         
+        if (IconMap.TryGetValue(tile, out var icon))
+        {
+            var style = new GUIStyle {fixedHeight = iconRadius * 110, fixedWidth = iconRadius * 110};
+            Handles.Label(worldPos + new Vector3(-iconRadius, iconRadius), new GUIContent(icon), style);
+        }
+
+        if (tile == TileType.PortalBlue || tile == TileType.PortalOrange)
+        {
+            var portal = EditingStage.PortalPairs.Where(s => s.Blue == gridPos || s.Orange == gridPos);
+            if (portal.Any())
+            {
+                var style = new GUIStyle {fontSize = 30};
+                Handles.Label(worldPos + new Vector3(-1, 3, 0) * iconRadius * 0.25f, (EditingStage.PortalPairs.IndexOf(portal.First()) + 1).ToString(), style);
+            }
+        }
     }
 
     private void DrawHighLight(Vector2Int gridPos)
