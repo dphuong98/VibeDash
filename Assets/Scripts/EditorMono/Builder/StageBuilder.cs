@@ -7,6 +7,8 @@ using System.Numerics;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
+using Matrix4x4 = UnityEngine.Matrix4x4;
+using Quaternion = UnityEngine.Quaternion;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
@@ -20,29 +22,32 @@ public class StageBuilder : Builder<Stage>
     //Data
     private static readonly Dictionary<TileType, char> ShortCuts = new Dictionary<TileType, char>()
     {
+        {TileType.Air, 'a'},
         {TileType.Entrance, 'e'},
         {TileType.Exit, 'x'},
-        {TileType.Air, 'a'},
-        {TileType.Road, 'r'},
-        {TileType.Wall, 'w'},
-        {TileType.Stop, 's'},
         {TileType.PortalBlue, 'b'},
-        {TileType.PortalOrange, 'o'}
+        {TileType.PortalOrange, 'o'},
+        {TileType.Push, 'p'},
+        {TileType.Road, 'r'},
+        {TileType.Stop, 's'},
+        {TileType.Wall, 'w'},
     };
 
     private static readonly Dictionary<TileType, Color> BackgroundColorMap = new Dictionary<TileType, Color>()
     {
+        {TileType.Air, Color.clear},
         {TileType.Entrance, new Color(0.39f, 0.74f, 1f)},
         {TileType.Exit, new Color(1f, 0.26f, 0.19f, 0.77f)},
-        {TileType.Air, Color.clear},
-        {TileType.Road,  new Color(0.63f, 0.63f, 0.63f)},
-        {TileType.Wall, new Color(0.94f, 0.62f, 0.79f)},
-        {TileType.Stop, new Color(0.63f, 0.63f, 0.63f)},
         {TileType.PortalBlue, new Color(0.63f, 0.63f, 0.63f)},
-        {TileType.PortalOrange, new Color(0.63f, 0.63f, 0.63f)}
+        {TileType.PortalOrange, new Color(0.63f, 0.63f, 0.63f)},
+        {TileType.Push, new Color(0.63f, 0.63f, 0.63f)},
+        {TileType.Road,  new Color(0.63f, 0.63f, 0.63f)},
+        {TileType.Stop, new Color(0.63f, 0.63f, 0.63f)},
+        {TileType.Wall, new Color(0.94f, 0.62f, 0.79f)},
     };
 
     private static readonly Dictionary<TileType, Texture> IconMap = new Dictionary<TileType, Texture>();
+    private static readonly Dictionary<TileType, List<Texture>> DirectionalIconMap = new Dictionary<TileType, List<Texture>>();
     
     //Components
     private Grid grid;
@@ -79,11 +84,24 @@ public class StageBuilder : Builder<Stage>
     {
         grid = GetComponentInChildren<Grid>();
         IconMap[TileType.Entrance] = Resources.Load<Texture>("Icons/Entrance");
-        IconMap[TileType.Exit] = Resources.Load<Texture>("Icons/Exit");
+        IconMap[TileType.Exit] = Resources.Load<Texture>("Icons/Finish");
         IconMap[TileType.PortalBlue] = Resources.Load<Texture>("Icons/PortalBlue");
         IconMap[TileType.PortalOrange] = Resources.Load<Texture>("Icons/PortalOrange");
         IconMap[TileType.Stop] = Resources.Load<Texture>("Icons/Stop");
         
+        //TODO Hard code: 0 = Right; 1 = Down; 2 = Left; 3 = Up
+        DirectionalIconMap.Add(TileType.Push, new List<Texture>());
+        DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/R_Arrow"));
+        DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/D_Arrow"));
+        DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/L_Arrow"));
+        DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/U_Arrow"));
+        
+        DirectionalIconMap.Add(TileType.Corner, new List<Texture>());
+        DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>("Icons/Corners/R_Corner"));
+        DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>("Icons/Corners/D_Corner"));
+        DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>("Icons/Corners/L_Corner"));
+        DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>("Icons/Corners/U_Corner"));
+
         base.Init(stageFolder);
     }
 
@@ -380,7 +398,7 @@ public class StageBuilder : Builder<Stage>
             {
                 if (t == TileType.Exit)
                     continue;
-                menu.AddItem(new GUIContent(string.Format("[{1}] {0}", t, GetShortcut(t))), false, OnTileMenuClicked, new Tuple<int, int, TileType>(tilePos.x, tilePos.y, t));
+                menu.AddItem(new GUIContent(string.Format("[{1}] {0}", t, GetShortcut(t))), false, OnTileSelectMenu, new Tuple<int, int, TileType>(tilePos.x, tilePos.y, t));
             }
         }
         else
@@ -395,21 +413,48 @@ public class StageBuilder : Builder<Stage>
                 if (t == TileType.PortalOrange && !EditingStage.PortalPending())
                     continue;
                 
-                menu.AddItem(new GUIContent(string.Format("[{1}] {0}", t, GetShortcut(t))), t == dot, OnTileMenuClicked, new Tuple<int, int, TileType>(tilePos.x, tilePos.y, t));
+                menu.AddItem(new GUIContent(string.Format("[{1}] {0}", t, GetShortcut(t))), t == dot, OnTileSelectMenu, new Tuple<Vector2Int, TileType>(tilePos, t));
+            }
+
+            if (EditingStage[tilePos.x, tilePos.y] == TileType.Push)
+            {
+                menu.AddSeparator("");
+                menu.AddItem(new GUIContent("Rotate tile left"), false, OnTileRotateMenu, new Tuple<int, Vector2Int>(0, tilePos));
+                menu.AddItem(new GUIContent("Rotate tile right"), false, OnTileRotateMenu, new Tuple<int, Vector2Int>(1, tilePos));
             }
         }
         
         return menu;
     }
 
-    private void OnTileMenuClicked(object userdata)
+    private void OnTileRotateMenu(object userdata)
     {
-        if (userdata is Tuple<int, int, TileType> menuData)
+        if (!(userdata is Tuple<int, Vector2Int> menuData)) return;
+        
+        var currentDirection = EditingStage.TileDirections[menuData.Item2];
+            
+        //Rotate left
+        if (menuData.Item1 == 0)
         {
-            var clickedPos = new Vector2Int(menuData.Item1, menuData.Item2);
-            ExpandBorder(ref clickedPos);
-            SetTileData(clickedPos.x, clickedPos.y, menuData.Item3);
+            currentDirection = currentDirection.RotateCounterClockwise();
+            EditingStage.SetTileDirection(menuData.Item2, currentDirection);
         }
+
+        //Rotate right
+        if (menuData.Item1 == 1)
+        {
+            currentDirection = currentDirection.RotateClockwise();
+            EditingStage.SetTileDirection(menuData.Item2, currentDirection);
+        }
+    }
+
+    private void OnTileSelectMenu(object userdata)
+    {
+        if (!(userdata is Tuple<Vector2Int, TileType> menuData)) return;
+        
+        var clickedPos = menuData.Item1;
+        ExpandBorder(ref clickedPos);
+        SetTileData(clickedPos.x, clickedPos.y, menuData.Item2);
     }
 
     private void SetTileData(int x, int y, TileType type)
@@ -461,7 +506,6 @@ public class StageBuilder : Builder<Stage>
                     DrawHighLight(gridPos);
             }
         }
-        
     }
     
     private void DrawTileIcon(TileType tile, Vector2Int gridPos)
@@ -482,11 +526,38 @@ public class StageBuilder : Builder<Stage>
             });
         }
         
+        //Draw tile icon
         if (IconMap.TryGetValue(tile, out var icon))
         {
             HandlesExt.DrawTexture(worldPos + new Vector3(-iconRadius, iconRadius), icon, 210);
         }
 
+        //Draw directional tile
+        if (EditingStage.TileDirections.TryGetValue(gridPos, out var direction))
+        {
+            if (!DirectionalIconMap.ContainsKey(tile) ||
+                DirectionalIconMap[tile].Count != 4
+                ) return;
+            
+            if (direction == Vector2Int.right)
+            {
+                HandlesExt.DrawTexture(worldPos + new Vector3(-iconRadius, iconRadius), DirectionalIconMap[tile][0], 210);
+            }
+            if (direction == Vector2Int.down)
+            {
+                HandlesExt.DrawTexture(worldPos + new Vector3(-iconRadius, iconRadius), DirectionalIconMap[tile][1], 210);
+            }
+            if (direction == Vector2Int.left)
+            {
+                HandlesExt.DrawTexture(worldPos + new Vector3(-iconRadius, iconRadius), DirectionalIconMap[tile][2], 210);
+            }
+            if (direction == Vector2Int.up)
+            {
+                HandlesExt.DrawTexture(worldPos + new Vector3(-iconRadius, iconRadius), DirectionalIconMap[tile][3], 210);
+            }
+        }
+        
+        //Portal numbering
         if (tile == TileType.PortalBlue || tile == TileType.PortalOrange)
         {
             var portal = EditingStage.PortalPairs.Where(s => s.Blue == gridPos || s.Orange == gridPos);

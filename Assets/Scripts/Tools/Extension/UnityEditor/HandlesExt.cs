@@ -58,13 +58,14 @@ public class HandlesExt
         var zoom = SceneView.currentDrawingSceneView.camera.orthographicSize;
 
         // the style object allows you to control font size, among many other settings
-        var style = new GUIStyle();
-        
+        var style = new GUIStyle
+        {
+            fixedHeight = Mathf.FloorToInt(iconSize / zoom), fixedWidth = Mathf.FloorToInt(iconSize / zoom)
+        };
+
         // as you zoom out, the ortho size actually increases, 
         // so dividing by it makes the font smaller which is exactly what we need
-        style.fixedHeight = Mathf.FloorToInt(iconSize / zoom);
-        style.fixedWidth = Mathf.FloorToInt(iconSize / zoom);
-
+        
         Handles.Label(position, new GUIContent(icon), style);
     }
 }

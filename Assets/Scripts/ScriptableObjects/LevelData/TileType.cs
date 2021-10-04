@@ -11,7 +11,9 @@ public enum TileType
     Wall,
     Stop,
     PortalBlue,
-    PortalOrange
+    PortalOrange,
+    Push,
+    Corner,
 }
 
 public static class TileTypeExt {

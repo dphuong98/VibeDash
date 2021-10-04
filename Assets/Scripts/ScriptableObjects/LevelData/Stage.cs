@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.WSA;
 
 [Serializable]
 public struct Portal
@@ -21,15 +22,21 @@ public struct Portal
 }
 
 [Serializable]
+public class TileDirection : SerializableDictionary<Vector2Int, Vector2Int> { }
+
+//TODO refactor this class into smaller classes
+[Serializable]
 public class Stage : ScriptableObject, IInit, ICopiable<Stage>
 {
     //TODO purge vector2int in this class
     [SerializeField, HideInInspector] private Vector2Int size = new Vector2Int(5, 5);
     [SerializeField, HideInInspector] private List<TileType> tiles = new List<TileType>();
     [SerializeField, HideInInspector] private List<Portal> portalPairs = new List<Portal>();
+    [SerializeField, HideInInspector] private TileDirection tileDirections = new TileDirection();
 
     public Vector2Int Size => size;
     public List<Portal> PortalPairs => new List<Portal>(portalPairs);
+    public Dictionary<Vector2Int, Vector2Int> TileDirections => new Dictionary<Vector2Int, Vector2Int>(tileDirections);
 
     public void Init()
     {
@@ -47,36 +54,60 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
         get => tiles[r * size.x + c];
         set
         {
-            // //Destroy portals on tile position
-            foreach (var portal in portalPairs.Where(portal => portal.Blue == new Vector2Int(c, r) || portal.Orange == new Vector2Int(c, r)))
-            {
-                var portal_ = portal;
-                portalPairs.Remove(portal);
-                tiles[portal_.Blue.y * size.x + portal_.Blue.x] = TileType.Wall;
-                if (portal_.Orange != -Vector2Int.one)
-                    tiles[portal_.Orange.y * size.x + portal_.Orange.x] = TileType.Wall;
-                break;
-            }
-            
-            //Ensure that their could be only one entrance or exit
-            if (value == TileType.Entrance || value == TileType.Exit)
-            {
-                if (tiles.IndexOf(value) is var tilePos && tilePos != -1) tiles[tilePos] = TileType.Wall;
-            }
+           Unset(c,r);
+           Set(c, r, value);
+           tiles[r * size.x + c] = value;
+        }
+    }
 
-            if (value == TileType.PortalBlue)
-            {
-                OpenPortal(new Vector2Int(c, r));
-            }
+    private void Unset(int c, int r)
+    {
+        //Destroy portals on tile position
+        foreach (var portal in portalPairs.Where(portal => portal.Blue == new Vector2Int(c, r) || portal.Orange == new Vector2Int(c, r)))
+        {
+            var portal_ = portal;
+            portalPairs.Remove(portal);
+            tiles[portal_.Blue.y * size.x + portal_.Blue.x] = TileType.Wall;
+            if (portal_.Orange != -Vector2Int.one)
+                tiles[portal_.Orange.y * size.x + portal_.Orange.x] = TileType.Wall;
+            break;
+        }
+        
+        //Destroy tile direction
+        tileDirections.Remove(new Vector2Int(c, r));
+    }
+
+    private void Set(int c, int r, TileType value)
+    {
+        //Ensure that their could be only one entrance or exit
+        if (value == TileType.Entrance || value == TileType.Exit)
+        {
+            if (tiles.IndexOf(value) is var tilePos && tilePos != -1) tiles[tilePos] = TileType.Wall;
+        }
+
+        if (value == TileType.PortalBlue)
+        {
+            OpenPortal(new Vector2Int(c, r));
+        }
             
-            if (value == TileType.PortalOrange)
-            {
-                if (PortalPending())
-                    ClosePortal(new Vector2Int(c, r));
-                else return;
-            }
-            
-            tiles[r * size.x + c] = value;
+        if (value == TileType.PortalOrange)
+        {
+            if (PortalPending())
+                ClosePortal(new Vector2Int(c, r));
+            else return;
+        }
+
+        if (value == TileType.Push)
+        {
+            tileDirections.Add(new Vector2Int(c, r), Vector2Int.right);
+        }
+    }
+
+    public void SetTileDirection(Vector2Int position, Vector2Int direction)
+    {
+        if (tileDirections.TryGetValue(position, out var directionRef))
+        {
+            tileDirections[position] = direction;
         }
     }
 
