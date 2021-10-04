@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 using Vector2 = UnityEngine.Vector2;
@@ -98,7 +99,7 @@ public class StageBuilder : Builder<Stage>
 
         HandleClick();
         HandleKey();
-
+        
         //Other GUI option
     }
     
@@ -472,7 +473,7 @@ public class StageBuilder : Builder<Stage>
         {
             Handles.color = color;
             
-            Handles.DrawAAConvexPolygon(new Vector3[]
+            Handles.DrawAAConvexPolygon(new[]
             {
                 worldPos + new Vector3(-iconRadius, -iconRadius),
                 worldPos + new Vector3(-iconRadius, iconRadius),
@@ -483,8 +484,7 @@ public class StageBuilder : Builder<Stage>
         
         if (IconMap.TryGetValue(tile, out var icon))
         {
-            var style = new GUIStyle {fixedHeight = iconRadius * 110, fixedWidth = iconRadius * 110};
-            Handles.Label(worldPos + new Vector3(-iconRadius, iconRadius), new GUIContent(icon), style);
+            HandlesExt.DrawTexture(worldPos + new Vector3(-iconRadius, iconRadius), icon, 210);
         }
 
         if (tile == TileType.PortalBlue || tile == TileType.PortalOrange)
