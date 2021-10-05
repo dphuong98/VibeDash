@@ -344,19 +344,13 @@ public class StageBuilder : Builder<Stage>
         {
             if (TileSelected(out var gridPos))
             {
-                if (gridPos.x == -1 || gridPos.x == Cols || gridPos.y == -1 || gridPos.y == Rows)
-                {
-                    return;
-                }
-
                 var types = ShortCuts.Where(i => i.Value == Event.current.character);
-
-                if (types.Any())
-                {
-                    if (types.First().Key == TileType.Exit && !EditingStage.IsOnBorder(gridPos)) return;
-                    if (types.First().Key == TileType.PortalOrange && !EditingStage.PortalPending()) return;
-                    SetTileData(gridPos.x, gridPos.y, types.First().Key);
-                }
+                if (!types.Any()) return;
+                
+                ExpandBorder(ref gridPos);
+                if (types.First().Key == TileType.Exit && !EditingStage.IsOnBorder(gridPos)) return;
+                if (types.First().Key == TileType.PortalOrange && !EditingStage.PortalPending()) return;
+                SetTileData(gridPos.x, gridPos.y, types.First().Key);
             }
         }
     }
