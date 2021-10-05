@@ -89,7 +89,7 @@ public class StageBuilder : Builder<Stage>
         IconMap[TileType.PortalOrange] = Resources.Load<Texture>("Icons/PortalOrange");
         IconMap[TileType.Stop] = Resources.Load<Texture>("Icons/Stop");
         
-        //TODO Hard code: 0 = Right; 1 = Down; 2 = Left; 3 = Up
+        //Hint: 0 = Right; 1 = Down; 2 = Left; 3 = Up
         DirectionalIconMap.Add(TileType.Push, new List<Texture>());
         DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/R_Arrow"));
         DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/D_Arrow"));

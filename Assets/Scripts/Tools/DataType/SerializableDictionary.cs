@@ -17,6 +17,9 @@ public abstract class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TV
     [SerializeField, HideInInspector]
     private List<TValue> valueData = new List<TValue>();
 
+    public SerializableDictionary() : base() { }
+    public SerializableDictionary(IDictionary<TKey, TValue> values) : base(values) { }
+    
     public void OnBeforeSerialize()
     {
         this.keyData.Clear();

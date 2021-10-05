@@ -22,7 +22,11 @@ public struct Portal
 }
 
 [Serializable]
-public class TileDirection : SerializableDictionary<Vector2Int, Vector2Int> { }
+public class TileDirection : SerializableDictionary<Vector2Int, Vector2Int>
+{
+    public TileDirection() : base() {}
+    public TileDirection(TileDirection otherTileDirections) : base(otherTileDirections) { }
+}
 
 //TODO refactor this class into smaller classes
 [Serializable]
@@ -116,6 +120,7 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
         size = other.size;
         tiles = new List<TileType>(other.tiles);
         portalPairs = new List<Portal>(other.portalPairs);
+        tileDirections = new TileDirection(other.tileDirections);
     }
 
     public void OpenPortal(Vector2Int portalEntrance)
