@@ -94,6 +94,18 @@ public static class TileLogic
                 direction = stage.TileDirections[currentTilePosition];
                 continue;
             }
+            
+            if (currentTileType == TileType.Corner)
+            {
+                var upVector = stage.TileDirections[currentTilePosition];
+                var rightVector = upVector.RotateClockwise();
+                
+                path.Add(currentTilePosition);
+
+                if (direction == -upVector) direction = rightVector;
+                if (direction == -rightVector) direction = upVector;
+                continue;
+            }
 
             break; //Treat unknown tile as wall
         }

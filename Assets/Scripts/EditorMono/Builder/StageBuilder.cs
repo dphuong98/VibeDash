@@ -24,6 +24,7 @@ public class StageBuilder : Builder<Stage>
     {
         {TileType.Air, 'a'},
         {TileType.Entrance, 'e'},
+        {TileType.Corner, 'c'},
         {TileType.Exit, 'x'},
         {TileType.PortalBlue, 'b'},
         {TileType.PortalOrange, 'o'},
@@ -36,6 +37,7 @@ public class StageBuilder : Builder<Stage>
     private static readonly Dictionary<TileType, Color> BackgroundColorMap = new Dictionary<TileType, Color>()
     {
         {TileType.Air, Color.clear},
+        {TileType.Corner, new Color(0.63f, 0.63f, 0.63f)},
         {TileType.Entrance, new Color(0.39f, 0.74f, 1f)},
         {TileType.Exit, new Color(1f, 0.26f, 0.19f, 0.77f)},
         {TileType.PortalBlue, new Color(0.63f, 0.63f, 0.63f)},
@@ -89,18 +91,18 @@ public class StageBuilder : Builder<Stage>
         IconMap[TileType.PortalOrange] = Resources.Load<Texture>("Icons/PortalOrange");
         IconMap[TileType.Stop] = Resources.Load<Texture>("Icons/Stop");
         
-        //Hint: 0 = Right; 1 = Down; 2 = Left; 3 = Up
+        //Hint: 0 = Up; 1 = Right; 2 = Down; 3 = Left
         DirectionalIconMap.Add(TileType.Push, new List<Texture>());
+        DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/U_Arrow"));
         DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/R_Arrow"));
         DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/D_Arrow"));
         DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/L_Arrow"));
-        DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/U_Arrow"));
         
         DirectionalIconMap.Add(TileType.Corner, new List<Texture>());
+        DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>("Icons/Corners/U_Corner"));
         DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>("Icons/Corners/R_Corner"));
         DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>("Icons/Corners/D_Corner"));
         DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>("Icons/Corners/L_Corner"));
-        DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>("Icons/Corners/U_Corner"));
 
         base.Init(stageFolder);
     }
@@ -416,7 +418,9 @@ public class StageBuilder : Builder<Stage>
                 menu.AddItem(new GUIContent(string.Format("[{1}] {0}", t, GetShortcut(t))), t == dot, OnTileSelectMenu, new Tuple<Vector2Int, TileType>(tilePos, t));
             }
 
-            if (EditingStage[tilePos.x, tilePos.y] == TileType.Push)
+            if (EditingStage[tilePos.x, tilePos.y] == TileType.Push || 
+                EditingStage[tilePos.x, tilePos.y] == TileType.Corner
+                )
             {
                 menu.AddSeparator("");
                 menu.AddItem(new GUIContent("Rotate tile left"), false, OnTileRotateMenu, new Tuple<int, Vector2Int>(0, tilePos));
@@ -543,19 +547,19 @@ public class StageBuilder : Builder<Stage>
                 DirectionalIconMap[tile].Count != 4
                 ) return;
             
-            if (direction == Vector2Int.right)
+            if (direction == Vector2Int.up)
             {
                 HandlesExt.DrawTexture(worldPos + new Vector3(-iconRadius, iconRadius), DirectionalIconMap[tile][0], 210);
             }
-            if (direction == Vector2Int.down)
+            if (direction == Vector2Int.right)
             {
                 HandlesExt.DrawTexture(worldPos + new Vector3(-iconRadius, iconRadius), DirectionalIconMap[tile][1], 210);
             }
-            if (direction == Vector2Int.left)
+            if (direction == Vector2Int.down)
             {
                 HandlesExt.DrawTexture(worldPos + new Vector3(-iconRadius, iconRadius), DirectionalIconMap[tile][2], 210);
             }
-            if (direction == Vector2Int.up)
+            if (direction == Vector2Int.left)
             {
                 HandlesExt.DrawTexture(worldPos + new Vector3(-iconRadius, iconRadius), DirectionalIconMap[tile][3], 210);
             }

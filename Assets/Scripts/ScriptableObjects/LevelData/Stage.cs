@@ -101,9 +101,9 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
             else return;
         }
 
-        if (value == TileType.Push)
+        if (value == TileType.Push || value == TileType.Corner)
         {
-            tileDirections.Add(new Vector2Int(c, r), Vector2Int.right);
+            tileDirections.Add(new Vector2Int(c, r), Vector2Int.up);
         }
     }
 
