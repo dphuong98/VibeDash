@@ -389,7 +389,7 @@ public class StageBuilder : Builder<Stage>
         GenericMenu menu = new GenericMenu();
         
         //Border expand set
-        if (!EditingStage.Contains(tilePos))
+        if (!EditingStage.IsValidTile(tilePos))
         {
             foreach (TileType t in Enum.GetValues(typeof(TileType)))
             {
