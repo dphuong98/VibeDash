@@ -205,4 +205,34 @@ public class StageBuilderEditor : BuilderEditor<Stage>
 
         //End OnInspectorGUI
     }
+
+    public void SaveAs()
+    {
+        var defaultName = "";
+
+        if (!stageBuilder.EditingStage.IsOnBorder(stageBuilder.EditingStage.GetEntrance()))
+        {
+            defaultName += "En_";
+        }
+
+        var relativeSize = stageBuilder.EditingStage.Size.x + stageBuilder.EditingStage.Size.y;
+        if (relativeSize > 20) defaultName += "Large";
+        else if (relativeSize > 15) defaultName += "Medium";
+        else defaultName += "Small";
+        
+        var rx = new Regex(@"(\d+)");
+        var d = new DirectoryInfo(StageBuilder.DefaultFolder);
+        var number = 0;
+        if (d.GetFiles(defaultName+"??.asset") is var fileInfos && fileInfos.Count() != 0)
+        {
+            number = fileInfos.Select(s => rx.Match(s.Name)).Where(s => s.Success).Max(s =>
+            {
+                int.TryParse(s.Value, out var num);
+                return num;
+            });
+        }
+        
+        var path = EditorUtility.SaveFilePanel("Save As", StageBuilder.DefaultFolder, defaultName+(number+1), "asset");
+        builder.Save(FileUtil.GetProjectRelativePath(path));
+    }
 }
