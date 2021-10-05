@@ -429,23 +429,27 @@ public class StageBuilder : Builder<Stage>
 
     private void OnTileRotateMenu(object userdata)
     {
-        if (!(userdata is Tuple<int, Vector2Int> menuData)) return;
+        if (!(userdata is Tuple<int, Vector2Int> menuData) ||
+            (menuData.Item1 != 0 && menuData.Item1 != 1)
+        ) return;
         
         var currentDirection = EditingStage.TileDirections[menuData.Item2];
-            
+
         //Rotate left
         if (menuData.Item1 == 0)
         {
             currentDirection = currentDirection.RotateCounterClockwise();
-            EditingStage.SetTileDirection(menuData.Item2, currentDirection);
         }
 
         //Rotate right
         if (menuData.Item1 == 1)
         {
             currentDirection = currentDirection.RotateClockwise();
-            EditingStage.SetTileDirection(menuData.Item2, currentDirection);
         }
+        
+        EditingStage.SetTileDirection(menuData.Item2, currentDirection);
+        EditorUtility.SetDirty(EditingStage);
+        CreateSolution();
     }
 
     private void OnTileSelectMenu(object userdata)

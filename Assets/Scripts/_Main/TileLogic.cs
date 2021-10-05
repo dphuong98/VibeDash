@@ -31,6 +31,13 @@ public static class TileLogic
             
             var currentTileType = stage[currentTilePosition.x, currentTilePosition.y];
 
+            //Exit
+            if (currentTileType == TileType.Exit)
+            {
+                path.Add(currentTilePosition);
+                return true;
+            }
+            
             //Player fell out of the map
             if (currentTileType == TileType.Air)
             {
@@ -75,16 +82,17 @@ public static class TileLogic
                 break;
             }
 
-            if (currentTileType == TileType.Road  || currentTileType == TileType.Entrance)
+            if (currentTileType == TileType.Road || currentTileType == TileType.Entrance)
             {
                 path.Add(currentTilePosition);
                 continue;
             }
-            
-            if (currentTileType == TileType.Exit)
+
+            if (currentTileType == TileType.Push)
             {
                 path.Add(currentTilePosition);
-                return true;
+                direction = stage.TileDirections[currentTilePosition];
+                continue;
             }
 
             break; //Treat unknown tile as wall
