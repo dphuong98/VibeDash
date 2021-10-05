@@ -148,6 +148,7 @@ public class StageBuilder : Builder<Stage>
                 var lengthOffset = currentPath.normalized * sideOffset.magnitude * 2;
 
                 //Label path order when branch. WARNING: Place before prevent duplication
+                var style = new GUIStyle {normal = {textColor = Color.black}};
                 if (nextPath != default && Pathfinding.ExistDirectedPath(tracePath, solution[i], solution[i+1]))
                 {
                     var nextNodes = Pathfinding.GetNextNodes(tracePath, solution[i], solution[i + 1]);
@@ -163,8 +164,8 @@ public class StageBuilder : Builder<Stage>
                             var _lengthOffset = _nextPath.normalized * _sideOffset.magnitude * 2;
                             if (_nextPath == Vector3.right)
                             {
-                                Handles.Label(grid.GetCellCenterWorld(solution[i + 1]) + _sideOffset + _lengthOffset,
-                                    (nodeIndex + 1).ToString());
+                                HandlesExt.DrawText(grid.GetCellCenterWorld(solution[i + 1]) + _sideOffset + _lengthOffset,
+                                    (nodeIndex + 1).ToString(), 50);
                                 continue;
                             }
 
@@ -172,8 +173,8 @@ public class StageBuilder : Builder<Stage>
                             if (_nextPath != Vector3.down) _labelOffset += Vector3.up / 4;
                             if (_nextPath != Vector3.up) _labelOffset += Vector3.left / 5;
                             
-                            Handles.Label(grid.GetCellCenterWorld(solution[i + 1]) + 2 * _sideOffset + _lengthOffset + _labelOffset,
-                                (nodeIndex + 1).ToString());
+                            HandlesExt.DrawText(grid.GetCellCenterWorld(solution[i + 1]) + 2 * _sideOffset + _lengthOffset + _labelOffset,
+                                (nodeIndex + 1).ToString(), 50);
                         }
                     }
                 }
