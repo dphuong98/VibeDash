@@ -11,8 +11,8 @@ using UnityEngine.WSA;
 [Serializable]
 public struct Portal
 {
-    [FormerlySerializedAs("Entrance")] public Vector2Int Blue;
-    [FormerlySerializedAs("Exit")] public Vector2Int Orange;
+    public Vector2Int Blue;
+    public Vector2Int Orange;
 
     public Portal(Vector2Int portalBlue, Vector2Int portalOrange)
     {
@@ -51,6 +51,12 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
     public bool IsOnBorder(Vector2Int tilePos)
     {
         return 0 == tilePos.x || tilePos.x == size.x - 1 || 0 == tilePos.y || tilePos.y == size.y - 1;
+    }
+
+    public bool Contains(Vector2Int tilePos)
+    {
+        return 0 <= tilePos.x && tilePos.x < size.x &&
+               0 <= tilePos.y && tilePos.y < size.y;
     }
 
     public TileType this[int c, int r]
@@ -171,6 +177,7 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
                 break;
             }
         }
+        ShiftSpecialTiles(Vector2Int.up);
     }
 
     public void ExpandLeft()
@@ -189,6 +196,7 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
                 break;
             }
         }
+        ShiftSpecialTiles(Vector2Int.right);
     }
 
     public void ExpandRight()
@@ -235,6 +243,7 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
             tiles.RemoveAt(0);
         }
         size.y--;
+        ShiftSpecialTiles(Vector2Int.down);
     }
 
     public void CollapseLeft()
@@ -246,6 +255,7 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
             tiles.RemoveAt(r * size.x);
         }
         size.x--;
+        ShiftSpecialTiles(Vector2Int.left);
     }
 
     public void CollapseRight()
@@ -268,6 +278,30 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
             tiles.RemoveAt(tiles.Count - 1);
         }
         size.y--;
+    }
+
+    private void ShiftSpecialTiles(Vector2Int direction)
+    {
+        for (var i = 0; i < portalPairs.Count; i++)
+        {
+            var shiftedPortal = new Portal(portalPairs[i].Blue + direction, portalPairs[i].Orange + direction);
+            portalPairs[i] = shiftedPortal;
+        }
+
+        var tileDirectionKeys = tileDirections.Keys.ToList();
+        foreach (var key in tileDirectionKeys)
+        {
+            tileDirections.Add(key + direction, tileDirections[key]);
+            tileDirections.Remove(key);
+        }
+        
+        //Purge invalid tiles
+        portalPairs.RemoveAll(s => !Contains(s.Blue) || !Contains(s.Orange));
+        var invalidKeys = tileDirections.Keys.Where(s => !Contains(s));
+        foreach (var key in invalidKeys)
+        {
+            tileDirections.Remove(key);
+        }
     }
     
     public Vector2Int GetEntrance()
