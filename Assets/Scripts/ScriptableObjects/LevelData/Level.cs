@@ -8,6 +8,7 @@ using UnityEngine.EventSystems;
 [Serializable]
 public class Level : ScriptableObject, IInit, ICopiable<Level>
 {
+    //TODO into serializableDictionary
     [SerializeField, HideInInspector] private List<Stage> stageItems = new List<Stage>();
     [SerializeField, HideInInspector] private List<Vector2Int> stagesPositions = new List<Vector2Int>();
     public Dictionary<Stage, Vector2Int> Stages => stageItems.Zip(stagesPositions, (k, v) => new { Key = k, Value = v })

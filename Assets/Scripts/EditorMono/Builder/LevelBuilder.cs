@@ -27,14 +27,13 @@ public class LevelBuilder : Builder<Level>
     private static Vector2Int lastestBridgePart;
     private static Bridge editingBridge;
     
-    private static bool initialized = false;
-    private List<MiniStage> miniStages;
-    private List<Bridge> bridges;
+    private List<MiniStage> miniStages = new List<MiniStage>();
+    private List<Bridge> bridges = new List<Bridge>();
     
     private void OnEnable()
     {
         SceneView.duringSceneGui += DrawSceneGUI;
-        if (!initialized) Init();
+        Init();
     }
 
     private void OnDisable()
@@ -51,7 +50,6 @@ public class LevelBuilder : Builder<Level>
         if (bridges == null) bridges = new List<Bridge>();
         
         base.Init(levelFolder);
-        initialized = true;
     }
     
     private void DrawSceneGUI(SceneView sceneView)
@@ -122,7 +120,7 @@ public class LevelBuilder : Builder<Level>
 
     private void WipeScene()
     {
-        for (int i = transform.childCount - 1; i >= 0; i--)
+        for (var i = transform.childCount - 1; i >= 0; i--)
             DestroyImmediate(transform.GetChild(i).gameObject);
         
         miniStages = new List<MiniStage>();
