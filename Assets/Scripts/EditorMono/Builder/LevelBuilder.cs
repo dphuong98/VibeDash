@@ -5,6 +5,7 @@ using System.ComponentModel.Design.Serialization;
 using System.IO;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Experimental.TerrainAPI;
 using UnityEditor.Tilemaps;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -57,6 +58,7 @@ public class LevelBuilder : Builder<Level>
     {
         if (EditingLevel == null) return;
 
+        DrawBuilderFocusButton();
         HandleClick(sceneView);
 
         //Render and handle bridge connections
@@ -65,6 +67,20 @@ public class LevelBuilder : Builder<Level>
         HandleBridgeBuilding(sceneView);
 
         //Other GUI option
+    }
+
+    private void DrawBuilderFocusButton()
+    {
+        Handles.BeginGUI();
+             
+        var rect = new Rect(10, 400, 100, 50);
+        if (GUI.Button(rect, "Level Builder"))
+        {
+            Selection.activeGameObject = gameObject;
+        }
+
+        Handles.EndGUI();
+        
     }
 
     public override void NewItem()
@@ -183,8 +199,7 @@ public class LevelBuilder : Builder<Level>
                 {
                     if (stage[gridPos.x, gridPos.y] == TileType.Exit)
                     {
-                        //TODO Pathfinding.GetMaximumUniqueTile(miniStage.Stage)
-                        editingBridge = new Bridge(50);
+                        editingBridge = new Bridge(Pathfinding.CountUniqueTiles(miniStage.Stage.Solution));
                         var mouseGridPos3 = grid.WorldToCell(mousePos);
                         editingBridge.bridgeParts.Add(new Vector2Int(mouseGridPos3.x, mouseGridPos3.y));
                         return;
