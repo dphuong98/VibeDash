@@ -48,14 +48,14 @@ public class StageBuilder : Builder<Stage>
         {TileType.Wall, new Color(0.94f, 0.62f, 0.79f)},
     };
 
-    private static readonly Dictionary<TileType, Texture> IconMap = new Dictionary<TileType, Texture>();
-    private static readonly Dictionary<TileType, List<Texture>> DirectionalIconMap = new Dictionary<TileType, List<Texture>>();
+    private Dictionary<TileType, Texture> IconMap = new Dictionary<TileType, Texture>();
+    private Dictionary<TileType, List<Texture>> DirectionalIconMap = new Dictionary<TileType, List<Texture>>();
     
     //Components
     private Grid grid;
     
     //Members
-    private bool initialized;
+    private bool initialized = false;
     private bool pastSolutionMode;
     private List<Vector2Int> solution;
 
@@ -75,7 +75,7 @@ public class StageBuilder : Builder<Stage>
     private void OnEnable()
     {
         SceneView.duringSceneGui += DrawSceneGUI;
-        if (!initialized) Init();
+        Init();
     }
 
     private void OnDisable()
@@ -85,6 +85,8 @@ public class StageBuilder : Builder<Stage>
 
     private void Init()
     {
+        if (initialized) return;
+
         grid = GetComponentInChildren<Grid>();
         IconMap[TileType.Entrance] = Resources.Load<Texture>("Icons/Entrance");
         IconMap[TileType.Exit] = Resources.Load<Texture>("Icons/Finish");
@@ -351,7 +353,7 @@ public class StageBuilder : Builder<Stage>
                 
                 ExpandBorder(ref gridPos);
                 if (types.First().Key == TileType.Exit && !EditingStage.IsOnBorder(gridPos)) return;
-                if (types.First().Key == TileType.PortalOrange && !EditingStage.PortalPending()) return;
+                if (types.First().Key == TileType.PortalOrange && !EditingStage.PortalPending(out _)) return;
                 SetTileData(gridPos.x, gridPos.y, types.First().Key);
             }
         }
@@ -409,7 +411,7 @@ public class StageBuilder : Builder<Stage>
             {
                 if (t == TileType.Exit && !EditingStage.IsOnBorder(tilePos))
                     continue;
-                if (t == TileType.PortalOrange && !EditingStage.PortalPending())
+                if (t == TileType.PortalOrange && !EditingStage.PortalPending(out _))
                     continue;
                 
                 menu.AddItem(new GUIContent(string.Format("[{1}] {0}", t, GetShortcut(t))), t == dot, OnTileSelectMenu, new Tuple<Vector2Int, TileType>(tilePos, t));

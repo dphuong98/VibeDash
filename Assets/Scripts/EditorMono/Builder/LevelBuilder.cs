@@ -26,7 +26,7 @@ public class LevelBuilder : Builder<Level>
     private static Vector2Int lastestBridgePart;
     private static Bridge editingBridge;
     
-    private bool initialized = false;
+    private static bool initialized = false;
     private List<MiniStage> miniStages;
     private List<Bridge> bridges;
     
