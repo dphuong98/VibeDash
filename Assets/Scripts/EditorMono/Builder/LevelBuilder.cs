@@ -183,7 +183,8 @@ public class LevelBuilder : Builder<Level>
                 {
                     if (stage[gridPos.x, gridPos.y] == TileType.Exit)
                     {
-                        editingBridge = new Bridge(Pathfinding.GetMaximumUniqueTile(miniStage.Stage));
+                        //TODO Pathfinding.GetMaximumUniqueTile(miniStage.Stage)
+                        editingBridge = new Bridge(50);
                         var mouseGridPos3 = grid.WorldToCell(mousePos);
                         editingBridge.bridgeParts.Add(new Vector2Int(mouseGridPos3.x, mouseGridPos3.y));
                         return;

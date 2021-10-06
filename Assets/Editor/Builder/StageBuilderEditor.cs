@@ -30,24 +30,24 @@ public class StageBuilderEditor : BuilderEditor<Stage>
             GUILayout.Label("Stage Info", EditorStyles.boldLabel);
             GUILayout.Label("Stage size: (" + stageBuilder.EditingStage.Size.x + ", " + stageBuilder.EditingStage.Size.y + ")");
 
-            if (0 <= stageBuilder.SelectedTile.x && stageBuilder.SelectedTile.x < stageBuilder.Cols &&
-                0 <= stageBuilder.SelectedTile.y && stageBuilder.SelectedTile.y < stageBuilder.Rows)
+            if (0 <= stageBuilder.selectedTile.x && stageBuilder.selectedTile.x < stageBuilder.Cols &&
+                0 <= stageBuilder.selectedTile.y && stageBuilder.selectedTile.y < stageBuilder.Rows)
             {
-                GUILayout.Label("Selected Tile: (" + (stageBuilder.SelectedTile.x+1) + ", " + (stageBuilder.SelectedTile.y+1) + ")");
+                GUILayout.Label("Selected Tile: (" + (stageBuilder.selectedTile.x+1) + ", " + (stageBuilder.selectedTile.y+1) + ")");
             }
             else GUILayout.Label("Selected Tile: (  ,  )");
             
             GUILayout.BeginHorizontal();
-            stageBuilder.SolutionMode = GUILayout.Toggle(stageBuilder.SolutionMode, "View solution (turn off if lag)");
+            stageBuilder.solutionMode = GUILayout.Toggle(stageBuilder.solutionMode, "View solution (turn off if lag)");
             GUILayout.FlexibleSpace();
-            stageBuilder.MovingSolution = GUILayout.Toggle(stageBuilder.MovingSolution, "Moving path");
+            stageBuilder.movingSolution = GUILayout.Toggle(stageBuilder.movingSolution, "Moving path");
             GUILayout.FlexibleSpace();
             GUILayout.BeginHorizontal();
             GUILayout.Label("Speed: ");
-            stageBuilder.SolutionSpeed = EditorGUILayout.IntField(stageBuilder.SolutionSpeed, GUILayout.MaxWidth(64));
+            stageBuilder.solutionSpeed = EditorGUILayout.IntField(stageBuilder.solutionSpeed, GUILayout.MaxWidth(64));
             GUILayout.EndHorizontal();
-            GUILayout.Label("Maximum points: ");
             GUILayout.EndHorizontal();
+            GUILayout.Label("Maximum points: " + Pathfinding.CountUniqueTiles(stageBuilder.EditingStage.Solution));
         #endregion
 
         #region File

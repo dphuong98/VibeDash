@@ -56,14 +56,13 @@ public class StageBuilder : Builder<Stage>
     
     //Members
     private bool pastSolutionMode;
-    private List<Vector2Int> solution;
 
     private readonly Color solutionColor = new Color(1f, 0.97f, 0.11f);
-    public bool MovingSolution = true;
-    public int SolutionSpeed = 4;
-    public bool SolutionMode = false;
+    public bool movingSolution;
+    public int solutionSpeed = 4;
+    public bool solutionMode;
 
-    public Vector2Int SelectedTile = new Vector2Int(-1, -1);
+    public Vector2Int selectedTile = new Vector2Int(-1, -1);
 
     public Stage LoadedStage => LoadedItem;
     public Stage EditingStage => EditingItem;
@@ -112,7 +111,7 @@ public class StageBuilder : Builder<Stage>
         if (EditingStage == null) return;
         
         if (!pastSolutionMode) CreateSolution();
-        pastSolutionMode = SolutionMode;
+        pastSolutionMode = solutionMode;
 
         DrawTileIcons();
         DrawSolution();
@@ -123,13 +122,13 @@ public class StageBuilder : Builder<Stage>
         //Other GUI option
     }
     
-    private void DrawSolution()
-    {
-        if (!SolutionMode || solution == null || solution.Count < 2) return;
+    private void DrawSolution() {
+        var solution = EditingStage.Solution;
+        if (!solutionMode || solution == null || solution.Count < 2) return;
 
-        if (MovingSolution)
+        if (movingSolution)
         {
-            var frame = (int)Math.Round(Time.realtimeSinceStartup * SolutionSpeed) % solution.Count;
+            var frame = (int)Math.Round(Time.realtimeSinceStartup * solutionSpeed) % solution.Count;
 
             if (frame == solution.Count - 1) return;
             HandlesExt.DrawArrow(grid.GetCellCenterWorld(solution[frame]), grid.GetCellCenterWorld(solution[frame+1]), solutionColor);
@@ -148,7 +147,6 @@ public class StageBuilder : Builder<Stage>
                 var lengthOffset = currentPath.normalized * sideOffset.magnitude * 2;
 
                 //Label path order when branch. WARNING: Place before prevent duplication
-                var style = new GUIStyle {normal = {textColor = Color.black}};
                 if (nextPath != default && Pathfinding.ExistDirectedPath(tracePath, solution[i], solution[i+1]))
                 {
                     var nextNodes = Pathfinding.GetNextNodes(tracePath, solution[i], solution[i + 1]);
@@ -319,6 +317,7 @@ public class StageBuilder : Builder<Stage>
         }
 
     }
+    
     private void HandleClick()
     {
         if (Selection.activeGameObject == this.gameObject &&
@@ -326,12 +325,12 @@ public class StageBuilder : Builder<Stage>
             Event.current.modifiers == EventModifiers.None &&
             TileSelected(out var gridPos))
         {
-            SelectedTile = gridPos;
+            selectedTile = gridPos;
 
             if (Event.current.button == 1)
             {
                 SceneView.RepaintAll();
-                TileMenu(SelectedTile).ShowAsContext();
+                TileMenu(selectedTile).ShowAsContext();
             }
         }
     }
@@ -505,7 +504,7 @@ public class StageBuilder : Builder<Stage>
                 var gridPos = new Vector2Int(x, y);
                 
                 DrawTileIcon(tile, gridPos);
-                if (SelectedTile == gridPos)
+                if (selectedTile == gridPos)
                     DrawHighLight(gridPos);
             }
         }
@@ -662,7 +661,7 @@ public class StageBuilder : Builder<Stage>
     [ContextMenu("CreateSolution")]
     private void CreateSolution()
     {
-        if (SolutionMode) solution = Pathfinding.GetSolution(EditingStage);
+        if (solutionMode) EditingStage.GenerateSolution();
     }
 
     protected override void OnReload()

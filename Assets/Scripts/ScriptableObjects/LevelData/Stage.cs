@@ -33,10 +33,12 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
 {
     [SerializeField, HideInInspector] private Vector2Int size = new Vector2Int(5, 5);
     [SerializeField, HideInInspector] private List<TileType> tiles = new List<TileType>();
+    [SerializeField, HideInInspector] private List<Vector2Int> solution = new List<Vector2Int>();
     [SerializeField, HideInInspector] private List<Portal> portalPairs = new List<Portal>();
     [SerializeField, HideInInspector] private TileDirection tileDirections = new TileDirection();
 
     public Vector2Int Size => size;
+    public List<Vector2Int> Solution => new List<Vector2Int>(solution);
     public List<Portal> PortalPairs => new List<Portal>(portalPairs);
     public Dictionary<Vector2Int, Vector2Int> TileDirections => new Dictionary<Vector2Int, Vector2Int>(tileDirections);
 
@@ -310,5 +312,10 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
         }
 
         return -Vector2Int.one;
+    }
+
+    public void GenerateSolution()
+    {
+        solution = Pathfinding.GetSolution(this);
     }
 }

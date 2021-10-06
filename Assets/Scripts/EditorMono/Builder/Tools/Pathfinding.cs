@@ -6,9 +6,9 @@ using UnityEngine;
 
 public static class Pathfinding
 {
-    public static int GetMaximumUniqueTile(Stage stage)
+    public static int CountUniqueTiles(IEnumerable<Vector2Int> path)
     {
-        return GetSolution(stage).Distinct().Count();
+        return path.Distinct().Count();
     }
     
     public static List<Vector2Int> GetSolution(Stage stage)
