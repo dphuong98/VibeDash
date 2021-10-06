@@ -17,7 +17,7 @@ public static class Pathfinding
         
         if (stage == null || stage.GetEntrance() == -Vector2Int.one || stage.GetExit() == -Vector2Int.one)
         {
-            return null;
+            return solution;
         }
             
         //Brute force

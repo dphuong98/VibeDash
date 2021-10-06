@@ -16,10 +16,10 @@ public abstract class Builder<T> : MonoBehaviour where T : ScriptableObject, IIn
     //TODO This static variable is shared between derived
     public static string DefaultFolder { get; private set; }
 
-    public T LoadedItem { get; private set; }
-    public T EditingItem { get; private set; }
-    
-    public void Init(string defaultFolder)
+    protected T LoadedItem { get; private set; }
+    protected T EditingItem { get; private set; }
+
+    protected void Init(string defaultFolder)
     {
         DefaultFolder = defaultFolder;
         if (EditingItem == null) NewItem();
