@@ -55,7 +55,8 @@ public class StageBuilder : Builder<Stage>
     private Grid grid;
     
     //Members
-    private bool pastSolutionMode = false;
+    private bool initialized;
+    private bool pastSolutionMode;
     private List<Vector2Int> solution;
 
     private readonly Color solutionColor = new Color(1f, 0.97f, 0.11f);
@@ -74,7 +75,7 @@ public class StageBuilder : Builder<Stage>
     private void OnEnable()
     {
         SceneView.duringSceneGui += DrawSceneGUI;
-        Init();
+        if (!initialized) Init();
     }
 
     private void OnDisable()
@@ -105,6 +106,7 @@ public class StageBuilder : Builder<Stage>
         DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>("Icons/Corners/L_Corner"));
 
         base.Init(stageFolder);
+        initialized = true;
     }
 
     private void DrawSceneGUI(SceneView sceneview)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -25,13 +26,14 @@ public class LevelBuilder : Builder<Level>
     private static Vector2Int lastestBridgePart;
     private static Bridge editingBridge;
     
+    private bool initialized = false;
     private List<MiniStage> miniStages;
     private List<Bridge> bridges;
     
     private void OnEnable()
     {
         SceneView.duringSceneGui += DrawSceneGUI;
-        Init();
+        if (!initialized) Init();
     }
 
     private void OnDisable()
@@ -48,6 +50,7 @@ public class LevelBuilder : Builder<Level>
         if (bridges == null) bridges = new List<Bridge>();
         
         base.Init(levelFolder);
+        initialized = true;
     }
     
     private void DrawSceneGUI(SceneView sceneView)

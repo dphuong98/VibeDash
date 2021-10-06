@@ -223,7 +223,7 @@ public class StageBuilderEditor : BuilderEditor<Stage>
         var rx = new Regex(@"(\d+)");
         var d = new DirectoryInfo(StageBuilder.DefaultFolder);
         var number = 0;
-        if (d.GetFiles(defaultName+"??.asset") is var fileInfos && fileInfos.Count() != 0)
+        if (d.GetFiles(defaultName+"??.asset") is var fileInfos && fileInfos.Length != 0)
         {
             number = fileInfos.Select(s => rx.Match(s.Name)).Where(s => s.Success).Max(s =>
             {

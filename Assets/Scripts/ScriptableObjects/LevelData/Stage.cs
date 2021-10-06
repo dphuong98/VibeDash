@@ -97,8 +97,7 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
                 OpenPortal(new Vector2Int(c, r));
                 break;
             case TileType.PortalOrange:
-                if (PortalPending())
-                    ClosePortal(new Vector2Int(c, r));
+                ClosePortal(new Vector2Int(c, r));
                 break;
             case TileType.Push: case TileType.Corner:
                 tileDirections.Add(new Vector2Int(c, r), Vector2Int.up);
@@ -130,29 +129,25 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
 
     public void CancelPortal()
     {
-        if (!PortalPending()) return;
-        var item1 = portalPairs.Last().Blue;
-        tiles[item1.y * size.x + item1.x]  = TileType.Wall;
+        if (!PortalPending(out var portal)) return;
+        var bluePortal = portal.Blue;
+        tiles[bluePortal.y * size.x + bluePortal.x]  = TileType.Wall;
         portalPairs.RemoveAt(portalPairs.Count - 1);
     }
     
     public void ClosePortal(Vector2Int portalExit)
     {
-        if (!PortalPending()) return;
-        var item1 = portalPairs.Last().Blue;
-        portalPairs.Add(new Portal(item1, portalExit));
-        portalPairs.RemoveAt(portalPairs.Count - 2);
+        if (!PortalPending(out var portal)) return;
+        portal.Orange = portalExit;
+        portalPairs.RemoveAt(portalPairs.Count - 1);
+        portalPairs.Add(portal);
     }
 
-    public bool PortalPending()
+    public bool PortalPending(out Portal portal)
     {
+        portal = portalPairs.Any() ? portalPairs.Last() : default;
         return portalPairs.Any() &&
                portalPairs.Last().Orange == -Vector2Int.one;
-    }
-
-    public Portal GetPendingPortal()
-    {
-        return !PortalPending() ? new Portal(-Vector2Int.one, -Vector2Int.one) : portalPairs.Last();
     }
 
     public void ExpandBottom()
