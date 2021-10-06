@@ -113,6 +113,7 @@ public class StageBuilder : Builder<Stage>
         if (!pastSolutionMode) CreateSolution();
         pastSolutionMode = viewSolution;
 
+        DrawBuilderFocusButton();
         DrawTileIcons();
         DrawSolution();
 
@@ -120,6 +121,20 @@ public class StageBuilder : Builder<Stage>
         HandleKey();
         
         //Other GUI option
+    }
+    
+    private void DrawBuilderFocusButton()
+    {
+        Handles.BeginGUI();
+             
+        var rect = new Rect(10, 400, 100, 50);
+        if (GUI.Button(rect, "Stage Builder"))
+        {
+            Selection.activeGameObject = gameObject;
+        }
+
+        Handles.EndGUI();
+        
     }
     
     private void DrawSolution() {
