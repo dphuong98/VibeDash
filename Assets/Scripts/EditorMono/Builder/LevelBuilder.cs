@@ -23,7 +23,6 @@ public class LevelBuilder : Builder<Level>
     public Level EditingLevel => EditingItem;
 
     //Members
-    private static Grid grid;
     private static Vector2Int lastestBridgePart;
     private static Bridge editingBridge;
     
@@ -43,7 +42,6 @@ public class LevelBuilder : Builder<Level>
 
     private void Init()
     {
-        grid = GetComponent<Grid>();
         miniStagePrefab = Resources.Load<GameObject>("Prefabs/Editor/MiniStage");
         
         if (miniStages == null) miniStages = new List<MiniStage>();
@@ -65,6 +63,11 @@ public class LevelBuilder : Builder<Level>
         HandleBridgeBuilding(sceneView);
 
         //Other GUI option
+    }
+
+    private void Update()
+    {
+        ApplyChanges();
     }
 
     private void DrawBuilderFocusButton()
@@ -99,18 +102,6 @@ public class LevelBuilder : Builder<Level>
         return true;
     }
 
-    public override bool Save()
-    {
-        ApplyChanges();
-        return base.Save();
-    }
-
-    public override bool Save(string path)
-    {
-        ApplyChanges();
-        return base.Save(path);
-    }
-
     public override void Reload()
     {
         WipeScene();
@@ -129,11 +120,10 @@ public class LevelBuilder : Builder<Level>
 
     private void PopulateScene()
     {
-        foreach (var stage in EditingLevel.Stages)
+        foreach (var stage in EditingLevel.StagePositions)
         {
-            var gridPos = new Vector3Int(stage.Value.x, stage.Value.y, 0);
-            var position = grid.CellToWorld(gridPos);
-            ImportStage(AssetDatabase.GetAssetPath(stage.Key), position);
+            var position = stage.Key;
+            ImportStage(AssetDatabase.GetAssetPath(stage.Value), position);
         }
 
         bridges = new List<Bridge>(EditingLevel.Bridges);
@@ -144,7 +134,7 @@ public class LevelBuilder : Builder<Level>
         miniStages.RemoveAll(s => s == null);
         
         var stageData =
-            miniStages.ToDictionary(s => s.Stage, s => grid.WorldToCell(s.GetPosition()).ToVector2Int());
+            miniStages.ToDictionary(s => s.GetPosition(), s => s.Stage);
         EditingLevel.Import(stageData, bridges);
     }
 
@@ -185,6 +175,7 @@ public class LevelBuilder : Builder<Level>
             Event.current.modifiers != EventModifiers.None)
             return;
         
+        //Start bridge building
         if (Event.current.button == 0)
         {
             if (RaycastMiniStage(out var miniStage) &&

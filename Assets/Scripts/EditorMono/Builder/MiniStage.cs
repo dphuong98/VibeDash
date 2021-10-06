@@ -104,7 +104,7 @@ public class MiniStage : MonoBehaviour
 
     public Vector3 GetPosition()
     {
-        return transform.parent.position;
+        return transform.position;
     }
     
     public bool TileSelected(out Vector2Int gridPos)
@@ -170,7 +170,7 @@ public class MiniStage : MonoBehaviour
     
     private void RemoveSelf()
     {
-        DestroyImmediate(transform.parent.gameObject);
+        DestroyImmediate(gameObject);
     }
 
     [ContextMenu("CreateMesh")]

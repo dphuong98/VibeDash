@@ -248,13 +248,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   StageBuilder: {fileID: 1004767545}
---- !u!43 &716662346
+--- !u!43 &865696714
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Custom Quad (7,7)
+  m_Name: Custom Quad (15,10)
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -266,7 +266,7 @@ Mesh:
     vertexCount: 4
     localAABB:
       m_Center: {x: 0, y: 0, z: 0}
-      m_Extent: {x: 3.5, y: 3.5, z: 0}
+      m_Extent: {x: 7.5, y: 5, z: 0}
   m_Shapes:
     vertices: []
     shapes: []
@@ -345,7 +345,7 @@ Mesh:
       format: 0
       dimension: 0
     m_DataSize: 96
-    _typelessdata: 000060c0000060c0000000000000000000000000000080bf00006040000060c0000000000000000000000000000080bf0000604000006040000000000000000000000000000080bf000060c000006040000000000000000000000000000080bf
+    _typelessdata: 0000f0c00000a0c0000000000000000000000000000080bf0000f0400000a0c0000000000000000000000000000080bf0000f0400000a040000000000000000000000000000080bf0000f0c00000a040000000000000000000000000000080bf
   m_CompressedMesh:
     m_Vertices:
       m_NumItems: 0
@@ -400,7 +400,7 @@ Mesh:
     m_UVInfo: 0
   m_LocalAABB:
     m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 3.5, y: 3.5, z: 0}
+    m_Extent: {x: 7.5, y: 5, z: 0}
   m_MeshUsageFlags: 0
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
@@ -421,12 +421,12 @@ PrefabInstance:
     - target: {fileID: 2613842165087503930, guid: 4d5826c11b458334cb9509aed19a4ee3,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.5
+      value: -6.5
       objectReference: {fileID: 0}
     - target: {fileID: 2613842165087503930, guid: 4d5826c11b458334cb9509aed19a4ee3,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.5
+      value: -4
       objectReference: {fileID: 0}
     - target: {fileID: 2613842165508376240, guid: 4d5826c11b458334cb9509aed19a4ee3,
         type: 3}

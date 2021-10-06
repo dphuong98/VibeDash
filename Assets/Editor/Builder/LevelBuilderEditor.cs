@@ -110,30 +110,6 @@ public class LevelBuilderEditor : BuilderEditor<Level>
         levelBuilder.Open(FileUtil.GetProjectRelativePath(path));
     }
 
-    public override void Save()
-    {
-        if (!levelBuilder.Save())
-            SaveAs();
-    }
-
-    public override void SaveAs()
-    {
-        var rx = new Regex(@"(\d+)");
-        var d = new DirectoryInfo(LevelBuilder.DefaultFolder);
-        var number = 0;
-        if (d.GetFiles(LevelBuilder.DefaultName+"??.asset") is var fileInfos && fileInfos.Count() != 0)
-        {
-            number = fileInfos.Select(s => rx.Match(s.Name)).Where(s => s.Success).Max(s =>
-            {
-                int.TryParse(s.Value, out var num);
-                return num;
-            });
-        }
-        
-        var path = EditorUtility.SaveFilePanel("Save As", LevelBuilder.DefaultFolder, LevelBuilder.DefaultName+(number+1), "asset");
-        levelBuilder.Save(FileUtil.GetProjectRelativePath(path));
-    }
-
     public override void Reload()
     {
         levelBuilder.Reload();

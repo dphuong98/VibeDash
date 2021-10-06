@@ -6,13 +6,20 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 [Serializable]
+public class StagePosition : SerializableDictionary<Vector3, Stage>
+{
+    public StagePosition() : base() {}
+    public StagePosition(StagePosition otherStagePositions) : base(otherStagePositions) { }
+
+    public StagePosition(IDictionary<Vector3, Stage> dictionary) : base(dictionary) { }
+}
+
+[Serializable]
 public class Level : ScriptableObject, IInit, ICopiable<Level>
 {
     //TODO into serializableDictionary
-    [SerializeField, HideInInspector] private List<Stage> stageItems = new List<Stage>();
-    [SerializeField, HideInInspector] private List<Vector2Int> stagesPositions = new List<Vector2Int>();
-    public Dictionary<Stage, Vector2Int> Stages => stageItems.Zip(stagesPositions, (k, v) => new { Key = k, Value = v })
-        .ToDictionary(x => x.Key, x => x.Value);
+    [SerializeField, HideInInspector] private StagePosition stagePositions = new StagePosition();
+    public StagePosition StagePositions => new StagePosition(stagePositions);
     
     [SerializeField, HideInInspector] private List<Bridge> bridges = new List<Bridge>();
     public List<Bridge> Bridges => new List<Bridge>(bridges);
@@ -24,15 +31,13 @@ public class Level : ScriptableObject, IInit, ICopiable<Level>
 
     public void CopyFrom(Level other)
     {
-        this.stageItems = new List<Stage>(other.stageItems);
-        this.stagesPositions = new List<Vector2Int>(other.stagesPositions);
+        this.stagePositions = new StagePosition(other.stagePositions);
         this.bridges = new List<Bridge>(other.bridges);
     }
 
-    public void Import(Dictionary<Stage, Vector2Int> stages, List<Bridge> bridges)
+    public void Import(Dictionary<Vector3, Stage> stagePositions, List<Bridge> bridges)
     {
-        this.stageItems = new List<Stage>(stages.Keys);
-        this.stagesPositions = new List<Vector2Int>(stages.Values);
+        this.stagePositions = new StagePosition(stagePositions);
         this.bridges = new List<Bridge>(bridges);
     }
 }
