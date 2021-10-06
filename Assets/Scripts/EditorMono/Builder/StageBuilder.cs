@@ -58,9 +58,9 @@ public class StageBuilder : Builder<Stage>
     private bool pastSolutionMode;
 
     private readonly Color solutionColor = new Color(1f, 0.97f, 0.11f);
+    public bool viewSolution = true;
     public bool movingSolution;
     public int solutionSpeed = 4;
-    public bool solutionMode;
 
     public Vector2Int selectedTile = new Vector2Int(-1, -1);
 
@@ -91,13 +91,13 @@ public class StageBuilder : Builder<Stage>
         IconMap[TileType.Stop] = Resources.Load<Texture>("Icons/Stop");
         
         //Hint: 0 = Up; 1 = Right; 2 = Down; 3 = Left
-        DirectionalIconMap.AddUnique(TileType.Push, new List<Texture>());
+        DirectionalIconMap[TileType.Push] = new List<Texture>();
         DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/U_Arrow"));
         DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/R_Arrow"));
         DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/D_Arrow"));
         DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/L_Arrow"));
         
-        DirectionalIconMap.AddUnique(TileType.Corner, new List<Texture>());
+        DirectionalIconMap[TileType.Corner] = new List<Texture>();
         DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>("Icons/Corners/U_Corner"));
         DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>("Icons/Corners/R_Corner"));
         DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>("Icons/Corners/D_Corner"));
@@ -109,9 +109,9 @@ public class StageBuilder : Builder<Stage>
     private void DrawSceneGUI(SceneView sceneview)
     {
         if (EditingStage == null) return;
-        
+
         if (!pastSolutionMode) CreateSolution();
-        pastSolutionMode = solutionMode;
+        pastSolutionMode = viewSolution;
 
         DrawTileIcons();
         DrawSolution();
@@ -124,7 +124,7 @@ public class StageBuilder : Builder<Stage>
     
     private void DrawSolution() {
         var solution = EditingStage.Solution;
-        if (!solutionMode || solution == null || solution.Count < 2) return;
+        if (!viewSolution || solution == null || solution.Count < 2) return;
 
         if (movingSolution)
         {
@@ -661,7 +661,7 @@ public class StageBuilder : Builder<Stage>
     [ContextMenu("CreateSolution")]
     private void CreateSolution()
     {
-        if (solutionMode) EditingStage.GenerateSolution();
+        if (viewSolution) EditingStage.GenerateSolution();
     }
 
     protected override void OnReload()
