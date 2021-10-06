@@ -48,14 +48,13 @@ public class StageBuilder : Builder<Stage>
         {TileType.Wall, new Color(0.94f, 0.62f, 0.79f)},
     };
 
-    private Dictionary<TileType, Texture> IconMap = new Dictionary<TileType, Texture>();
-    private Dictionary<TileType, List<Texture>> DirectionalIconMap = new Dictionary<TileType, List<Texture>>();
+    private static readonly Dictionary<TileType, Texture> IconMap = new Dictionary<TileType, Texture>();
+    private static readonly Dictionary<TileType, List<Texture>> DirectionalIconMap = new Dictionary<TileType, List<Texture>>();
     
     //Components
     private Grid grid;
     
     //Members
-    private bool initialized = false;
     private bool pastSolutionMode;
     private List<Vector2Int> solution;
 
@@ -85,8 +84,6 @@ public class StageBuilder : Builder<Stage>
 
     private void Init()
     {
-        if (initialized) return;
-
         grid = GetComponentInChildren<Grid>();
         IconMap[TileType.Entrance] = Resources.Load<Texture>("Icons/Entrance");
         IconMap[TileType.Exit] = Resources.Load<Texture>("Icons/Finish");
@@ -95,20 +92,19 @@ public class StageBuilder : Builder<Stage>
         IconMap[TileType.Stop] = Resources.Load<Texture>("Icons/Stop");
         
         //Hint: 0 = Up; 1 = Right; 2 = Down; 3 = Left
-        DirectionalIconMap.Add(TileType.Push, new List<Texture>());
+        DirectionalIconMap.AddUnique(TileType.Push, new List<Texture>());
         DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/U_Arrow"));
         DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/R_Arrow"));
         DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/D_Arrow"));
         DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/L_Arrow"));
         
-        DirectionalIconMap.Add(TileType.Corner, new List<Texture>());
+        DirectionalIconMap.AddUnique(TileType.Corner, new List<Texture>());
         DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>("Icons/Corners/U_Corner"));
         DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>("Icons/Corners/R_Corner"));
         DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>("Icons/Corners/D_Corner"));
         DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>("Icons/Corners/L_Corner"));
 
         base.Init(stageFolder);
-        initialized = true;
     }
 
     private void DrawSceneGUI(SceneView sceneview)

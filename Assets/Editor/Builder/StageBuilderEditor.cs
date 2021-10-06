@@ -29,7 +29,7 @@ public class StageBuilderEditor : BuilderEditor<Stage>
         #region Info
             GUILayout.Label("Stage Info", EditorStyles.boldLabel);
             GUILayout.Label("Stage size: (" + stageBuilder.EditingStage.Size.x + ", " + stageBuilder.EditingStage.Size.y + ")");
-            
+
             if (0 <= stageBuilder.SelectedTile.x && stageBuilder.SelectedTile.x < stageBuilder.Cols &&
                 0 <= stageBuilder.SelectedTile.y && stageBuilder.SelectedTile.y < stageBuilder.Rows)
             {
@@ -46,6 +46,7 @@ public class StageBuilderEditor : BuilderEditor<Stage>
             GUILayout.Label("Speed: ");
             stageBuilder.SolutionSpeed = EditorGUILayout.IntField(stageBuilder.SolutionSpeed, GUILayout.MaxWidth(64));
             GUILayout.EndHorizontal();
+            GUILayout.Label("Maximum points: ");
             GUILayout.EndHorizontal();
         #endregion
 
