@@ -73,9 +73,8 @@ public class LevelBuilder : Builder<Level>
     private void DrawBuilderFocusButton()
     {
         Handles.BeginGUI();
-             
-        var rect = new Rect(10, 400, 100, 50);
-        if (GUI.Button(rect, "Level Builder"))
+        
+        if (HandlesExt.DrawButton(10, 400, 100, 50))
         {
             Selection.activeGameObject = gameObject;
         }

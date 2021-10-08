@@ -82,4 +82,10 @@ public class HandlesExt
         
         Handles.Label(position + Vector3.back * 3, text, style);
     }
+
+    public static bool DrawButton(float screenX, float screenY, float width, float height)
+    {
+        var rect = new Rect(10, 400, 100, 50);
+        return GUI.Button(rect, "Level Builder");
+    }
 }
