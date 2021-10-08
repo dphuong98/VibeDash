@@ -136,6 +136,41 @@ public class LevelBuilder : Builder<Level>
         var stageData =
             miniStages.ToDictionary(s => s.Stage, s => s.GetPosition());
         EditingLevel.Import(stageData, bridges);
+
+        for (var i = bridges.Count - 1; i >= 0; i--)
+        { 
+            //TODO Index ministage
+            var bridgeStart = bridges[i].bridgeParts.First();
+            if (!IsValidTile(bridgeStart, out var tileType) ||
+                tileType != TileType.Exit)
+            {
+                bridges.RemoveAt(i);
+                return;
+            }
+
+            var bridgeEnd = bridges[i].bridgeParts.Last();
+            if (!IsValidTile(bridgeEnd, out var tileType2) ||
+                tileType2 != TileType.Entrance)
+            {
+                bridges.RemoveAt(i);
+                return;
+            }
+
+        }
+    }
+
+    private bool IsValidTile(Vector3 position, out TileType tileType)
+    {
+        tileType = TileType.Air;
+        if (RaycastMiniStage(position, out var miniStage) &&
+            miniStage.TileSelected(position, out var gridPos) &&
+            miniStage.Stage.IsValidTile(gridPos))
+        {
+            tileType = miniStage.Stage[gridPos.x, gridPos.y];
+            return true;
+        }
+
+        return false;
     }
 
     public void ImportStage(string path, Vector3 position = default)
@@ -190,7 +225,7 @@ public class LevelBuilder : Builder<Level>
                 var stage = miniStage.Stage;
                 var mousePos = sceneView.SceneViewToWorld();
                 
-                if (0 <= gridPos.x && gridPos.x < stage.Size.x && 0 <= gridPos.y && gridPos.y < stage.Size.y)
+                if (stage.IsValidTile(gridPos))
                 {
                     if (stage[gridPos.x, gridPos.y] == TileType.Exit)
                     {
@@ -224,6 +259,21 @@ public class LevelBuilder : Builder<Level>
         var worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
 
         if (Physics.Raycast(worldRay, out var hitInfo))
+        {
+            if (hitInfo.collider.gameObject.GetComponent<MiniStage>() != null)
+            {
+                miniStage = hitInfo.collider.gameObject.GetComponent<MiniStage>();
+                return true;
+            }
+        }
+
+        miniStage = null;
+        return false;
+    }
+    
+    private bool RaycastMiniStage(Vector3 position, out MiniStage miniStage)
+    {
+        if (Physics.Raycast(position + Vector3.back * 45, Vector3.forward, out var hitInfo))
         {
             if (hitInfo.collider.gameObject.GetComponent<MiniStage>() != null)
             {

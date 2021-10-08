@@ -61,6 +61,10 @@ public class MiniStage : MonoBehaviour
         HandleClick();
     }
 
+    private void DrawMaxPoint()
+    {
+        
+    }
     
     private void HandleClick()
     {
@@ -87,6 +91,23 @@ public class MiniStage : MonoBehaviour
         var worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
 
         if (Physics.Raycast(worldRay, out var hitInfo))
+        {
+            if (hitInfo.collider.gameObject == this.gameObject)
+            {
+                var gridPos3 = grid.WorldToCell(hitInfo.point);
+                gridPos = new Vector2Int(gridPos3.x, gridPos3.y);
+                
+                return true;
+            }
+        }
+
+        gridPos = Vector2Int.zero;
+        return false;
+    }
+    
+    public bool TileSelected(Vector3 position, out Vector2Int gridPos)
+    {
+        if (Physics.Raycast(position + Vector3.back * 45 , Vector3.forward, out var hitInfo))
         {
             if (hitInfo.collider.gameObject == this.gameObject)
             {
