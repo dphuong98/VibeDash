@@ -80,6 +80,6 @@ public class HandlesExt
             fontSize = Mathf.FloorToInt(textSize / zoom),
         };
         
-        Handles.Label(position, text, style);
+        Handles.Label(position + Vector3.back * 3, text, style);
     }
 }

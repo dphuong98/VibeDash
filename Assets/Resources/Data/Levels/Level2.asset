@@ -14,9 +14,51 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stagePositions:
     keyData:
-    - {x: 4.5, y: 4, z: 0}
-    - {x: 7, y: 13, z: 0}
-    valueData:
     - {fileID: 11400000, guid: 22eb801df7bf17149864b6afba20fc63, type: 2}
-    - {fileID: 11400000, guid: e608d5281612f4c40896cd7fbb60a112, type: 2}
-  bridges: []
+    - {fileID: 11400000, guid: 086d3ccfc5740c84c92ae9e9cf9a0207, type: 2}
+    - {fileID: 11400000, guid: d54d49e9c2ca0ee49b4a080769d03da7, type: 2}
+    valueData:
+    - {x: 0, y: 0, z: 0}
+    - {x: 1, y: 16.5, z: 0}
+    - {x: -5, y: 34.5, z: 0}
+  bridges:
+  - bridgeParts:
+    - {x: 1, y: 2.5, z: 0}
+    - {x: 1, y: 3.5, z: 0}
+    - {x: 1, y: 4.5, z: 0}
+    - {x: 1, y: 5.5, z: 0}
+    - {x: 1, y: 6.5, z: 0}
+    - {x: 1, y: 7.5, z: 0}
+    - {x: 1, y: 8.5, z: 0}
+    - {x: 1, y: 9.5, z: 0}
+    - {x: 1, y: 10.5, z: 0}
+    - {x: 1, y: 11.5, z: 0}
+    - {x: 1, y: 12, z: 0}
+  - bridgeParts:
+    - {x: 1, y: 21, z: 0}
+    - {x: 1, y: 22, z: 0}
+    - {x: 1, y: 23, z: 0}
+    - {x: 1, y: 24, z: 0}
+    - {x: 1, y: 25, z: 0}
+    - {x: 1, y: 26, z: 0}
+    - {x: 2, y: 26, z: 0}
+    - {x: 3, y: 26, z: 0}
+    - {x: 3, y: 25, z: 0}
+    - {x: 3, y: 24, z: 0}
+    - {x: 2, y: 24, z: 0}
+    - {x: 1, y: 24, z: 0}
+    - {x: 0, y: 24, z: 0}
+    - {x: -1, y: 24, z: 0}
+    - {x: -2, y: 24, z: 0}
+    - {x: -3, y: 24, z: 0}
+    - {x: -4, y: 24, z: 0}
+    - {x: -5, y: 24, z: 0}
+    - {x: -6, y: 24, z: 0}
+    - {x: -7, y: 24, z: 0}
+    - {x: -7, y: 25, z: 0}
+    - {x: -7, y: 26, z: 0}
+    - {x: -6, y: 26, z: 0}
+    - {x: -5, y: 26, z: 0}
+    - {x: -5, y: 27, z: 0}
+    - {x: -5, y: 28, z: 0}
+    - {x: -5, y: 28, z: 0}

@@ -58,12 +58,14 @@ public class MiniStage : MonoBehaviour
         StageRenderer.SetStage(Stage, grid);
         StageRenderer.DrawTileIcons();
         
+        DrawMaxPoints();
         HandleClick();
     }
 
-    private void DrawMaxPoint()
+    private void DrawMaxPoints()
     {
-        
+        var topLeft = transform.position + new Vector3(-meshFilter.sharedMesh.bounds.size.x / 2, meshFilter.sharedMesh.bounds.size.y / 2, 0);
+        HandlesExt.DrawText(topLeft, "MaxPoints: " + Pathfinding.CountUniqueTiles(Stage.Solution), 150);
     }
     
     private void HandleClick()

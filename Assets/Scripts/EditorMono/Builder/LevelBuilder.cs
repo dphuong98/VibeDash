@@ -23,9 +23,8 @@ public class LevelBuilder : Builder<Level>
     public Level EditingLevel => EditingItem;
 
     //Members
-    private Vector2Int lastestBridgePart;
     private MiniStage bridgeBase;
-    private Bridge editingBridge;
+    private Bridge editingBridge = null;
     
     private List<MiniStage> miniStages = new List<MiniStage>();
     private List<Bridge> bridges = new List<Bridge>();
@@ -47,7 +46,7 @@ public class LevelBuilder : Builder<Level>
         
         if (miniStages == null) miniStages = new List<MiniStage>();
         if (bridges == null) bridges = new List<Bridge>();
-        
+
         base.Init(levelFolder);
     }
     
@@ -236,7 +235,7 @@ public class LevelBuilder : Builder<Level>
                         return;
                     }
 
-                    if (editingBridge != null &&
+                    if (IsBuildingBridge() &&
                         stage[gridPos.x, gridPos.y] == TileType.Entrance &&
                         stage.IsOnBorder(gridPos))
                     {
@@ -289,16 +288,17 @@ public class LevelBuilder : Builder<Level>
 
     private void DrawBridgeBuilder()
     {
-        if (editingBridge == null)
+        if (!IsBuildingBridge())
         {
             //Render exit blinking
             
             return;
         }
+
+        var remainingBridgeLength = editingBridge.MaxLength - editingBridge.bridgeParts.Count + 1;
+        HandlesExt.DrawText(editingBridge.bridgeParts.Last(), "" + remainingBridgeLength, 150);
         
-        if (editingBridge.bridgeParts.Count > editingBridge.MaxLength)
-            Handles.color = Color.red;
-        else Handles.color = Color.green;
+        Handles.color = remainingBridgeLength < 0 ? Color.red : Color.green;
         
         //Render entrance for bridge end
         
@@ -325,7 +325,7 @@ public class LevelBuilder : Builder<Level>
     private void HandleBridgeBuilding(SceneView sceneView)
     {
         //Get current grid tile relative to bridge start
-        if (editingBridge == null || bridgeBase == null) return;
+        if (!IsBuildingBridge()) return;
 
         var mousePos = sceneView.SceneViewToWorld();
         var mouseGridPos = bridgeBase.GetNearestCellCenter(mousePos);
@@ -338,5 +338,10 @@ public class LevelBuilder : Builder<Level>
         }
         
         if (mouseGridPos != editingBridge.bridgeParts.Last()) editingBridge.bridgeParts.Add(mouseGridPos);
+    }
+
+    private bool IsBuildingBridge()
+    {
+        return editingBridge != null && editingBridge.MaxLength != 0;
     }
 }
