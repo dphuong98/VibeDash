@@ -74,7 +74,7 @@ public class LevelBuilder : Builder<Level>
     {
         Handles.BeginGUI();
         
-        if (HandlesExt.DrawButton(10, 400, 100, 50))
+        if (HandlesExt.DrawButton(10, 400, 100, 50, "LevelBuilder"))
         {
             Selection.activeGameObject = gameObject;
         }

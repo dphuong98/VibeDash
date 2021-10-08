@@ -133,9 +133,8 @@ public class StageBuilder : Builder<Stage>
     private void DrawBuilderFocusButton()
     {
         Handles.BeginGUI();
-             
-        var rect = new Rect(10, 400, 100, 50);
-        if (GUI.Button(rect, "Stage Builder"))
+
+        if (HandlesExt.DrawButton(10, 400, 100, 50, "StageBuilder"))
         {
             Selection.activeGameObject = gameObject;
         }
