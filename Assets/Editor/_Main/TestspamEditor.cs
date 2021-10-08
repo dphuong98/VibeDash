@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-[CustomEditor(typeof(Testspam))]
+[CustomEditor(typeof(UpdateScriptableObject))]
 public class TestspamEditor : Editor
 {
     [FormerlySerializedAs("stageData")] public Stage stageData;

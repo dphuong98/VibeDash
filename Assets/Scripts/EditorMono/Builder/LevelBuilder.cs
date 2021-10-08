@@ -23,8 +23,9 @@ public class LevelBuilder : Builder<Level>
     public Level EditingLevel => EditingItem;
 
     //Members
-    private static Vector2Int lastestBridgePart;
-    private static Bridge editingBridge;
+    private Vector2Int lastestBridgePart;
+    private MiniStage bridgeBase;
+    private Bridge editingBridge;
     
     private List<MiniStage> miniStages = new List<MiniStage>();
     private List<Bridge> bridges = new List<Bridge>();
@@ -81,7 +82,6 @@ public class LevelBuilder : Builder<Level>
         }
 
         Handles.EndGUI();
-        
     }
 
     public override void NewItem()
@@ -122,8 +122,8 @@ public class LevelBuilder : Builder<Level>
     {
         foreach (var stage in EditingLevel.StagePositions)
         {
-            var position = stage.Key;
-            ImportStage(AssetDatabase.GetAssetPath(stage.Value), position);
+            var position = stage.Value;
+            ImportStage(AssetDatabase.GetAssetPath(stage.Key), position);
         }
 
         bridges = new List<Bridge>(EditingLevel.Bridges);
@@ -134,14 +134,14 @@ public class LevelBuilder : Builder<Level>
         miniStages.RemoveAll(s => s == null);
         
         var stageData =
-            miniStages.ToDictionary(s => s.GetPosition(), s => s.Stage);
+            miniStages.ToDictionary(s => s.Stage, s => s.GetPosition());
         EditingLevel.Import(stageData, bridges);
     }
 
     public void ImportStage(string path, Vector3 position = default)
     {
         if (string.IsNullOrEmpty(path)) return;
-        
+
         try
         {
             var stage = AssetDatabase.LoadAssetAtPath<Stage>(path);
@@ -155,6 +155,12 @@ public class LevelBuilder : Builder<Level>
             {
                 Debug.LogError("A level cannot contain the same stage twice");
                 return;
+            }
+
+            if (miniStages.Any())
+            {
+                var highestStageTop = miniStages.Max(s => s.transform.position.y + s.Stage.Size.y / 2);
+                position = new Vector3(0, highestStageTop + stage.Size.y / 2 + 3, 0);
             }
             
             var miniStageObject = Instantiate(miniStagePrefab, position, Quaternion.identity, transform);
@@ -189,24 +195,20 @@ public class LevelBuilder : Builder<Level>
                     if (stage[gridPos.x, gridPos.y] == TileType.Exit)
                     {
                         editingBridge = new Bridge(Pathfinding.CountUniqueTiles(miniStage.Stage.Solution));
-                        var mouseGridPos3 = grid.WorldToCell(mousePos);
-                        editingBridge.bridgeParts.Add(new Vector2Int(mouseGridPos3.x, mouseGridPos3.y));
+                        editingBridge.bridgeParts.Add(miniStage.GetNearestCellCenter(mousePos));
+                        bridgeBase = miniStage;
                         return;
                     }
-                    
-                    if (editingBridge != null && editingBridge.bridgeParts.Count > editingBridge.MaxLength)
-                    {
-                        editingBridge = null;
-                    }
-                    
-                    if (editingBridge != null && stage[gridPos.x, gridPos.y] == TileType.Entrance)
+
+                    if (editingBridge != null &&
+                        stage[gridPos.x, gridPos.y] == TileType.Entrance &&
+                        stage.IsOnBorder(gridPos))
                     {
                         //End bridge and append to scriptable
-                        var mouseGridPos3 = grid.WorldToCell(mousePos);
-                        editingBridge.bridgeParts.Add(new Vector2Int(mouseGridPos3.x, mouseGridPos3.y));
-                    
+                        editingBridge.bridgeParts.Add(miniStage.GetNearestCellCenter(mousePos));
                         bridges.Add(editingBridge);
                         editingBridge = null;
+                        bridgeBase = null;
                         return;
                     }
                 }
@@ -253,7 +255,7 @@ public class LevelBuilder : Builder<Level>
         //Render editing bridge
         for (int i = 0; i < editingBridge.bridgeParts.Count - 1; i++)
         {
-            Handles.DrawLine(grid.GetCellCenterWorld(editingBridge.bridgeParts[i]), (grid.GetCellCenterWorld(editingBridge.bridgeParts[i+1])));
+            Handles.DrawLine(editingBridge.bridgeParts[i], editingBridge.bridgeParts[i+1]);
         }
     }
 
@@ -264,7 +266,7 @@ public class LevelBuilder : Builder<Level>
         {
             for (int i = 0; i < bridge.bridgeParts.Count - 1; i++)
             {
-                Handles.DrawLine(grid.GetCellCenterWorld(bridge.bridgeParts[i]), (grid.GetCellCenterWorld(bridge.bridgeParts[i+1])));
+                Handles.DrawLine(bridge.bridgeParts[i], bridge.bridgeParts[i+1]);
             }
         }
     }
@@ -272,11 +274,10 @@ public class LevelBuilder : Builder<Level>
     private void HandleBridgeBuilding(SceneView sceneView)
     {
         //Get current grid tile relative to bridge start
-        if (editingBridge == null) return;
+        if (editingBridge == null || bridgeBase == null) return;
 
         var mousePos = sceneView.SceneViewToWorld();
-        var mouseGridPos3 = grid.WorldToCell(mousePos);
-        var mouseGridPos = new Vector2Int(mouseGridPos3.x, mouseGridPos3.y);
+        var mouseGridPos = bridgeBase.GetNearestCellCenter(mousePos);
 
         if (editingBridge.bridgeParts.Count >= 2 && mouseGridPos == editingBridge.bridgeParts[editingBridge.bridgeParts.Count - 2])
         {

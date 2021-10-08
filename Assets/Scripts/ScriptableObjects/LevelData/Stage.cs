@@ -119,6 +119,7 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
     {
         size = other.size;
         tiles = new List<TileType>(other.tiles);
+        solution = new List<Vector2Int>(other.solution);
         portalPairs = new List<Portal>(other.portalPairs);
         tileDirections = new TileDirection(other.tileDirections);
     }

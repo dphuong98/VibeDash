@@ -12,8 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b600e0df47ceb74ca2d142a423ef708, type: 3}
   m_Name: Level1
   m_EditorClassIdentifier: 
-  stageItems:
-  - {fileID: 11400000, guid: 22eb801df7bf17149864b6afba20fc63, type: 2}
-  stagesPositions:
-  - {x: 0, y: 0}
-  bridges: []
+  stagePositions:
+    keyData:
+    - {fileID: 11400000, guid: 49c5f897881e06a49afcf85c9a87aed7, type: 2}
+    - {fileID: 11400000, guid: 59aff57b6989ed44c90c829f284716fa, type: 2}
+    valueData:
+    - {x: 0, y: 0, z: 0}
+    - {x: 1, y: 13.5, z: 0}
+  bridges:
+  - bridgeParts:
+    - {x: 3, y: 4.5, z: 0}
+    - {x: 3, y: 5.5, z: 0}
+    - {x: 2, y: 6.5, z: 0}
+    - {x: 1, y: 7.5, z: 0}
+    - {x: 1, y: 8.5, z: 0}
+    - {x: 1, y: 9.5, z: 0}
+    - {x: 1, y: 10.5, z: 0}
+    - {x: 1, y: 10, z: 0}

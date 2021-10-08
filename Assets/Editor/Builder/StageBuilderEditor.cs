@@ -44,7 +44,7 @@ public class StageBuilderEditor : BuilderEditor<Stage>
             GUILayout.FlexibleSpace();
             GUILayout.BeginHorizontal();
             GUILayout.Label("Speed: ");
-            stageBuilder.solutionSpeed = EditorGUILayout.IntField(stageBuilder.solutionSpeed, GUILayout.MaxWidth(64));
+            StageRenderer.solutionSpeed = EditorGUILayout.FloatField(StageRenderer.solutionSpeed, GUILayout.MaxWidth(64));
             GUILayout.EndHorizontal();
             GUILayout.EndHorizontal();
             GUILayout.Label("Maximum points: " + Pathfinding.CountUniqueTiles(stageBuilder.EditingStage.Solution));
@@ -207,7 +207,7 @@ public class StageBuilderEditor : BuilderEditor<Stage>
         //End OnInspectorGUI
     }
 
-    public void SaveAs()
+    public override void SaveAs()
     {
         var defaultName = "";
 
