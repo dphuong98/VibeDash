@@ -135,7 +135,6 @@ public class LevelBuilder : Builder<Level>
         
         var stageData =
             miniStages.ToDictionary(s => s.Stage, s => s.GetPosition());
-        EditingLevel.Import(stageData, bridges);
 
         for (var i = bridges.Count - 1; i >= 0; i--)
         { 
@@ -157,6 +156,8 @@ public class LevelBuilder : Builder<Level>
             }
 
         }
+        
+        EditingLevel.Import(stageData, bridges);
     }
 
     private bool IsValidTile(Vector3 position, out TileType tileType)
