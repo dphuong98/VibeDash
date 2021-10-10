@@ -191,7 +191,7 @@ public class LevelBuilder : Builder<Level>
                 return;
             }
 
-            if (miniStages.Any())
+            if (position == default && miniStages.Any())
             {
                 var highestStageTop = miniStages.Max(s => s.transform.position.y + s.Stage.Size.y / 2);
                 position = new Vector3(0, highestStageTop + stage.Size.y / 2 + 3, 0);

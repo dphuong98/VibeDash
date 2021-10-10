@@ -4,9 +4,9 @@ using UnityEngine;
 
 public enum TileType
 {
-    Entrance,
-    Exit,
     Air,
+    Exit,
+    Entrance,
     Road,
     Wall,
     Stop,

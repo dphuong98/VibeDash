@@ -16,13 +16,23 @@ public class UpdateScriptableObject : MonoBehaviour
         {
             string assetPath = FileUtil.GetProjectRelativePath(stagePath);
             var stage = AssetDatabase.LoadAssetAtPath<Stage>(assetPath);
-            stage.GenerateSolution();
+            
+            UpdateStage(ref stage);
             
             var asset = ScriptableObject.CreateInstance<Stage>();
             asset.Init();
             asset.CopyFrom(stage);
             AssetDatabase.CreateAsset(asset, assetPath);
             AssetDatabase.SaveAssets();
+        }
+    }
+
+    private void UpdateStage(ref Stage stage)
+    {
+        for (var x = 0; x < stage.Size.x; x++)
+        for (var y = 0; y < stage.Size.y; y++)
+        {
+            if (stage[x, y] == TileType.Air) stage[x, y] = TileType.Entrance;
         }
     }
 }

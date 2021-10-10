@@ -7,6 +7,6 @@ public class GameManager : MonoBehaviour
 {
     private void Awake()
     {
-        LevelLoader.Instance.LoadLevel();
+        
     }
 }

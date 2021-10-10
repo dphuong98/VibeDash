@@ -221,7 +221,7 @@ public class StageBuilder : Builder<Stage>
             {
                 if (t == TileType.Exit)
                     continue;
-                menu.AddItem(new GUIContent(string.Format("[{1}] {0}", t, GetShortcut(t))), false, OnTileSelectMenu, new Tuple<int, int, TileType>(tilePos.x, tilePos.y, t));
+                menu.AddItem(new GUIContent(string.Format("[{1}] {0}", t, GetShortcut(t))), false, OnTileSelectMenu, new Tuple<Vector2Int, TileType>(tilePos, t));
             }
         }
         else

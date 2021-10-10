@@ -65,7 +65,7 @@ public class MiniStage : MonoBehaviour
     private void DrawMaxPoints()
     {
         var topLeft = transform.position + new Vector3(-meshFilter.sharedMesh.bounds.size.x / 2, meshFilter.sharedMesh.bounds.size.y / 2, 0);
-        HandlesExt.DrawText(topLeft, "MaxPoints: " + Pathfinding.CountUniqueTiles(Stage.Solution), 150);
+        HandlesExt.DrawText(topLeft, "MaxPoints: " + maxPoints, 150);
     }
     
     private void HandleClick()

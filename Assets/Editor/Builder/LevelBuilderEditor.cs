@@ -81,18 +81,15 @@ public class LevelBuilderEditor : BuilderEditor<Level>
         #region Play
         if (GUILayout.Button("Play"))
         {
-            /*var level = (target as StageBuilder).EditingStage;
-                
-            if (Application.isPlaying)
-            {
-                return;
-            }
+            var level = levelBuilder.EditingLevel;
+            
+            if (Application.isPlaying) return;
 
-            LevelLoader.CurrentStage = level;
+            LevelLoader.SetAutoloadLevel(level);
             AssetDatabase.SaveAssets();
             EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
             EditorSceneManager.OpenScene(GameScenePath);
-            EditorApplication.isPlaying = true;*/
+            EditorApplication.isPlaying = true;
         }
         #endregion
         
