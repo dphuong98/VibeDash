@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-[CustomPropertyDrawer(typeof(TilePack))]
-public class TilePackDrawer : DictionaryDrawer<TileType, GameObject> { }
-
-[Serializable]
-public class TilePack : SerializableDictionary<TileType, GameObject> { }
-
 [CreateAssetMenu(fileName = "Pack", menuName = "ScriptableObjects/TilePrefabPack", order = 1)]
 public class TilePrefabPack : ScriptableObject
 {
-    [SerializeField] public TilePack TilePack;
+    public GameObject WallPrefab;
+    public GameObject RoadPrefab;
+    public GameObject StopPrefab;
+    public GameObject PortalBluePrefab;
+    public GameObject PortalOrangePrefab;
+    public GameObject PushPrefab;
+    public GameObject CornerPrefab;
 }

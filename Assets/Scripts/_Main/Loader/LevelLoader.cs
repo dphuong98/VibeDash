@@ -58,6 +58,11 @@ public class LevelLoader : MonoBehaviour
                 var tile = stage[x, y];
                 var gridPos = new Vector2Int(x, y);
 
+                if (stage.TileDirections.TryGetValue(gridPos, out var direction))
+                {
+                    continue;
+                }
+                
                 PlaceTile(position + levelGrid.GetCellCenterWorld(gridPos), tile);
             }
         }
@@ -65,10 +70,30 @@ public class LevelLoader : MonoBehaviour
 
     private void PlaceTile(Vector3 position, TileType tile)
     {
-        if (PrefabPack.TilePack.TryGetValue(tile, out var prefab))
+        GameObject prefab = null;
+        
+        switch (tile)
         {
-            Instantiate(prefab, position, Quaternion.identity, levelObject);
+            case TileType.Wall:
+                prefab = PrefabPack.WallPrefab;
+                break;
+            case TileType.Entrance: case TileType.Exit: case TileType.Road:
+                prefab = PrefabPack.RoadPrefab;
+                break;
+            case TileType.Stop:
+                prefab = PrefabPack.StopPrefab;
+                break;
+            case TileType.PortalBlue:
+                prefab = PrefabPack.PortalBluePrefab;
+                break;
+            case TileType.PortalOrange:
+                prefab = PrefabPack.PortalOrangePrefab;
+                break;
+            default: case TileType.Air:
+                break;
         }
+        
+        if (prefab) Instantiate(prefab, position, Quaternion.identity, levelObject);
     }
 
     private void PlaceDirectionalTile(Vector3 position, Vector2Int direction, TileType tile)

@@ -164,7 +164,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7a7e95809db39647b720bd448d6ce9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DebugLoadLevel: {fileID: 11400000, guid: 4f1f060cf83991040ac32d9a23845f4c, type: 2}
+  DebugLoadLevel: {fileID: 11400000, guid: 6bf1ce06ac91f0b4096234e554ffb020, type: 2}
   PrefabPack: {fileID: 11400000, guid: 98cd8d4b52965734ab4cb5eff4d796fa, type: 2}
   levelObject: {fileID: 1524381787}
 --- !u!1 &809049036

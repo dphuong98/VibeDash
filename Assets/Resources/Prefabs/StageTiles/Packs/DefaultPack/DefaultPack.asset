@@ -16,3 +16,11 @@ MonoBehaviour:
     type: 3}
   RoadPrefab: {fileID: 5745008388756971587, guid: f19d210a4f763164795752c94cf3a4b1,
     type: 3}
+  StopPrefab: {fileID: 5745008388756971587, guid: 6ddcc5fd102e8f149882a118d0efd6e6,
+    type: 3}
+  PortalBluePrefab: {fileID: 5745008388756971587, guid: 8c3b3ad88f33e5f41bb5605a09772127,
+    type: 3}
+  PortalOrangePrefab: {fileID: 5745008388756971587, guid: 976da71f9b46b7a4188028f5729f641a,
+    type: 3}
+  PushPrefab: {fileID: 0}
+  CornerPrefab: {fileID: 0}

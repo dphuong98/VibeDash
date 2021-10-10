@@ -8,7 +8,8 @@ public class EditorMenu
 {
     private const string StageBuilderScenePath = "Assets/Scenes/StageBuilder.unity";
     private const string LevelBuilderScenePath = "Assets/Scenes/LevelBuilder.unity";
-    
+    private const string GameplayScenePath = "Assets/Scenes/Gameplay.unity";
+
     [MenuItem("VibeDash/StageBuilder")]
     private static void OpenStageEditor()
     {
@@ -43,5 +44,23 @@ public class EditorMenu
     private static bool OpenLevelEditorCondition()
     {
         return EditorSceneManager.GetActiveScene().path != LevelBuilderScenePath;
+    }
+    
+    [MenuItem("VibeDash/Gameplay")]
+    private static void OpenGameplay()
+    {
+        if (Application.isPlaying)
+        {
+            return;
+        }
+
+        EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
+        EditorSceneManager.OpenScene(GameplayScenePath);
+    }
+    
+    [MenuItem("VibeDash/Gameplay", true)]
+    private static bool OpenGameplayCondition()
+    {
+        return EditorSceneManager.GetActiveScene().path != GameplayScenePath;
     }
 }
