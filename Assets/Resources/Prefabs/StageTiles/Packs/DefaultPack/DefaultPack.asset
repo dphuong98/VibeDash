@@ -22,5 +22,7 @@ MonoBehaviour:
     type: 3}
   PortalOrangePrefab: {fileID: 5745008388756971587, guid: 976da71f9b46b7a4188028f5729f641a,
     type: 3}
-  PushPrefab: {fileID: 0}
-  CornerPrefab: {fileID: 0}
+  PushPrefab: {fileID: 5745008388756971587, guid: 23726c642e41c1e45802761a47251197,
+    type: 3}
+  CornerPrefab: {fileID: 5745008388756971587, guid: 0574722b020a31040af541737914b4de,
+    type: 3}

@@ -60,6 +60,7 @@ public class LevelLoader : MonoBehaviour
 
                 if (stage.TileDirections.TryGetValue(gridPos, out var direction))
                 {
+                    PlaceDirectionalTile(position + levelGrid.GetCellCenterWorld(gridPos), direction, tile);
                     continue;
                 }
                 
@@ -98,12 +99,20 @@ public class LevelLoader : MonoBehaviour
 
     private void PlaceDirectionalTile(Vector3 position, Vector2Int direction, TileType tile)
     {
+        GameObject prefab = null;
+        
         switch (tile)
         {
             case TileType.Push:
+                prefab = PrefabPack.PushPrefab;
                 break;
             case TileType.Corner:
+                prefab = PrefabPack.CornerPrefab;
                 break;
         }
+
+        //var rotation = new Quaternion();
+        //rotation.z = Vector3.Angle(Vector3.up, new Vector3(direction.x, direction.y, 0));
+        if (prefab) Instantiate(prefab, position, Quaternion.identity, levelObject);
     }
 }
