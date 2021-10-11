@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
 public class LevelLoader : Singleton<LevelLoader>
-{ 
+{
+    public GameObject PlayerPrefab;
     public TilePrefabPack PrefabPack;
     public GameObject LevelObject { get; private set; }
     private Grid levelGrid;
@@ -13,6 +15,10 @@ public class LevelLoader : Singleton<LevelLoader>
     public void LoadLevel(Level level)
     {
         Destroy(LevelObject);
+        if (level.StagePositions.Count == 0)
+        {
+            Debug.LogError("Level contains no stage"); return;
+        }
 
         LevelObject = new GameObject {name = "LevelObject"};
         levelGrid = LevelObject.AddComponent<Grid>();
@@ -23,6 +29,16 @@ public class LevelLoader : Singleton<LevelLoader>
             var stagePos = new Vector3(stage.Value.x, 0, stage.Value.y);
             LoadStage(stagePos, stage.Key);
         }
+        
+        LoadPlayerObject(level);
+    }
+
+    private void LoadPlayerObject(Level level)
+    {
+        var entranceStage = level.StagePositions.First();
+        var playerPos = entranceStage.Value + levelGrid.GetCellCenterWorld(entranceStage.Key.GetEntrance());
+
+        Instantiate(PlayerPrefab, playerPos, Quaternion.identity);
     }
 
     private void LoadStage(Vector3 position, Stage stage)

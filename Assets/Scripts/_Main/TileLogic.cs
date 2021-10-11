@@ -24,10 +24,10 @@ public static class TileLogic
         while (true)
         {
             currentTilePosition += direction;
-            //Out of bound
+            //Out of bound, count as air
             if (0 > currentTilePosition.x || currentTilePosition.x >= stage.Size.x ||
                 0 > currentTilePosition.y || currentTilePosition.y >= stage.Size.y)
-                break;
+                return false;
             
             var currentTileType = stage[currentTilePosition.x, currentTilePosition.y];
 
@@ -44,7 +44,7 @@ public static class TileLogic
                 return false;
             }
             
-            //Impassibles
+            //Impassible
             if (currentTileType == TileType.Wall)
                 break;
 
