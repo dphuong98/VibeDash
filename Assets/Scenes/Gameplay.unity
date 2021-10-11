@@ -136,7 +136,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &446447114
 Transform:
@@ -166,7 +166,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DebugLoadLevel: {fileID: 11400000, guid: 6bf1ce06ac91f0b4096234e554ffb020, type: 2}
   PrefabPack: {fileID: 11400000, guid: 98cd8d4b52965734ab4cb5eff4d796fa, type: 2}
-  levelObject: {fileID: 1524381787}
+  levelTransform: {fileID: 0}
 --- !u!1 &809049036
 GameObject:
   m_ObjectHideFlags: 0
@@ -352,7 +352,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1524381787}
   m_Layer: 0
-  m_Name: LevelObject
+  m_Name: LevelTransform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

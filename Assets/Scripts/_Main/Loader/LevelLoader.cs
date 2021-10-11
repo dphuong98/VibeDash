@@ -10,13 +10,13 @@ public class LevelLoader : MonoBehaviour
     [SerializeField] private Level DebugLoadLevel;
     
     [SerializeField] private TilePrefabPack PrefabPack;
-    [SerializeField] private Transform levelObject;
+    [SerializeField] private Transform levelTransform;
 
     private Grid levelGrid;
 
     private void Awake()
     {
-        levelGrid = levelObject.gameObject.AddComponent<Grid>();
+        levelGrid = levelTransform.gameObject.AddComponent<Grid>();
         levelGrid.cellSwizzle = GridLayout.CellSwizzle.XZY;
     }
 
@@ -28,6 +28,9 @@ public class LevelLoader : MonoBehaviour
     [ContextMenu("LoadDebug")]
     public void LoadLevel()
     {
+        AutoloadLevel = DebugLoadLevel;
+        EditorApplication.isPlaying = true;
+        
         foreach (var stage in DebugLoadLevel.StagePositions)
         {
             var stagePos = new Vector3(stage.Value.x, 0, stage.Value.y);
@@ -94,7 +97,7 @@ public class LevelLoader : MonoBehaviour
                 break;
         }
         
-        if (prefab) Instantiate(prefab, position, Quaternion.identity, levelObject);
+        if (prefab) Instantiate(prefab, position, Quaternion.identity, levelTransform);
     }
 
     private void PlaceDirectionalTile(Vector3 position, Vector2Int direction, TileType tile)
@@ -113,6 +116,6 @@ public class LevelLoader : MonoBehaviour
 
         //var rotation = new Quaternion();
         //rotation.z = Vector3.Angle(Vector3.up, new Vector3(direction.x, direction.y, 0));
-        if (prefab) Instantiate(prefab, position, Quaternion.identity, levelObject);
+        if (prefab) Instantiate(prefab, position, Quaternion.identity, levelTransform);
     }
 }

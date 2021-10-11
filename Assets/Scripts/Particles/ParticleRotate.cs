@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RingParticle : MonoBehaviour
+public class ParticleRotate : MonoBehaviour
 {
     public Vector3 spinSpeed;
     
