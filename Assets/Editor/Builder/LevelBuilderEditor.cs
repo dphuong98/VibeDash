@@ -85,7 +85,7 @@ public class LevelBuilderEditor : BuilderEditor<Level>
             
             if (Application.isPlaying) return;
 
-            LevelLoader.SetAutoloadLevel(level);
+            GameManager.SetAutoloadLevel(level);
             AssetDatabase.SaveAssets();
             EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
             EditorSceneManager.OpenScene(GameScenePath);

@@ -4,47 +4,20 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class LevelLoader : MonoBehaviour
-{
-    [SerializeField] private static Level AutoloadLevel;
-    [SerializeField] private Level DebugLoadLevel;
-    
-    [SerializeField] private TilePrefabPack PrefabPack;
-    [SerializeField] private Transform levelTransform;
-
+public class LevelLoader : Singleton<LevelLoader>
+{ 
+    public TilePrefabPack PrefabPack;
+    public GameObject LevelObject { get; private set; }
     private Grid levelGrid;
-
-    private void Awake()
-    {
-        levelGrid = levelTransform.gameObject.AddComponent<Grid>();
-        levelGrid.cellSwizzle = GridLayout.CellSwizzle.XZY;
-    }
-
-    private void Start()
-    {
-        if (AutoloadLevel) LoadLevel(AutoloadLevel);
-    }
-
-    [ContextMenu("LoadDebug")]
-    public void LoadLevel()
-    {
-        AutoloadLevel = DebugLoadLevel;
-        EditorApplication.isPlaying = true;
-        
-        foreach (var stage in DebugLoadLevel.StagePositions)
-        {
-            var stagePos = new Vector3(stage.Value.x, 0, stage.Value.y);
-            LoadStage(stagePos, stage.Key);
-        }
-    }
-
-    public static void SetAutoloadLevel(Level level)
-    {
-        AutoloadLevel = level;
-    }
-
+    
     public void LoadLevel(Level level)
     {
+        Destroy(LevelObject);
+
+        LevelObject = new GameObject {name = "LevelObject"};
+        levelGrid = LevelObject.AddComponent<Grid>();
+        levelGrid.cellSwizzle = GridLayout.CellSwizzle.XZY;
+        
         foreach (var stage in level.StagePositions)
         {
             var stagePos = new Vector3(stage.Value.x, 0, stage.Value.y);
@@ -97,7 +70,7 @@ public class LevelLoader : MonoBehaviour
                 break;
         }
         
-        if (prefab) Instantiate(prefab, position, Quaternion.identity, levelTransform);
+        if (prefab) Instantiate(prefab, position, Quaternion.identity, LevelObject.transform);
     }
 
     private void PlaceDirectionalTile(Vector3 position, Vector2Int direction, TileType tile)
@@ -114,8 +87,8 @@ public class LevelLoader : MonoBehaviour
                 break;
         }
 
-        //var rotation = new Quaternion();
-        //rotation.z = Vector3.Angle(Vector3.up, new Vector3(direction.x, direction.y, 0));
-        if (prefab) Instantiate(prefab, position, Quaternion.identity, levelTransform);
+        var rotation = Quaternion.Euler(new Vector3
+            {y = Vector3.Angle(Vector3.up, new Vector3(direction.x, direction.y, 0))});
+        if (prefab) Instantiate(prefab, position, rotation, LevelObject.transform);
     }
 }

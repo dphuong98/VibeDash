@@ -3,20 +3,25 @@ using System.Collections;
 using System.Collections.Generic;
 using Lean.Touch;
 using UnityEngine;
+using UnityEngine.Events;
+
+[Serializable] public class Vector2IntEvent : UnityEvent<Vector2Int> {}
 
 public class InputManager : MonoBehaviour
 {
+    public static Vector2IntEvent OnSwipeDirection = new Vector2IntEvent(); 
+    
     private void OnEnable()
     {
         LeanTouch.OnFingerSwipe += HandleFingerSwipe;
     }
     
-    protected virtual void OnDisable()
+    private void OnDisable()
     {
         LeanTouch.OnFingerSwipe -= HandleFingerSwipe;
     }
 
-    private void HandleFingerSwipe(LeanFinger finger)
+    private static void HandleFingerSwipe(LeanFinger finger)
     {
         if (finger.StartedOverGui ||
             finger.IsOverGui
@@ -37,6 +42,6 @@ public class InputManager : MonoBehaviour
             direction = finalDelta.y > 0 ? Vector2Int.down : Vector2Int.up;
         }
         
-        Debug.Log(direction);
+        OnSwipeDirection.Invoke(direction);
     }
 }
