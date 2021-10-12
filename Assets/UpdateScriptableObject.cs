@@ -15,11 +15,11 @@ public class UpdateScriptableObject : MonoBehaviour
         foreach(string stagePath in stagePaths)
         {
             string assetPath = FileUtil.GetProjectRelativePath(stagePath);
-            var stage = AssetDatabase.LoadAssetAtPath<Stage>(assetPath);
+            var stage = AssetDatabase.LoadAssetAtPath<StageData>(assetPath);
             
             UpdateStage(ref stage);
             
-            var asset = ScriptableObject.CreateInstance<Stage>();
+            var asset = ScriptableObject.CreateInstance<StageData>();
             asset.Init();
             asset.CopyFrom(stage);
             AssetDatabase.CreateAsset(asset, assetPath);
@@ -27,12 +27,12 @@ public class UpdateScriptableObject : MonoBehaviour
         }
     }
 
-    private void UpdateStage(ref Stage stage)
+    private void UpdateStage(ref StageData stageData)
     {
-        for (var x = 0; x < stage.Size.x; x++)
-        for (var y = 0; y < stage.Size.y; y++)
+        for (var x = 0; x < stageData.Size.x; x++)
+        for (var y = 0; y < stageData.Size.y; y++)
         {
-            if (stage[x, y] == TileType.Air) stage[x, y] = TileType.Entrance;
+            if (stageData[x, y] == TileType.Air) stageData[x, y] = TileType.Entrance;
         }
     }
 }

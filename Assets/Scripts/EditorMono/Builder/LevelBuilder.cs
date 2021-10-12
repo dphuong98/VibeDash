@@ -12,15 +12,15 @@ using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
 [ExecuteInEditMode]
-public class LevelBuilder : Builder<Level>
+public class LevelBuilder : Builder<LevelData>
 {
     //Path
     private const string levelFolder = "Assets/Resources/Data/Levels";
 
     private GameObject miniStagePrefab;
 
-    public Level LoadedLevel => LoadedItem;
-    public Level EditingLevel => EditingItem;
+    public LevelData LoadedLevelData => LoadedItem;
+    public LevelData EditingLevelData => EditingItem;
 
     //Members
     private MiniStage bridgeBase;
@@ -52,7 +52,7 @@ public class LevelBuilder : Builder<Level>
     
     private void DrawSceneGUI(SceneView sceneView)
     {
-        if (EditingLevel == null) return;
+        if (EditingLevelData == null) return;
 
         DrawBuilderFocusButton();
         HandleClick(sceneView);
@@ -118,13 +118,13 @@ public class LevelBuilder : Builder<Level>
 
     private void PopulateScene()
     {
-        foreach (var stage in EditingLevel.StagePositions)
+        foreach (var stage in EditingLevelData.StagePositions)
         {
             var position = stage.Value;
             ImportStage(AssetDatabase.GetAssetPath(stage.Key), position);
         }
 
-        bridges = new List<Bridge>(EditingLevel.Bridges);
+        bridges = new List<Bridge>(EditingLevelData.Bridges);
     }
 
     private void ApplyChanges()
@@ -132,7 +132,7 @@ public class LevelBuilder : Builder<Level>
         miniStages.RemoveAll(s => s == null);
         
         var stageData =
-            miniStages.ToDictionary(s => s.Stage, s => s.GetPosition());
+            miniStages.ToDictionary(s => s.StageData, s => s.GetPosition());
 
         for (var i = bridges.Count - 1; i >= 0; i--)
         { 
@@ -155,7 +155,7 @@ public class LevelBuilder : Builder<Level>
 
         }
         
-        EditingLevel.Import(stageData, bridges);
+        EditingLevelData.Import(stageData, bridges);
     }
 
     private bool IsValidTile(Vector3 position, out TileType tileType)
@@ -163,9 +163,9 @@ public class LevelBuilder : Builder<Level>
         tileType = TileType.Air;
         if (RaycastMiniStage(position, out var miniStage) &&
             miniStage.TileSelected(position, out var gridPos) &&
-            miniStage.Stage.IsValidTile(gridPos))
+            miniStage.StageData.IsValidTile(gridPos))
         {
-            tileType = miniStage.Stage[gridPos.x, gridPos.y];
+            tileType = miniStage.StageData[gridPos.x, gridPos.y];
             return true;
         }
 
@@ -178,14 +178,14 @@ public class LevelBuilder : Builder<Level>
 
         try
         {
-            var stage = AssetDatabase.LoadAssetAtPath<Stage>(path);
+            var stage = AssetDatabase.LoadAssetAtPath<StageData>(path);
             if (stage == null)
             {
                 Debug.LogErrorFormat("Cannot load {0} asset at {1}", "Stage", path);
                 return;
             }
 
-            if (miniStages.Any(s => s.Stage == stage))
+            if (miniStages.Any(s => s.StageData == stage))
             {
                 Debug.LogError("A level cannot contain the same stage twice");
                 return;
@@ -193,7 +193,7 @@ public class LevelBuilder : Builder<Level>
 
             if (position == default && miniStages.Any())
             {
-                var highestStageTop = miniStages.Max(s => s.transform.position.y + s.Stage.Size.y / 2);
+                var highestStageTop = miniStages.Max(s => s.transform.position.y + s.StageData.Size.y / 2);
                 position = new Vector3(0, highestStageTop + stage.Size.y / 2 + 3, 0);
             }
             
@@ -221,14 +221,14 @@ public class LevelBuilder : Builder<Level>
             if (RaycastMiniStage(out var miniStage) &&
                 miniStage.TileSelected(out var gridPos))
             {
-                var stage = miniStage.Stage;
+                var stage = miniStage.StageData;
                 var mousePos = sceneView.SceneViewToWorld();
                 
                 if (stage.IsValidTile(gridPos))
                 {
                     if (stage[gridPos.x, gridPos.y] == TileType.Exit)
                     {
-                        editingBridge = new Bridge(Pathfinding.CountUniqueTiles(miniStage.Stage.Solution));
+                        editingBridge = new Bridge(Pathfinding.CountUniqueTiles(miniStage.StageData.Solution));
                         editingBridge.bridgeParts.Add(miniStage.GetNearestCellCenter(mousePos));
                         bridgeBase = miniStage;
                         return;

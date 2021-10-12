@@ -3,27 +3,37 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class GameManager : MonoBehaviour
 {
-    public Level DebugLevel;
-    
-    private static Level AutoloadLevel;
+    [FormerlySerializedAs("DebugLevel")] public LevelData debugLevelData;
+    private static LevelData autoloadLevelData;
+
+    private Level level;
+    private GameObject playerObject;
+    private PlayerController playerController;
 
     private void Start()
     {
-        if (AutoloadLevel) LevelLoader.Instance.LoadLevel(AutoloadLevel);
+        if (autoloadLevelData)
+        {
+            level = new LevelLoader().LoadLevel(autoloadLevelData);
+            var levelGrid = level.GetComponent<Grid>();
+            playerObject = new PlayerLoader().LoadPlayerObject(levelGrid, autoloadLevelData);
+            playerController = new PlayerController(playerObject.transform, level);
+        }
     }
-    
-    public static void SetAutoloadLevel(Level level)
+
+    public static void SetAutoloadLevel(LevelData levelData)
     {
-        AutoloadLevel = level;
+        autoloadLevelData = levelData;
     }
 
     [ContextMenu("Load Debug")]
     public void LoadDebug()
     {
-        AutoloadLevel = DebugLevel;
+        autoloadLevelData = debugLevelData;
         EditorApplication.isPlaying = true;
     }
 }

@@ -11,12 +11,12 @@ public static class TileLogic
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="stage"></param>
+    /// <param name="stageData"></param>
     /// <param name="start"></param>
     /// <param name="direction"></param>
     /// <param name="path"></param>
     /// <returns>false if player fell out of the map</returns>
-    public static bool TryMove(this Stage stage, Vector2Int start, Vector2Int direction, out List<Vector2Int> path)
+    public static bool TryMove(this StageData stageData, Vector2Int start, Vector2Int direction, out List<Vector2Int> path)
     {
         var currentTilePosition = start;
         path = new List<Vector2Int>();
@@ -25,25 +25,25 @@ public static class TileLogic
         {
             currentTilePosition += direction;
             //Out of bound, count as air
-            if (0 > currentTilePosition.x || currentTilePosition.x >= stage.Size.x ||
-                0 > currentTilePosition.y || currentTilePosition.y >= stage.Size.y)
+            if (0 > currentTilePosition.x || currentTilePosition.x >= stageData.Size.x ||
+                0 > currentTilePosition.y || currentTilePosition.y >= stageData.Size.y)
                 return false;
             
-            var currentTileType = stage[currentTilePosition.x, currentTilePosition.y];
+            var currentTileType = stageData[currentTilePosition.x, currentTilePosition.y];
 
-            //Exit
-            if (currentTileType == TileType.Exit)
-            {
-                path.Add(currentTilePosition);
-                return true;
-            }
-            
             //Player fell out of the map
             if (currentTileType == TileType.Air)
             {
                 return false;
             }
             
+            //Exit
+            if (currentTileType == TileType.Exit)
+            {
+                path.Add(currentTilePosition);
+                return true;
+            }
+
             //Impassible
             if (currentTileType == TileType.Wall)
                 break;
@@ -59,7 +59,7 @@ public static class TileLogic
                 path.Add(currentTilePosition);
                 
                 //If exit does not exist act as stop
-                var portal = stage.PortalPairs.Where(s => s.Blue == currentTilePosition);
+                var portal = stageData.PortalPairs.Where(s => s.Blue == currentTilePosition);
                 if (portal.Any() && portal.First().Orange != -Vector2Int.one)
                 {
                     path.Add(portal.First().Orange);
@@ -73,7 +73,7 @@ public static class TileLogic
                 path.Add(currentTilePosition);
                 
                 //If there is no portal act as stop
-                var portal = stage.PortalPairs.Where(s => s.Orange == currentTilePosition);
+                var portal = stageData.PortalPairs.Where(s => s.Orange == currentTilePosition);
                 if (portal.Any() && portal.First().Blue != -Vector2Int.one)
                 {
                     path.Add(portal.First().Blue);
@@ -91,13 +91,13 @@ public static class TileLogic
             if (currentTileType == TileType.Push)
             {
                 path.Add(currentTilePosition);
-                direction = stage.TileDirections[currentTilePosition];
+                direction = stageData.TileDirections[currentTilePosition];
                 continue;
             }
             
             if (currentTileType == TileType.Corner)
             {
-                var upVector = stage.TileDirections[currentTilePosition];
+                var upVector = stageData.TileDirections[currentTilePosition];
                 var rightVector = upVector.RotateClockwise();
                 
                 path.Add(currentTilePosition);

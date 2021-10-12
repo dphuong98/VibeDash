@@ -9,7 +9,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 
 [CustomEditor(typeof(StageBuilder))]
-public class StageBuilderEditor : BuilderEditor<Stage>
+public class StageBuilderEditor : BuilderEditor<StageData>
 {
     private StageBuilder stageBuilder;
     
@@ -28,7 +28,7 @@ public class StageBuilderEditor : BuilderEditor<Stage>
     {
         #region Info
             GUILayout.Label("Stage Info", EditorStyles.boldLabel);
-            GUILayout.Label("Stage size: (" + stageBuilder.EditingStage.Size.x + ", " + stageBuilder.EditingStage.Size.y + ")");
+            GUILayout.Label("Stage size: (" + stageBuilder.EditingStageData.Size.x + ", " + stageBuilder.EditingStageData.Size.y + ")");
 
             if (0 <= stageBuilder.selectedTile.x && stageBuilder.selectedTile.x < stageBuilder.Cols &&
                 0 <= stageBuilder.selectedTile.y && stageBuilder.selectedTile.y < stageBuilder.Rows)
@@ -47,14 +47,14 @@ public class StageBuilderEditor : BuilderEditor<Stage>
             StageRenderer.solutionSpeed = EditorGUILayout.FloatField(StageRenderer.solutionSpeed, GUILayout.MaxWidth(64));
             GUILayout.EndHorizontal();
             GUILayout.EndHorizontal();
-            GUILayout.Label("Maximum points: " + Pathfinding.CountUniqueTiles(stageBuilder.EditingStage.Solution));
+            GUILayout.Label("Maximum points: " + Pathfinding.CountUniqueTiles(stageBuilder.EditingStageData.Solution));
         #endregion
 
         #region File
             GUILayoutExt.HorizontalSeparator();
             GUILayout.Label("File", EditorStyles.boldLabel);
             GUI.enabled = false;
-            EditorGUILayout.ObjectField("Loaded Stage: ", stageBuilder.LoadedStage, typeof(Stage), true);
+            EditorGUILayout.ObjectField("Loaded Stage: ", stageBuilder.LoadedStageData, typeof(StageData), true);
             GUI.enabled = true;
             GUILayout.BeginHorizontal();
             {
@@ -211,12 +211,12 @@ public class StageBuilderEditor : BuilderEditor<Stage>
     {
         var defaultName = "";
 
-        if (!stageBuilder.EditingStage.IsOnBorder(stageBuilder.EditingStage.GetEntrance()))
+        if (!stageBuilder.EditingStageData.IsOnBorder(stageBuilder.EditingStageData.GetEntrance()))
         {
             defaultName += "En_";
         }
 
-        var relativeSize = stageBuilder.EditingStage.Size.x + stageBuilder.EditingStage.Size.y;
+        var relativeSize = stageBuilder.EditingStageData.Size.x + stageBuilder.EditingStageData.Size.y;
         if (relativeSize > 20) defaultName += "Large";
         else if (relativeSize > 15) defaultName += "Medium";
         else defaultName += "Small";

@@ -9,7 +9,7 @@ using UnityEngine;
 public class MiniStage : MonoBehaviour
 {
     public int maxPoints;
-    public Stage Stage { get; private set; }
+    public StageData StageData { get; private set; }
     private Grid grid;
     private MeshFilter meshFilter;
     
@@ -27,10 +27,10 @@ public class MiniStage : MonoBehaviour
         return grid.GetCellCenterWorld(grid.WorldToCell(position));
     }
 
-    public void SetStage(Stage stage)
+    public void SetStage(StageData stageData)
     {
-        Stage = stage;
-        maxPoints = Pathfinding.CountUniqueTiles(stage.Solution);
+        StageData = stageData;
+        maxPoints = Pathfinding.CountUniqueTiles(stageData.Solution);
         CreateBackgroundMesh();
     }
 
@@ -53,9 +53,9 @@ public class MiniStage : MonoBehaviour
 
     private void DrawSceneGUI(SceneView sceneview)
     {
-        if (Stage == null) return;
+        if (StageData == null) return;
         
-        StageRenderer.SetStage(Stage, grid);
+        StageRenderer.SetStage(StageData, grid);
         StageRenderer.DrawTileIcons();
         
         DrawMaxPoints();
@@ -129,7 +129,7 @@ public class MiniStage : MonoBehaviour
         GenericMenu menu = new GenericMenu();
         
         menu.AddItem(new GUIContent("Change stage"), false, ChangeStage);
-        menu.AddItem(new GUIContent("Edit in StageBuilder"), false, OpenInStageBuilder, Stage);
+        menu.AddItem(new GUIContent("Edit in StageBuilder"), false, OpenInStageBuilder, StageData);
         menu.AddItem(new GUIContent("Remove stage"), false, RemoveSelf);
         
         return menu;
@@ -143,7 +143,7 @@ public class MiniStage : MonoBehaviour
         
         try
         {
-            var stage = AssetDatabase.LoadAssetAtPath<Stage>(UnityEditor.FileUtil.GetProjectRelativePath(path));
+            var stage = AssetDatabase.LoadAssetAtPath<StageData>(UnityEditor.FileUtil.GetProjectRelativePath(path));
             if (stage == null)
             {
                 Debug.LogErrorFormat("Cannot load {0} asset at {1}", "Stage", path);
@@ -161,7 +161,7 @@ public class MiniStage : MonoBehaviour
 
     private void OpenInStageBuilder(object stage)
     {
-        var stageObject = stage as Stage;
+        var stageObject = stage as StageData;
         StageBuilderScene.loadStageUponEnable = AssetDatabase.GetAssetPath(stageObject);
         EditorApplication.ExecuteMenuItem("VibeDash/StageBuilder");
     }
@@ -174,16 +174,16 @@ public class MiniStage : MonoBehaviour
     [ContextMenu("CreateMesh")]
     private void CreateBackgroundMesh()
     {
-        GetComponent<MeshCollider>().sharedMesh = meshFilter.sharedMesh = MeshGenerator.Quad(Stage.Size.x + 2, Stage.Size.y + 2, Vector3.back);
-        var posX = (Stage.Size.x + 2) / 2.0f * grid.cellSize.x;
-        var posY = (Stage.Size.y + 2) / 2.0f * grid.cellSize.y;
+        GetComponent<MeshCollider>().sharedMesh = meshFilter.sharedMesh = MeshGenerator.Quad(StageData.Size.x + 2, StageData.Size.y + 2, Vector3.back);
+        var posX = (StageData.Size.x + 2) / 2.0f * grid.cellSize.x;
+        var posY = (StageData.Size.y + 2) / 2.0f * grid.cellSize.y;
         RepositionGrid();
     }
     
     private void RepositionGrid()
     {
-        var posX = - Stage.Size.x / 2.0f * grid.cellSize.x;
-        var posY = - Stage.Size.y / 2.0f * grid.cellSize.y;
+        var posX = - StageData.Size.x / 2.0f * grid.cellSize.x;
+        var posY = - StageData.Size.y / 2.0f * grid.cellSize.y;
         grid.transform.localPosition = new Vector3(posX, posY, 0);
     }
 }

@@ -29,7 +29,7 @@ public class TileDirection : SerializableDictionary<Vector2Int, Vector2Int>
 }
 
 [Serializable]
-public class Stage : ScriptableObject, IInit, ICopiable<Stage>
+public class StageData : ScriptableObject, IInit, ICopiable<StageData>
 {
     [SerializeField, HideInInspector] private Vector2Int size = new Vector2Int(5, 5);
     [SerializeField, HideInInspector] private List<TileType> tiles = new List<TileType>();
@@ -115,7 +115,7 @@ public class Stage : ScriptableObject, IInit, ICopiable<Stage>
         }
     }
 
-    public void CopyFrom(Stage other)
+    public void CopyFrom(StageData other)
     {
         size = other.size;
         tiles = new List<TileType>(other.tiles);

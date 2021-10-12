@@ -4,64 +4,62 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
-public class LevelLoader : Singleton<LevelLoader>
+public class LevelLoader
 {
-    public GameObject PlayerPrefab;
+    private LayerMask tileLayerMask;
     public TilePrefabPack PrefabPack;
-    public GameObject LevelObject { get; private set; }
-    private Grid levelGrid;
-    
-    public void LoadLevel(Level level)
+
+    public LevelLoader()
     {
-        Destroy(LevelObject);
-        if (level.StagePositions.Count == 0)
+        PrefabPack = Resources.Load<TilePrefabPack>("Prefabs/StageTiles/Packs/DefaultPack/DefaultPack");
+        tileLayerMask = LayerMask.NameToLayer("Tiles");
+    }
+    
+    public Level LoadLevel(LevelData levelData)
+    {
+        if (levelData.StagePositions.Count == 0)
         {
-            Debug.LogError("Level contains no stage"); return;
+            Debug.LogError("Level contains no stage"); return null;
         }
 
-        LevelObject = new GameObject {name = "LevelObject"};
-        levelGrid = LevelObject.AddComponent<Grid>();
+        var levelObject = new GameObject {name = "LevelObject"};
+        var levelGrid = levelObject.AddComponent<Grid>();
+        var levelComponent = levelObject.AddComponent<Level>();
+        levelComponent.SetLevel(levelData, levelGrid);
         levelGrid.cellSwizzle = GridLayout.CellSwizzle.XZY;
         
-        foreach (var stage in level.StagePositions)
+        foreach (var stage in levelData.StagePositions)
         {
             var stagePos = new Vector3(stage.Value.x, 0, stage.Value.y);
-            LoadStage(stagePos, stage.Key);
+            LoadStage(levelGrid, stagePos, stage.Key);
         }
-        
-        LoadPlayerObject(level);
+
+        return levelComponent;
     }
 
-    private void LoadPlayerObject(Level level)
+    private void LoadStage(Grid levelGrid, Vector3 position, StageData stageData)
     {
-        var entranceStage = level.StagePositions.First();
-        var playerPos = entranceStage.Value + levelGrid.GetCellCenterWorld(entranceStage.Key.GetEntrance());
-
-        Instantiate(PlayerPrefab, playerPos, Quaternion.identity);
-    }
-
-    private void LoadStage(Vector3 position, Stage stage)
-    {
-        for (var y = 0; y < stage.Size.y; y++)
+        for (var y = 0; y < stageData.Size.y; y++)
         {
-            for (var x = 0; x < stage.Size.x; x++)
+            for (var x = 0; x < stageData.Size.x; x++)
             {
-                var tile = stage[x, y];
+                var tile = stageData[x, y];
                 var gridPos = new Vector2Int(x, y);
 
-                if (stage.TileDirections.TryGetValue(gridPos, out var direction))
+                if (stageData.TileDirections.TryGetValue(gridPos, out var direction))
                 {
-                    PlaceDirectionalTile(position + levelGrid.GetCellCenterWorld(gridPos), direction, tile);
+                    PlaceDirectionalTile(position + levelGrid.GetCellCenterWorld(gridPos), direction, tile, levelGrid.transform);
                     continue;
                 }
                 
-                PlaceTile(position + levelGrid.GetCellCenterWorld(gridPos), tile);
+                PlaceTile(position + levelGrid.GetCellCenterWorld(gridPos), tile, levelGrid.transform);
             }
         }
     }
 
-    private void PlaceTile(Vector3 position, TileType tile)
+    private void PlaceTile(Vector3 position, TileType tile, Transform parentTransform)
     {
         GameObject prefab = null;
         
@@ -85,11 +83,16 @@ public class LevelLoader : Singleton<LevelLoader>
             default: case TileType.Air:
                 break;
         }
-        
-        if (prefab) Instantiate(prefab, position, Quaternion.identity, LevelObject.transform);
+
+        if (prefab)
+        {
+            var tileObject = Object.Instantiate(prefab, position, Quaternion.identity, parentTransform);
+            tileObject.layer = tileLayerMask;
+            tileObject.AddComponent<Tile>().TileType = tile;
+        }
     }
 
-    private void PlaceDirectionalTile(Vector3 position, Vector2Int direction, TileType tile)
+    private void PlaceDirectionalTile(Vector3 position, Vector2Int direction, TileType tile, Transform parentTransform)
     {
         GameObject prefab = null;
         
@@ -105,6 +108,11 @@ public class LevelLoader : Singleton<LevelLoader>
 
         var rotation = Quaternion.Euler(new Vector3
             {y = Vector3.Angle(Vector3.up, new Vector3(direction.x, direction.y, 0))});
-        if (prefab) Instantiate(prefab, position, rotation, LevelObject.transform);
+        if (prefab)
+        {
+            var tileObject = Object.Instantiate(prefab, position, rotation, parentTransform);
+            tileObject.layer = tileLayerMask;
+            tileObject.AddComponent<Tile>().TileType = tile;
+        }
     }
 }

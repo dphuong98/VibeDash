@@ -13,7 +13,7 @@ using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
 [ExecuteInEditMode]
-public class StageBuilder : Builder<Stage>
+public class StageBuilder : Builder<StageData>
 {
     //Path
     private const string stageFolder = "Assets/Resources/Data/Stages";
@@ -62,8 +62,8 @@ public class StageBuilder : Builder<Stage>
 
     public Vector2Int selectedTile = new Vector2Int(-1, -1);
 
-    public Stage LoadedStage => LoadedItem;
-    public Stage EditingStage => EditingItem;
+    public StageData LoadedStageData => LoadedItem;
+    public StageData EditingStageData => EditingItem;
 
     public int Cols => EditingItem.Size.x;
     public int Rows => EditingItem.Size.y;
@@ -106,14 +106,14 @@ public class StageBuilder : Builder<Stage>
 
     private void DrawSceneGUI(SceneView sceneview)
     {
-        if (EditingStage == null) return;
+        if (EditingStageData == null) return;
 
         if (!pastSolutionMode) CreateSolution();
         pastSolutionMode = viewSolution;
 
         DrawBuilderFocusButton();
         
-        StageRenderer.SetStage(EditingStage, grid);
+        StageRenderer.SetStage(EditingStageData, grid);
         StageRenderer.DrawTileIcons();
         StageRenderer.DrawHighLight(selectedTile);
 
@@ -174,8 +174,8 @@ public class StageBuilder : Builder<Stage>
                 if (!types.Any()) return;
                 
                 ExpandBorder(ref gridPos);
-                if (types.First().Key == TileType.Exit && !EditingStage.IsOnBorder(gridPos)) return;
-                if (types.First().Key == TileType.PortalOrange && !EditingStage.PortalPending(out _)) return;
+                if (types.First().Key == TileType.Exit && !EditingStageData.IsOnBorder(gridPos)) return;
+                if (types.First().Key == TileType.PortalOrange && !EditingStageData.PortalPending(out _)) return;
                 SetTileData(gridPos.x, gridPos.y, types.First().Key);
             }
         }
@@ -215,7 +215,7 @@ public class StageBuilder : Builder<Stage>
         GenericMenu menu = new GenericMenu();
         
         //Border expand set
-        if (!EditingStage.IsValidTile(tilePos))
+        if (!EditingStageData.IsValidTile(tilePos))
         {
             foreach (TileType t in Enum.GetValues(typeof(TileType)))
             {
@@ -227,20 +227,20 @@ public class StageBuilder : Builder<Stage>
         else
         //Inside tile set
         {
-            var dot = EditingStage[tilePos.x, tilePos.y];
+            var dot = EditingStageData[tilePos.x, tilePos.y];
 
             foreach (TileType t in Enum.GetValues(typeof(TileType)))
             {
-                if (t == TileType.Exit && !EditingStage.IsOnBorder(tilePos))
+                if (t == TileType.Exit && !EditingStageData.IsOnBorder(tilePos))
                     continue;
-                if (t == TileType.PortalOrange && !EditingStage.PortalPending(out _))
+                if (t == TileType.PortalOrange && !EditingStageData.PortalPending(out _))
                     continue;
                 
                 menu.AddItem(new GUIContent(string.Format("[{1}] {0}", t, GetShortcut(t))), t == dot, OnTileSelectMenu, new Tuple<Vector2Int, TileType>(tilePos, t));
             }
 
-            if (EditingStage[tilePos.x, tilePos.y] == TileType.Push || 
-                EditingStage[tilePos.x, tilePos.y] == TileType.Corner
+            if (EditingStageData[tilePos.x, tilePos.y] == TileType.Push || 
+                EditingStageData[tilePos.x, tilePos.y] == TileType.Corner
                 )
             {
                 menu.AddSeparator("");
@@ -258,7 +258,7 @@ public class StageBuilder : Builder<Stage>
             (menuData.Item1 != 0 && menuData.Item1 != 1)
         ) return;
         
-        var currentDirection = EditingStage.TileDirections[menuData.Item2];
+        var currentDirection = EditingStageData.TileDirections[menuData.Item2];
 
         //Rotate left
         if (menuData.Item1 == 0)
@@ -272,8 +272,8 @@ public class StageBuilder : Builder<Stage>
             currentDirection = currentDirection.RotateClockwise();
         }
         
-        EditingStage.SetTileDirection(menuData.Item2, currentDirection);
-        EditorUtility.SetDirty(EditingStage);
+        EditingStageData.SetTileDirection(menuData.Item2, currentDirection);
+        EditorUtility.SetDirty(EditingStageData);
         CreateSolution();
     }
 
@@ -288,8 +288,8 @@ public class StageBuilder : Builder<Stage>
 
     private void SetTileData(int x, int y, TileType type)
     {
-        EditingStage[x, y] = type;
-        EditorUtility.SetDirty(EditingStage);
+        EditingStageData[x, y] = type;
+        EditorUtility.SetDirty(EditingStageData);
         CreateSolution();
     }
 
@@ -323,57 +323,57 @@ public class StageBuilder : Builder<Stage>
 
     public void ExpandBottom()
     {
-        EditingStage.ExpandBottom();
-        EditorUtility.SetDirty(EditingStage);
+        EditingStageData.ExpandBottom();
+        EditorUtility.SetDirty(EditingStageData);
         OnReload();
     }
 
     public void ExpandLeft()
     {
-        EditingStage.ExpandLeft();
-        EditorUtility.SetDirty(EditingStage);
+        EditingStageData.ExpandLeft();
+        EditorUtility.SetDirty(EditingStageData);
         OnReload();
     }
 
     public void ExpandRight()
     {
-        EditingStage.ExpandRight();
-        EditorUtility.SetDirty(EditingStage);
+        EditingStageData.ExpandRight();
+        EditorUtility.SetDirty(EditingStageData);
         OnReload();
     }
 
     public void ExpandTop()
     {
-        EditingStage.ExpandTop();
-        EditorUtility.SetDirty(EditingStage);
+        EditingStageData.ExpandTop();
+        EditorUtility.SetDirty(EditingStageData);
         OnReload();
     }
 
     public void CollapseTop()
     {
-        EditingStage.CollapseTop();
-        EditorUtility.SetDirty(EditingStage);
+        EditingStageData.CollapseTop();
+        EditorUtility.SetDirty(EditingStageData);
         OnReload();
     }
 
     public void CollapseLeft()
     {
-        EditingStage.CollapseLeft();
-        EditorUtility.SetDirty(EditingStage);
+        EditingStageData.CollapseLeft();
+        EditorUtility.SetDirty(EditingStageData);
         OnReload();
     }
 
     public void CollapseRight()
     {
-        EditingStage.CollapseRight();
-        EditorUtility.SetDirty(EditingStage);
+        EditingStageData.CollapseRight();
+        EditorUtility.SetDirty(EditingStageData);
         OnReload();
     }
 
     public void CollapseBottom()
     {
-        EditingStage.CollapseBottom();
-        EditorUtility.SetDirty(EditingStage);
+        EditingStageData.CollapseBottom();
+        EditorUtility.SetDirty(EditingStageData);
         OnReload();
     }
 
@@ -393,7 +393,7 @@ public class StageBuilder : Builder<Stage>
     [ContextMenu("CreateSolution")]
     private void CreateSolution()
     {
-        if (viewSolution) EditingStage.GenerateSolution();
+        if (viewSolution) EditingStageData.GenerateSolution();
     }
 
     protected override void OnReload()

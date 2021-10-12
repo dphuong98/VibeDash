@@ -30,7 +30,7 @@ public class StageRenderer
     public static Color solutionColor = new Color(1f, 0.97f, 0.11f);
     private static bool initialized;
     private static Grid grid;
-    private static Stage stage;
+    private static StageData stageData;
     
     private static void Init()
     {
@@ -56,26 +56,26 @@ public class StageRenderer
         initialized = true;
     }
     
-    public static void SetStage(Stage stage, Grid grid)
+    public static void SetStage(StageData stageData, Grid grid)
     {
         if (!initialized) Init();
         
-        StageRenderer.stage = stage;
+        StageRenderer.stageData = stageData;
         StageRenderer.grid = grid;
     }
     
     public static void DrawTileIcons()
     {
-        if (stage == null || grid == null)
+        if (stageData == null || grid == null)
         {
             Debug.LogError("Please use StageRenderer.SetStage(...) before using Render methods");
         }
         
-        for (var y = 0; y < stage.Size.y; y++)
+        for (var y = 0; y < stageData.Size.y; y++)
         {
-            for (var x = 0; x < stage.Size.x; x++)
+            for (var x = 0; x < stageData.Size.x; x++)
             {
-                var tile = stage[x, y];
+                var tile = stageData[x, y];
                 var gridPos = new Vector2Int(x, y);
 
                 DrawTileIcon(tile, gridPos);
@@ -108,7 +108,7 @@ public class StageRenderer
         }
 
         //Draw directional tile
-        if (stage.TileDirections.TryGetValue(gridPos, out var direction))
+        if (stageData.TileDirections.TryGetValue(gridPos, out var direction))
         {
             if (!DirectionalIconMap.ContainsKey(tile) ||
                 DirectionalIconMap[tile].Count != 4
@@ -143,11 +143,11 @@ public class StageRenderer
         if (tile == TileType.PortalBlue || tile == TileType.PortalOrange)
         {
             var textSize = 100f;
-            var portal = stage.PortalPairs.Where(s => s.Blue == gridPos || s.Orange == gridPos);
+            var portal = stageData.PortalPairs.Where(s => s.Blue == gridPos || s.Orange == gridPos);
             if (portal.Any())
             {
                 HandlesExt.DrawText(worldPos + new Vector3(-iconRadius, iconRadius) + new Vector3(1, -1, 0) * iconRadius * 0.4f,
-                    (stage.PortalPairs.IndexOf(portal.First()) + 1).ToString(), textSize);
+                    (stageData.PortalPairs.IndexOf(portal.First()) + 1).ToString(), textSize);
             }
         }
     }
@@ -172,7 +172,7 @@ public class StageRenderer
 
     public static void DrawMovingSolution()
     {
-        var solution = stage.Solution;
+        var solution = stageData.Solution;
         if (solution == null || solution.Count < 2) return;
         
         var frame = (int)Math.Round(Time.realtimeSinceStartup * solutionSpeed) % solution.Count;
@@ -183,7 +183,7 @@ public class StageRenderer
     } 
     
     public static void DrawSolution() {
-        var solution = stage.Solution;
+        var solution = stageData.Solution;
         if (solution == null || solution.Count < 2) return;
         
         //TODO refactor this into smaller classes

@@ -9,7 +9,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 
 [CustomEditor(typeof(LevelBuilder))]
-public class LevelBuilderEditor : BuilderEditor<Level>
+public class LevelBuilderEditor : BuilderEditor<LevelData>
 {
     private const string GameScenePath = "Assets/Scenes/Gameplay.unity";
     private LevelBuilder levelBuilder;
@@ -33,8 +33,8 @@ public class LevelBuilderEditor : BuilderEditor<Level>
             GUILayoutExt.HorizontalSeparator();
             GUILayout.Label("File", EditorStyles.boldLabel);
             GUI.enabled = false;
-            EditorGUILayout.ObjectField("Loaded Level: ", levelBuilder.LoadedLevel, typeof(Level), true);
-            EditorGUILayout.ObjectField("Editing Level: ", levelBuilder.EditingLevel, typeof(Level), true);
+            EditorGUILayout.ObjectField("Loaded Level: ", levelBuilder.LoadedLevelData, typeof(LevelData), true);
+            EditorGUILayout.ObjectField("Editing Level: ", levelBuilder.EditingLevelData, typeof(LevelData), true);
             GUI.enabled = true;
             GUILayout.BeginHorizontal();
             {
@@ -81,7 +81,7 @@ public class LevelBuilderEditor : BuilderEditor<Level>
         #region Play
         if (GUILayout.Button("Play"))
         {
-            var level = levelBuilder.EditingLevel;
+            var level = levelBuilder.EditingLevelData;
             
             if (Application.isPlaying) return;
 
