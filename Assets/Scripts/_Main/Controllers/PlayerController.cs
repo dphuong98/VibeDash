@@ -40,7 +40,6 @@ public class PlayerController
             currentGridPosition += direction;
 
             var currentTileType = level.GetTileType(currentGridPosition);
-            Debug.Log(currentTileType);
 
             if (currentTileType == TileType.Air)
             {

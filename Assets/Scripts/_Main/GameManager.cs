@@ -13,16 +13,23 @@ public class GameManager : MonoBehaviour
     private Level level;
     private GameObject playerObject;
     private PlayerController playerController;
+    private CameraController cameraController;
 
     private void Start()
     {
         if (autoloadLevelData)
         {
-            level = new LevelLoader().LoadLevel(autoloadLevelData);
-            var levelGrid = level.GetComponent<Grid>();
-            playerObject = new PlayerLoader().LoadPlayerObject(levelGrid, autoloadLevelData);
-            playerController = new PlayerController(playerObject.transform, level);
+            LoadGameplay(autoloadLevelData);
         }
+    }
+
+    private void LoadGameplay(LevelData levelData)
+    {
+        level = new LevelLoader().LoadLevel(levelData);
+        var levelGrid = level.GetComponent<Grid>();
+        playerObject = new PlayerLoader().LoadPlayerObject(levelGrid, levelData);
+        playerController = new PlayerController(playerObject.transform, level);
+        playerObject.AddComponent<CameraController>();
     }
 
     public static void SetAutoloadLevel(LevelData levelData)
