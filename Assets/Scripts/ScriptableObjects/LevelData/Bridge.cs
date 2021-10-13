@@ -14,4 +14,9 @@ public class Bridge
         MaxLength = maxLength;
         bridgeParts = new List<Vector3>();
     }
+
+    public bool IsValid()
+    {
+        return bridgeParts.Count <= MaxLength;
+    }
 }

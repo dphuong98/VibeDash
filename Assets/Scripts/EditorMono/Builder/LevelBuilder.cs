@@ -22,8 +22,9 @@ public class LevelBuilder : Builder<LevelData>
 
     public LevelData LoadedLevelData => LoadedItem;
     public LevelData EditingLevelData => EditingItem;
-
+    
     //Members
+    private Grid levelGrid;
     private MiniStage bridgeBase;
     private Bridge editingBridge = null;
     
@@ -32,6 +33,7 @@ public class LevelBuilder : Builder<LevelData>
     
     private void OnEnable()
     {
+        levelGrid = GetComponentInChildren<Grid>();
         SceneView.duringSceneGui += DrawSceneGUI;
         Init();
     }
@@ -57,6 +59,12 @@ public class LevelBuilder : Builder<LevelData>
 
         DrawFocusButton();
         HandleClick(sceneView);
+
+        foreach (var miniStage in miniStages)
+        {
+            StageRenderer.SetStage(miniStage.StageData, levelGrid, levelGrid.WorldToCell(miniStage.transform.position) + new Vector3Int(1, 1, 0));
+            StageRenderer.DrawTileIcons();
+        }
 
         //Render and handle bridge connections
         DrawBridge();
@@ -114,8 +122,16 @@ public class LevelBuilder : Builder<LevelData>
 
     private void WipeScene()
     {
-        for (var i = transform.childCount - 1; i >= 0; i--)
-            DestroyImmediate(transform.GetChild(i).gameObject);
+        var miniStageFolder = transform.FindInChildren("MiniStages");
+
+        if (miniStageFolder == null)
+        {
+            miniStageFolder = new GameObject("MiniStages").transform;
+            miniStageFolder.parent = transform;
+        }
+        
+        for (var i = miniStageFolder.childCount - 1; i >= 0; i--)
+            DestroyImmediate(miniStageFolder.GetChild(i).gameObject);
         
         miniStages = new List<MiniStage>();
         bridges = new List<Bridge>();
@@ -209,7 +225,7 @@ public class LevelBuilder : Builder<LevelData>
                 position = new Vector3(0, highestStageTop + stage.Size.y / 2 + 3, 0);
             }
             
-            var miniStageObject = Instantiate(miniStagePrefab, position, Quaternion.identity, transform);
+            var miniStageObject = Instantiate(miniStagePrefab, position, Quaternion.identity, transform.FindInChildren("MiniStages"));
             var miniStage = miniStageObject.GetComponentInChildren<MiniStage>();
             miniStage.SetStage(stage);
             miniStageObject.name = Path.GetFileNameWithoutExtension(path);
@@ -248,7 +264,8 @@ public class LevelBuilder : Builder<LevelData>
 
                     if (IsBuildingBridge() &&
                         stage[gridPos.x, gridPos.y] == TileType.Entrance &&
-                        stage.IsOnBorder(gridPos))
+                        stage.IsOnBorder(gridPos) &&
+                        editingBridge.IsValid())
                     {
                         //End bridge and append to scriptable
                         editingBridge.bridgeParts.Add(miniStage.GetNearestCellCenter(mousePos));
@@ -317,9 +334,7 @@ public class LevelBuilder : Builder<LevelData>
         //Render editing bridge
         for (int i = 0; i < editingBridge.bridgeParts.Count - 1; i++)
         {
-            var layerOffset = 2;
-            Handles.DrawLine(editingBridge.bridgeParts[i] + Vector3.back * layerOffset, 
-                editingBridge.bridgeParts[i+1] + Vector3.back * layerOffset);
+            Handles.DrawLine(editingBridge.bridgeParts[i],  editingBridge.bridgeParts[i+1]);
         }
     }
 

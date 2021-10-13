@@ -32,9 +32,11 @@ public class StageRenderer
     public static float solutionSpeed = 4f;
     public static Color solutionColor = new Color(1f, 0.97f, 0.11f);
     private static bool initialized;
-    private static Grid grid;
+
+    private static Vector3Int positionOffset;
     private static StageData stageData;
-    
+    private static Grid grid;
+
     private static void Init()
     {
         IconMap[TileType.Entrance] = Resources.Load<Texture>("Icons/Entrance");
@@ -59,10 +61,11 @@ public class StageRenderer
         initialized = true;
     }
     
-    public static void SetStage(StageData stageData, Grid grid)
+    public static void SetStage(StageData stageData, Grid grid, Vector3Int positionOffset = default)
     {
         if (!initialized) Init();
-        
+
+        StageRenderer.positionOffset = positionOffset;
         StageRenderer.stageData = stageData;
         StageRenderer.grid = grid;
     }
@@ -89,7 +92,7 @@ public class StageRenderer
     private static void DrawTileIcon(TileType tile, Vector2Int gridPos)
     {
         float iconRadius = 0.45f;
-        var worldPos = grid.GetCellCenterWorld(new Vector3Int(gridPos.x, gridPos.y, 0));
+        var worldPos = grid.GetCellCenterWorld(new Vector3Int(gridPos.x, gridPos.y, 0) + positionOffset);
 
         if (BackgroundColorMap.TryGetValue(tile, out var color))
         {

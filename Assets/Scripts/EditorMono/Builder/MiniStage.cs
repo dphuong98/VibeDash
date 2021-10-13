@@ -2,8 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
 using UnityEditor;
 using UnityEngine;
+using Vector3 = UnityEngine.Vector3;
 
 [ExecuteInEditMode]
 public class MiniStage : MonoBehaviour
@@ -46,8 +48,11 @@ public class MiniStage : MonoBehaviour
     {
         if (StageData == null) return;
         
-        StageRenderer.SetStage(StageData, grid);
-        StageRenderer.DrawTileIcons();
+        Handles.DrawAAConvexPolygon(new []
+        {
+            new Vector3(-1, -1),
+            new Vector3()
+        });
         
         DrawMaxPoints();
         HandleClick();
@@ -128,7 +133,6 @@ public class MiniStage : MonoBehaviour
 
     private void ChangeStage()
     {
-        //TODO Refactor this into file loader class
         var path = EditorUtility.OpenFilePanel("Open", StageBuilder.DefaultFolder, "asset");
         if (string.IsNullOrEmpty(path)) return;
         
@@ -165,14 +169,7 @@ public class MiniStage : MonoBehaviour
     [ContextMenu("CreateMesh")]
     private void CreateBackgroundMesh()
     {
-        GetComponent<MeshCollider>().sharedMesh = meshFilter.sharedMesh = MeshGenerator.Quad(StageData.Size.x + 2, StageData.Size.y + 2, Vector3.back, new Vector2Int(-1, -1));
-        RepositionGrid();
-    }
-
-    private void RepositionGrid()
-    {
-        var posX = grid.cellSize.x;
-        var posY = grid.cellSize.y;
-        grid.transform.localPosition = new Vector3(posX, posY, 0);
+        GetComponent<MeshCollider>().sharedMesh = meshFilter.sharedMesh = MeshGenerator.Quad(StageData.Size.x + 2,
+            StageData.Size.y + 2, Vector3.back, new Vector2Int(-1, -1));
     }
 }
