@@ -134,14 +134,15 @@ public class LevelBuilder : Builder<LevelData>
 
     private void ApplyChanges()
     {
-        miniStages.RemoveAll(s => s == null);
+        if (EditingLevelData == null) return;
         
+        miniStages.RemoveAll(s => s == null);
+
         var stageData =
             miniStages.ToDictionary(s => s.StageData, s => s.GetPosition());
 
         for (var i = bridges.Count - 1; i >= 0; i--)
-        { 
-            //TODO Index ministage
+        {
             var bridgeStart = bridges[i].bridgeParts.First();
             if (!IsValidTile(bridgeStart, out var tileType) ||
                 tileType != TileType.Exit)

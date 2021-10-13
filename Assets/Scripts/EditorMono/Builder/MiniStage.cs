@@ -8,7 +8,7 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class MiniStage : MonoBehaviour
 {
-    public int maxPoints;
+    public int maxPoints { get; private set; }
     public StageData StageData { get; private set; }
     private Grid grid;
     private MeshFilter meshFilter;
@@ -55,7 +55,7 @@ public class MiniStage : MonoBehaviour
 
     private void DrawMaxPoints()
     {
-        var topLeft = transform.position + new Vector3(-meshFilter.sharedMesh.bounds.size.x / 2, meshFilter.sharedMesh.bounds.size.y / 2, 0);
+        var topLeft = transform.position + new Vector3(0, meshFilter.sharedMesh.bounds.size.y, 0);
         HandlesExt.DrawText(topLeft, "MaxPoints: " + maxPoints, 150);
     }
     
@@ -165,16 +165,14 @@ public class MiniStage : MonoBehaviour
     [ContextMenu("CreateMesh")]
     private void CreateBackgroundMesh()
     {
-        GetComponent<MeshCollider>().sharedMesh = meshFilter.sharedMesh = MeshGenerator.Quad(StageData.Size.x + 2, StageData.Size.y + 2, Vector3.back);
-        var posX = (StageData.Size.x + 2) / 2.0f * grid.cellSize.x;
-        var posY = (StageData.Size.y + 2) / 2.0f * grid.cellSize.y;
+        GetComponent<MeshCollider>().sharedMesh = meshFilter.sharedMesh = MeshGenerator.Quad(StageData.Size.x + 2, StageData.Size.y + 2, Vector3.back, new Vector2Int(-1, -1));
         RepositionGrid();
     }
-    
+
     private void RepositionGrid()
     {
-        var posX = - StageData.Size.x / 2.0f * grid.cellSize.x;
-        var posY = - StageData.Size.y / 2.0f * grid.cellSize.y;
+        var posX = grid.cellSize.x;
+        var posY = grid.cellSize.y;
         grid.transform.localPosition = new Vector3(posX, posY, 0);
     }
 }

@@ -222,15 +222,16 @@ public static class MeshGenerator
         return mesh;
     }
 
-    public static Mesh Quad(float width, float height, Vector3 normal)
+    public static Mesh Quad(float width, float height, Vector3 normal, Vector2Int pivotPosition = default)
     {
         var mesh = new Mesh();
 
+        var pivotOffset = new Vector3(pivotPosition.x * width/2, pivotPosition.y * height/2, 0);
         var vertices = new Vector3[] {
-            new Vector3(-width/2, -height/2, 0),
-            new Vector3(width/2, -height/2, 0),
-            new Vector3(width/2, height/2, 0),
-            new Vector3(-width/2, height/2, 0),
+            new Vector3(-width/2, -height/2, 0) -pivotOffset,
+            new Vector3(width/2, -height/2, 0)  - pivotOffset,
+            new Vector3(width/2, height/2, 0)  - pivotOffset,
+            new Vector3(-width/2, height/2, 0)  - pivotOffset,
         };
         var triangles = new int[] { 0, 2, 1, 0, 3, 2 };
 
