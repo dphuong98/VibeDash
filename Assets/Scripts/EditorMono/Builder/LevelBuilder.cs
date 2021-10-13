@@ -16,6 +16,7 @@ public class LevelBuilder : Builder<LevelData>
 {
     //Path
     private const string levelFolder = "Assets/Resources/Data/Levels";
+    public static string LevelFolder => levelFolder;
 
     private GameObject miniStagePrefab;
 

@@ -32,8 +32,11 @@ public class PlayerController
     /// <returns>false if the player fell out of the map</returns>
     private bool TryMove(Vector3Int direction, out List<Vector3Int> path)
     {
-        var currentGridPosition = level.LevelGrid.WorldToCell(playerTransform.position);
         path = new List<Vector3Int>();
+
+        if (playerTransform == null) return false;
+        var currentGridPosition = level.LevelGrid.WorldToCell(playerTransform.position);
+        
 
         while (true)
         {

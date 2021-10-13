@@ -18,8 +18,8 @@ public static class TileLogic
     /// <returns>false if player fell out of the map</returns>
     public static bool TryMove(this StageData stageData, Vector2Int start, Vector2Int direction, out List<Vector2Int> path)
     {
-        var currentTilePosition = start;
         path = new List<Vector2Int>();
+        var currentTilePosition = start;
 
         while (true)
         {

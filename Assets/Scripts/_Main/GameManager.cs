@@ -1,14 +1,44 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 public class GameManager : MonoBehaviour
 {
-    [FormerlySerializedAs("DebugLevel")] public LevelData debugLevelData;
-    private static LevelData autoloadLevelData;
+    public static LevelData AutoloadLevelData
+    {
+        get
+        {
+            var path = Path.Combine(LevelBuilder.LevelFolder, "_autoload.asset");
+            return AssetDatabase.LoadAssetAtPath<LevelData>(path);
+        }
+        set
+        {
+            var path = Path.Combine(LevelBuilder.LevelFolder, "_autoload.asset");
+            if (value == null)
+            {
+                AssetDatabase.DeleteAsset(path);
+                return;
+            }
+            
+            var c = AutoloadLevelData;
+            if (c == null)
+            {
+                var asset = ScriptableObject.CreateInstance<LevelData>();
+                asset.CopyFrom(value);
+                AssetDatabase.CreateAsset(asset, path);
+            }
+            else
+            {
+                c.CopyFrom(value);
+            }
+
+            AssetDatabase.SaveAssets();
+        }
+    }
 
     private Level level;
     private GameObject playerObject;
@@ -17,9 +47,10 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        if (autoloadLevelData)
+        if (AutoloadLevelData != null)
         {
-            LoadGameplay(autoloadLevelData);
+            LoadGameplay(AutoloadLevelData);
+            AutoloadLevelData = null;
         }
     }
 
@@ -32,15 +63,4 @@ public class GameManager : MonoBehaviour
         playerObject.AddComponent<CameraController>();
     }
 
-    public static void SetAutoloadLevel(LevelData levelData)
-    {
-        autoloadLevelData = levelData;
-    }
-
-    [ContextMenu("Load Debug")]
-    public void LoadDebug()
-    {
-        autoloadLevelData = debugLevelData;
-        EditorApplication.isPlaying = true;
-    }
 }
