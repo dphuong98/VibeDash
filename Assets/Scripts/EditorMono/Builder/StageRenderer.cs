@@ -7,18 +7,21 @@ using UnityEngine;
 
 public class StageRenderer
 {
+    private static readonly Color roadColor = new Color(0.64f, 0.66f, 0.64f);
+
     private static readonly Dictionary<TileType, Color> BackgroundColorMap = new Dictionary<TileType, Color>()
     {
         {TileType.Air, Color.clear},
-        {TileType.Corner, new Color(0.63f, 0.63f, 0.63f)},
+        {TileType.Corner, roadColor},
         {TileType.Entrance, new Color(0.39f, 0.74f, 1f)},
         {TileType.Exit, new Color(1f, 0.26f, 0.19f, 0.77f)},
-        {TileType.PortalBlue, new Color(0.63f, 0.63f, 0.63f)},
-        {TileType.PortalOrange, new Color(0.63f, 0.63f, 0.63f)},
-        {TileType.Push, new Color(0.63f, 0.63f, 0.63f)},
-        {TileType.Road, new Color(0.63f, 0.63f, 0.63f)},
-        {TileType.Stop, new Color(0.63f, 0.63f, 0.63f)},
+        {TileType.PortalBlue, roadColor},
+        {TileType.PortalOrange, roadColor},
+        {TileType.Push, roadColor},
+        {TileType.Road, roadColor},
+        {TileType.Stop, roadColor},
         {TileType.Wall, new Color(0.94f, 0.62f, 0.79f)},
+        {TileType.Blank, new Color(0.82f, 0.69f, 0.82f)}
     };
 
     private static readonly Dictionary<TileType, Texture> IconMap = new Dictionary<TileType, Texture>();

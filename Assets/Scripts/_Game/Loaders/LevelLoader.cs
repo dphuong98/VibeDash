@@ -13,7 +13,7 @@ public class LevelLoader
 
     public LevelLoader()
     {
-        PrefabPack = Resources.Load<TilePrefabPack>("Prefabs/StageTiles/Packs/DefaultPack/DefaultPack");
+        PrefabPack = Resources.Load<TilePrefabPack>("Prefabs/StageTilePacks/DefaultPack/DefaultPack");
         tileLayerMask = LayerMask.NameToLayer("Tiles");
     }
     
@@ -79,6 +79,9 @@ public class LevelLoader
                 break;
             case TileType.PortalOrange:
                 prefab = PrefabPack.PortalOrangePrefab;
+                break;
+            case TileType.Blank:
+                prefab = PrefabPack.BlankPrefab;
                 break;
             default: case TileType.Air:
                 break;

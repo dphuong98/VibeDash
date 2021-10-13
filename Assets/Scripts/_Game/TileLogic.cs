@@ -82,7 +82,9 @@ public static class TileLogic
                 break;
             }
 
-            if (currentTileType == TileType.Road || currentTileType == TileType.Entrance)
+            if (currentTileType == TileType.Road ||
+                currentTileType == TileType.Entrance ||
+                currentTileType == TileType.Blank)
             {
                 path.Add(currentTilePosition);
                 continue;

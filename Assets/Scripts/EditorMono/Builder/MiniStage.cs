@@ -12,15 +12,6 @@ public class MiniStage : MonoBehaviour
     public StageData StageData { get; private set; }
     private Grid grid;
     private MeshFilter meshFilter;
-    
-    private static readonly Dictionary<TileType, Color> ColorMap = new Dictionary<TileType, Color>()
-    {
-        {TileType.Entrance, new Color(0f, 1f, 1f, 0.5f)},
-        {TileType.Exit, new Color(1f, 0f, 0.03f, 0.77f)},
-        { TileType.Air, Color.clear },
-        { TileType.Road,  new Color(0.24f, 0.26f, 0.42f, 0.5f)},
-        { TileType.Wall, new Color(0.94f, 0.62f, 0.79f) },
-    };
 
     public Vector3 GetNearestCellCenter(Vector3 position)
     {

@@ -14,4 +14,5 @@ public class TilePrefabPack : ScriptableObject
     public GameObject PortalOrangePrefab;
     public GameObject PushPrefab;
     public GameObject CornerPrefab;
+    public GameObject BlankPrefab;
 }

@@ -26,3 +26,5 @@ MonoBehaviour:
     type: 3}
   CornerPrefab: {fileID: 5745008388756971587, guid: 0574722b020a31040af541737914b4de,
     type: 3}
+  BlankPrefab: {fileID: 5745008388756971587, guid: da007630a39a4cf4788289e5bf24d0ea,
+    type: 3}

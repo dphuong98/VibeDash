@@ -17,7 +17,6 @@ public class StagePosition : SerializableDictionary<StageData, Vector3>
 [Serializable]
 public class LevelData : ScriptableObject, IInit, ICopiable<LevelData>
 {
-    //TODO into serializableDictionary
     [SerializeField, HideInInspector] private StagePosition stagePositions = new StagePosition();
     public StagePosition StagePositions => new StagePosition(stagePositions);
     
