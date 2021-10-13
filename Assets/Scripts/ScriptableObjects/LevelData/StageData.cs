@@ -319,4 +319,9 @@ public class StageData : ScriptableObject, IInit, ICopiable<StageData>
     {
         solution = Pathfinding.GetSolution(this);
     }
+
+    public bool IsEntranceStage()
+    {
+        return !IsOnBorder(GetEntrance());
+    }
 }

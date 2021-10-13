@@ -190,6 +190,12 @@ public class LevelBuilder : Builder<LevelData>
                 return;
             }
 
+            if (stage.IsEntranceStage() && miniStages.Exists(s => s.StageData.IsEntranceStage()))
+            {
+                Debug.LogError("There can only be one entrance stage where entrance tile is in the middle of the stage.");
+                return;
+            }
+
             if (miniStages.Any(s => s.StageData == stage))
             {
                 Debug.LogError("A level cannot contain the same stage twice");
