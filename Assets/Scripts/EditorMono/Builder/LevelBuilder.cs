@@ -55,7 +55,7 @@ public class LevelBuilder : Builder<LevelData>
     {
         if (EditingLevelData == null) return;
 
-        DrawBuilderFocusButton();
+        DrawFocusButton();
         HandleClick(sceneView);
 
         //Render and handle bridge connections
@@ -71,13 +71,17 @@ public class LevelBuilder : Builder<LevelData>
         ApplyChanges();
     }
 
-    private void DrawBuilderFocusButton()
+    private void DrawFocusButton()
     {
         Handles.BeginGUI();
-        
+
         if (HandlesExt.DrawButton(10, 400, 100, 50, "LevelBuilder"))
         {
+            UnityEditorWindowHelper.GetWindow(WindowType.Inspector);
             Selection.activeGameObject = gameObject;
+            SceneView.lastActiveSceneView.rotation = Quaternion.Euler(0,0,0);
+            SceneView.FrameLastActiveSceneView();
+            SceneView.lastActiveSceneView.orthographic = true;
         }
 
         Handles.EndGUI();
@@ -306,7 +310,9 @@ public class LevelBuilder : Builder<LevelData>
         //Render editing bridge
         for (int i = 0; i < editingBridge.bridgeParts.Count - 1; i++)
         {
-            Handles.DrawLine(editingBridge.bridgeParts[i], editingBridge.bridgeParts[i+1]);
+            var layerOffset = 2;
+            Handles.DrawLine(editingBridge.bridgeParts[i] + Vector3.back * layerOffset, 
+                editingBridge.bridgeParts[i+1] + Vector3.back * layerOffset);
         }
     }
 

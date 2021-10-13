@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class EditorMenu
 {
@@ -17,15 +18,14 @@ public class EditorMenu
         {
             return;
         }
-
-        EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
+        
         EditorSceneManager.OpenScene(StageBuilderScenePath);
     }
     
     [MenuItem("VibeDash/StageBuilder", true)]
     private static bool OpenStageEditorCondition()
     {
-        return EditorSceneManager.GetActiveScene().path != StageBuilderScenePath;
+        return SceneManager.GetActiveScene().path != StageBuilderScenePath;
     }
     
     [MenuItem("VibeDash/LevelBuilder")]
@@ -35,15 +35,14 @@ public class EditorMenu
         {
             return;
         }
-
-        EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
+        
         EditorSceneManager.OpenScene(LevelBuilderScenePath);
     }
     
     [MenuItem("VibeDash/LevelBuilder", true)]
     private static bool OpenLevelEditorCondition()
     {
-        return EditorSceneManager.GetActiveScene().path != LevelBuilderScenePath;
+        return SceneManager.GetActiveScene().path != LevelBuilderScenePath;
     }
     
     [MenuItem("VibeDash/Gameplay")]
@@ -54,13 +53,12 @@ public class EditorMenu
             return;
         }
 
-        EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
         EditorSceneManager.OpenScene(GameplayScenePath);
     }
     
     [MenuItem("VibeDash/Gameplay", true)]
     private static bool OpenGameplayCondition()
     {
-        return EditorSceneManager.GetActiveScene().path != GameplayScenePath;
+        return SceneManager.GetActiveScene().path != GameplayScenePath;
     }
 }

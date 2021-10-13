@@ -136,15 +136,17 @@ public class StageBuilder : Builder<StageData>
 
         if (HandlesExt.DrawButton(10, 400, 100, 50, "StageBuilder"))
         {
+            UnityEditorWindowHelper.GetWindow(WindowType.Inspector);
             Selection.activeGameObject = gameObject;
+            SceneView.lastActiveSceneView.rotation = Quaternion.Euler(0,0,0);
+            SceneView.FrameLastActiveSceneView();
+            SceneView.lastActiveSceneView.orthographic = true;
         }
 
         Handles.EndGUI();
         
     }
-    
-    
-    
+
     private void HandleClick()
     {
         if (Selection.activeGameObject == this.gameObject &&
