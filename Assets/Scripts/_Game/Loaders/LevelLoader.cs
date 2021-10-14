@@ -36,6 +36,14 @@ public class LevelLoader
             LoadStage(levelGrid, stagePos, stage.Key);
         }
 
+        foreach (var bridge in levelData.Bridges)
+        {
+            foreach (var part in bridge.bridgeParts)
+            {
+                PlaceTile(levelGrid.GetCellCenterWorld(part), TileType.Bridge, levelObject.transform);
+            }
+        }
+
         return levelComponent;
     }
 
@@ -82,6 +90,9 @@ public class LevelLoader
                 break;
             case TileType.Blank:
                 prefab = PrefabPack.BlankPrefab;
+                break;
+            case TileType.Bridge:
+                prefab = PrefabPack.BridgePrefab;
                 break;
             default: case TileType.Air:
                 break;

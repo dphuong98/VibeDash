@@ -26,6 +26,7 @@ public class TileDirection : SerializableDictionary<Vector2Int, Vector2Int>
 {
     public TileDirection() : base() {}
     public TileDirection(TileDirection otherTileDirections) : base(otherTileDirections) { }
+    public TileDirection(IDictionary<Vector2Int, Vector2Int> dictionary) : base(dictionary) {}
 }
 
 [Serializable]

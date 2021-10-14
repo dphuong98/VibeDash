@@ -28,3 +28,5 @@ MonoBehaviour:
     type: 3}
   BlankPrefab: {fileID: 5745008388756971587, guid: da007630a39a4cf4788289e5bf24d0ea,
     type: 3}
+  BridgePrefab: {fileID: 5745008388756971587, guid: eecd13d315f43cc45819f26886248971,
+    type: 3}

@@ -25,10 +25,7 @@ public class LevelBuilder : Builder<LevelData>
 
     public LevelData LoadedLevelData => LoadedItem;
     public LevelData EditingLevelData => EditingItem;
-    
-    //Constant
-    private readonly Vector3Int gridOffset = new Vector3Int(1, 1, 0);
-    
+
     //Members
     private Grid levelGrid;
     private Bridge editingBridge = null;
@@ -67,7 +64,7 @@ public class LevelBuilder : Builder<LevelData>
 
         foreach (var miniStage in miniStages)
         {
-            StageRenderer.SetStage(miniStage.StageData, levelGrid, levelGrid.WorldToCell(miniStage.transform.position) + gridOffset);
+            StageRenderer.SetStage(miniStage.StageData, levelGrid, levelGrid.WorldToCell(miniStage.transform.position));
             StageRenderer.DrawTileIcons();
         }
 
@@ -274,7 +271,7 @@ public class LevelBuilder : Builder<LevelData>
         }
 
         var remainingBridgeLength = editingBridge.MaxLength - editingBridge.bridgeParts.Count + 1;
-        HandlesExt.DrawText(GetWorldPosition(editingBridge.bridgeParts.Last()), "" + remainingBridgeLength, 150);
+        HandlesExt.DrawText(GetWorldPosition(editingBridge.bridgeParts.Last()), "" + remainingBridgeLength, 150, Color.white);
         
         Handles.color = remainingBridgeLength < 0 ? Color.red : Color.green;
         
@@ -295,7 +292,7 @@ public class LevelBuilder : Builder<LevelData>
         {
             for (int i = 0; i < bridge.bridgeParts.Count - 1; i++)
             {
-                Handles.DrawLine(levelGrid.GetCellCenterWorld(bridge.bridgeParts[i]), levelGrid.GetCellCenterWorld(bridge.bridgeParts[i+1]));
+                Handles.DrawLine(GetWorldPosition(bridge.bridgeParts[i]), GetWorldPosition(bridge.bridgeParts[i+1]));
             }
         }
     }
@@ -324,7 +321,7 @@ public class LevelBuilder : Builder<LevelData>
         if (miniStage == null) return TileType.Air;
         
         var miniStageGridPos = GetGridPosition(miniStage.transform.position);
-        var relativeGridPos = gridPos - miniStageGridPos - gridOffset.ToVector2Int();
+        var relativeGridPos = gridPos - miniStageGridPos;
         return miniStage.StageData[relativeGridPos.x, relativeGridPos.y];
     }
     
@@ -333,7 +330,7 @@ public class LevelBuilder : Builder<LevelData>
         foreach (var miniStage in miniStages)
         {
             var miniStageGridPos = GetGridPosition(miniStage.transform.position);
-            var relativeGridPos = gridPos - miniStageGridPos - gridOffset.ToVector2Int();
+            var relativeGridPos = gridPos - miniStageGridPos;
             if (miniStage.StageData.IsValidTile(relativeGridPos)) return miniStage;
         }
 
@@ -347,11 +344,11 @@ public class LevelBuilder : Builder<LevelData>
     
     private Vector2Int GetGridPosition(Vector3 worldPos)
     {
-        return levelGrid.WorldToCell(worldPos).ToVector2Int();
+        return (levelGrid.WorldToCell(worldPos)).ToVector2Int();
     }
 
     private Vector3 GetWorldPosition(Vector2Int gridPos)
     {
-        return levelGrid.GetCellCenterWorld(gridPos);
+        return levelGrid.GetCellCenterWorld(gridPos.ToVector3Int());
     }
 }

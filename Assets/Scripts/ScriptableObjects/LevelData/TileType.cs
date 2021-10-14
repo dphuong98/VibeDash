@@ -15,4 +15,5 @@ public enum TileType
     Push,
     Corner,
     Blank,
+    Bridge,
 }

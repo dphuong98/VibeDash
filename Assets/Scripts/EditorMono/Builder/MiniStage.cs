@@ -47,8 +47,8 @@ public class MiniStage : MonoBehaviour
 
     private void DrawMaxPoints()
     {
-        var topLeft = transform.position + new Vector3(0, meshFilter.sharedMesh.bounds.size.y, 0);
-        HandlesExt.DrawText(topLeft, "MaxPoints: " + maxPoints, 150);
+        var topLeft = transform.position + new Vector3(0, meshFilter.sharedMesh.bounds.size.y + 0.7f, 0);
+        HandlesExt.DrawText(topLeft, "MaxPoints: " + maxPoints, 150, Color.white);
     }
     
     private void HandleClick()
@@ -115,7 +115,7 @@ public class MiniStage : MonoBehaviour
     [ContextMenu("CreateMesh")]
     private void CreateBackgroundMesh()
     {
-        GetComponent<MeshCollider>().sharedMesh = meshFilter.sharedMesh = MeshGenerator.Quad(StageData.Size.x + 2,
-            StageData.Size.y + 2, Vector3.back, new Vector2Int(-1, -1));
+        GetComponent<MeshCollider>().sharedMesh = meshFilter.sharedMesh = MeshGenerator.Quad(StageData.Size.x,
+            StageData.Size.y, Vector3.back, new Vector2Int(-1, -1));
     }
 }

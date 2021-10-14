@@ -188,6 +188,8 @@ public class StageBuilder : Builder<StageData>
             {
                 if (t == TileType.Exit)
                     continue;
+                if (t == TileType.Bridge)
+                    continue;
                 menu.AddItem(new GUIContent(string.Format("[{1}] {0}", t, GetShortcut(t))), false, OnTileSelectMenu, new Tuple<Vector2Int, TileType>(tilePos, t));
             }
         }
@@ -198,6 +200,8 @@ public class StageBuilder : Builder<StageData>
 
             foreach (TileType t in Enum.GetValues(typeof(TileType)))
             {
+                if (t == TileType.Bridge)
+                    continue;
                 if (t == TileType.Exit && !EditingStageData.IsOnBorder(tilePos))
                     continue;
                 if (t == TileType.PortalOrange && !EditingStageData.PortalPending(out _))

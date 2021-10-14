@@ -15,4 +15,5 @@ public class TilePrefabPack : ScriptableObject
     public GameObject PushPrefab;
     public GameObject CornerPrefab;
     public GameObject BlankPrefab;
+    public GameObject BridgePrefab;
 }

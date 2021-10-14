@@ -92,26 +92,34 @@ public class PlayerController
                 path.Add(currentGridPosition);
                 continue;
             }
+
+            if (currentTileType == TileType.Bridge)
+            {
+                //Perform score check here
+                path.Add(currentGridPosition);
+                continue;
+            }
             
-            /*
             if (currentTileType == TileType.Push)
             {
-                path.Add(currentTilePosition);
-                direction = stageData.TileDirections[currentTilePosition];
+                path.Add(currentGridPosition);
+                //TODO this
+                direction = level.TileDirections[currentGridPosition.ToVector2Int()].ToVector3Int();
                 continue;
             }
             
             if (currentTileType == TileType.Corner)
             {
-                var upVector = stageData.TileDirections[currentTilePosition];
-                var rightVector = upVector.RotateClockwise();
+                //TODO this
+                var upVector = level.TileDirections[currentGridPosition.ToVector2Int()].ToVector3Int();
+                var rightVector = upVector.ToVector2Int().RotateClockwise().ToVector3Int();
                 
-                path.Add(currentTilePosition);
+                path.Add(currentGridPosition);
 
                 if (direction == -upVector) direction = rightVector;
                 if (direction == -rightVector) direction = upVector;
                 continue;
-            }*/
+            }
 
             break;
         }

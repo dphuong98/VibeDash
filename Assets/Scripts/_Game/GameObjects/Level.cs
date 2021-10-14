@@ -9,17 +9,20 @@ using UnityEngine;
 public class Level : MonoBehaviour
 {
     private LevelData levelData;
-    private Grid levelGrid;
     private List<Portal> portals = new List<Portal>();
     private TileDirection tileDirections = new TileDirection();
 
-    public Grid LevelGrid => levelGrid;
+    public Grid LevelGrid { get; private set; }
+
     public List<Portal> Portals => new List<Portal>(portals);
+    public TileDirection TileDirections => new TileDirection(tileDirections);
     
     public void SetLevel(LevelData levelData, Grid levelGrid)
     {
         this.levelData = levelData;
-        this.levelGrid = levelGrid;
+        this.LevelGrid = levelGrid;
+        
+        //Combine portal and tile direction data from all stages
         foreach (var stageData in levelData.StagePositions.Keys)
         {
             if (stageData.PortalPairs.Count != 0) portals.AddRange(stageData.PortalPairs);
@@ -33,7 +36,7 @@ public class Level : MonoBehaviour
     
     public TileType GetTileType(Vector3Int gridPos)
     {
-        var position = levelGrid.GetCellCenterWorld(gridPos);
+        var position = LevelGrid.GetCellCenterWorld(gridPos);
 
         if (Physics.Raycast(position + Vector3.up, Vector3.down, out var hitInfo, Mathf.Infinity) &&
             hitInfo.transform.GetComponent<Tile>() is var tileComponent &&
