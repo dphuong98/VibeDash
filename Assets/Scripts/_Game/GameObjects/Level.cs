@@ -23,14 +23,21 @@ public class Level : MonoBehaviour
         this.LevelGrid = levelGrid;
         
         //Combine portal and tile direction data from all stages
-        foreach (var stageData in levelData.StagePositions.Keys)
+        foreach (var stagePos in levelData.StagePositions)
         {
-            if (stageData.PortalPairs.Count != 0) portals.AddRange(stageData.PortalPairs);
+            foreach (var portal in stagePos.Key.PortalPairs)
+            {
+                portals.Add(new Portal(portal.Blue + stagePos.Value, portal.Orange + stagePos.Value));
+            }
         }
 
-        foreach (var tileDirection in levelData.StagePositions.Keys.SelectMany(stageData => stageData.TileDirections))
+        foreach (var stagePos in levelData.StagePositions)
         {
-            tileDirections.AddUnique(tileDirection.Key, tileDirection.Value);
+            foreach (var tileDirection in stagePos.Key.TileDirections)
+            {
+                var gridPos = tileDirection.Key + stagePos.Value;
+                tileDirections.Add(gridPos, tileDirection.Value);
+            }
         }
     }
     
