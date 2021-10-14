@@ -250,7 +250,6 @@ public class LevelBuilder : Builder<LevelData>
                 gridTileType == TileType.Entrance &&
                 editingBridge.IsValid())
             {
-                editingBridge.bridgeParts.Add(GetGridPosition(mousePos));
                 bridges.Add(editingBridge);
                 editingBridge = null;
                 return;

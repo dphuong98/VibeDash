@@ -11,7 +11,7 @@ public class Level : MonoBehaviour
     private LevelData levelData;
     private List<Portal> portals = new List<Portal>();
     private TileDirection tileDirections = new TileDirection();
-
+    
     public Grid LevelGrid { get; private set; }
 
     public List<Portal> Portals => new List<Portal>(portals);
@@ -53,5 +53,11 @@ public class Level : MonoBehaviour
         }
 
         return TileType.Air;
+    }
+
+    public Bridge GetBridge(Vector3Int gridPos)
+    {
+        var anyBridge = levelData.Bridges.Where(s => s.bridgeParts[1] == gridPos.ToVector2Int());
+        return anyBridge.Any() ? anyBridge.First() : null;
     }
 }

@@ -36,7 +36,6 @@ public class PlayerController
 
         if (playerTransform == null) return false;
         var currentGridPosition = level.LevelGrid.WorldToCell(playerTransform.position);
-        
 
         while (true)
         {
@@ -96,7 +95,16 @@ public class PlayerController
             if (currentTileType == TileType.Bridge)
             {
                 //Perform score check here
-                path.Add(currentGridPosition);
+                var bridge = level.GetBridge(currentGridPosition);
+                for (var i = 0; i < bridge.bridgeParts.Count; i++)
+                {
+                    if (i == 0 || i == bridge.bridgeParts.Count - 1) continue;
+                    path.Add(bridge.bridgeParts[i].ToVector3Int());
+                }
+
+                currentGridPosition = bridge.bridgeParts[bridge.bridgeParts.Count - 2].ToVector3Int();
+                direction = (bridge.bridgeParts[bridge.bridgeParts.Count - 1] -
+                            bridge.bridgeParts[bridge.bridgeParts.Count - 2]).ToVector3Int();
                 continue;
             }
             
