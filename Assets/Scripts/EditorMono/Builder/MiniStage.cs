@@ -79,7 +79,7 @@ public class MiniStage : MonoBehaviour
 
     private void ChangeStage()
     {
-        var path = EditorUtility.OpenFilePanel("Open", StageBuilder.DefaultFolder, "asset");
+        var path = EditorUtility.OpenFilePanel("Open", StageBuilder.StageFolder, "asset");
         if (string.IsNullOrEmpty(path)) return;
         
         try

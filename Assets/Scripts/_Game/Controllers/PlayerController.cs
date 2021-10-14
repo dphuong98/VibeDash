@@ -45,7 +45,9 @@ public class PlayerController
 
             if (currentTileType == TileType.Air)
             {
-                return false;
+                //Temporary let air behave like wall
+                break;
+                //return false
             }
             
             //Impassible

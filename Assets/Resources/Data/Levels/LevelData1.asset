@@ -15,15 +15,23 @@ MonoBehaviour:
   stagePositions:
     keyData:
     - {fileID: 11400000, guid: 22eb801df7bf17149864b6afba20fc63, type: 2}
-    - {fileID: 11400000, guid: 59aff57b6989ed44c90c829f284716fa, type: 2}
+    - {fileID: 11400000, guid: 7fd6d4e6d128a9a4298f0c81865009fc, type: 2}
+    - {fileID: 11400000, guid: 46056642877a0bc41849570b90537fea, type: 2}
     valueData:
     - {x: 0, y: 0}
-    - {x: 0, y: 8}
+    - {x: 5, y: 8}
+    - {x: 0, y: 15}
   bridges:
   - bridgeParts:
     - {x: 4, y: 5}
     - {x: 4, y: 6}
-    - {x: 5, y: 6}
-    - {x: 6, y: 6}
-    - {x: 6, y: 7}
-    - {x: 6, y: 8}
+    - {x: 4, y: 7}
+    - {x: 4, y: 8}
+    - {x: 4, y: 9}
+    - {x: 5, y: 9}
+  - bridgeParts:
+    - {x: 8, y: 12}
+    - {x: 8, y: 13}
+    - {x: 8, y: 14}
+    - {x: 7, y: 14}
+    - {x: 7, y: 15}
