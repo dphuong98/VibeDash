@@ -6,12 +6,12 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 [Serializable]
-public class StagePosition : SerializableDictionary<StageData, Vector3>
+public class StagePosition : SerializableDictionary<StageData, Vector2Int>
 {
     public StagePosition() : base() {}
     public StagePosition(StagePosition otherStagePositions) : base(otherStagePositions) { }
 
-    public StagePosition(IDictionary<StageData, Vector3> dictionary) : base(dictionary) { }
+    public StagePosition(IDictionary<StageData, Vector2Int> dictionary) : base(dictionary) { }
 }
 
 [Serializable]
@@ -34,7 +34,7 @@ public class LevelData : ScriptableObject, IInit, ICopiable<LevelData>
         this.bridges = new List<Bridge>(other.bridges);
     }
 
-    public void Import(Dictionary<StageData, Vector3> stagePositions, List<Bridge> bridges)
+    public void Import(Dictionary<StageData, Vector2Int> stagePositions, List<Bridge> bridges)
     {
         this.stagePositions = new StagePosition(stagePositions);
         this.bridges = new List<Bridge>(bridges);

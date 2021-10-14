@@ -7,12 +7,12 @@ using UnityEngine;
 public class Bridge
 {
     [SerializeField] public readonly int MaxLength;
-    [SerializeField] public List<Vector3> bridgeParts;
+    [SerializeField] public List<Vector2Int> bridgeParts;
 
     public Bridge(int maxLength)
     {
         MaxLength = maxLength;
-        bridgeParts = new List<Vector3>();
+        bridgeParts = new List<Vector2Int>();
     }
 
     public bool IsValid()

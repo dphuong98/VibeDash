@@ -47,13 +47,7 @@ public class MiniStage : MonoBehaviour
     private void DrawSceneGUI(SceneView sceneview)
     {
         if (StageData == null) return;
-        
-        Handles.DrawAAConvexPolygon(new []
-        {
-            new Vector3(-1, -1),
-            new Vector3()
-        });
-        
+
         DrawMaxPoints();
         HandleClick();
     }
@@ -79,11 +73,6 @@ public class MiniStage : MonoBehaviour
 
     }
 
-    public Vector3 GetPosition()
-    {
-        return transform.position;
-    }
-    
     public bool TileSelected(out Vector2Int gridPos)
     {
         var worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
