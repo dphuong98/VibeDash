@@ -12,13 +12,7 @@ public class MiniStage : MonoBehaviour
 {
     public int maxPoints { get; private set; }
     public StageData StageData { get; private set; }
-    private Grid grid;
     private MeshFilter meshFilter;
-
-    public Vector3 GetNearestCellCenter(Vector3 position)
-    {
-        return grid.GetCellCenterWorld(grid.WorldToCell(position));
-    }
 
     public void SetStage(StageData stageData)
     {
@@ -40,7 +34,6 @@ public class MiniStage : MonoBehaviour
     
     private void Init()
     {
-        grid = GetComponentInChildren<Grid>();
         meshFilter = GetComponent<MeshFilter>();
     }
 
@@ -73,42 +66,6 @@ public class MiniStage : MonoBehaviour
 
     }
 
-    public bool TileSelected(out Vector2Int gridPos)
-    {
-        var worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
-
-        if (Physics.Raycast(worldRay, out var hitInfo))
-        {
-            if (hitInfo.collider.gameObject == this.gameObject)
-            {
-                var gridPos3 = grid.WorldToCell(hitInfo.point);
-                gridPos = new Vector2Int(gridPos3.x, gridPos3.y);
-                
-                return true;
-            }
-        }
-
-        gridPos = Vector2Int.zero;
-        return false;
-    }
-    
-    public bool TileSelected(Vector3 position, out Vector2Int gridPos)
-    {
-        if (Physics.Raycast(position + Vector3.back * 45 , Vector3.forward, out var hitInfo))
-        {
-            if (hitInfo.collider.gameObject == this.gameObject)
-            {
-                var gridPos3 = grid.WorldToCell(hitInfo.point);
-                gridPos = new Vector2Int(gridPos3.x, gridPos3.y);
-                
-                return true;
-            }
-        }
-
-        gridPos = Vector2Int.zero;
-        return false;
-    }
-    
     private GenericMenu TileMenu()
     {
         GenericMenu menu = new GenericMenu();

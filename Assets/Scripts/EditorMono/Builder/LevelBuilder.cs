@@ -26,6 +26,9 @@ public class LevelBuilder : Builder<LevelData>
     public LevelData LoadedLevelData => LoadedItem;
     public LevelData EditingLevelData => EditingItem;
     
+    //Constant
+    private readonly Vector3Int gridOffset = new Vector3Int(1, 1, 0);
+    
     //Members
     private Grid levelGrid;
     private Bridge editingBridge = null;
@@ -64,7 +67,7 @@ public class LevelBuilder : Builder<LevelData>
 
         foreach (var miniStage in miniStages)
         {
-            StageRenderer.SetStage(miniStage.StageData, levelGrid, levelGrid.WorldToCell(miniStage.transform.position) + new Vector3Int(1, 1, 0));
+            StageRenderer.SetStage(miniStage.StageData, levelGrid, levelGrid.WorldToCell(miniStage.transform.position) + gridOffset);
             StageRenderer.DrawTileIcons();
         }
 
@@ -181,21 +184,6 @@ public class LevelBuilder : Builder<LevelData>
         EditingLevelData.Import(stageData, bridges);
     }
 
-    private TileType GetTileType(Vector2Int gridPos)
-    {
-        foreach (var miniStage in miniStages)
-        {
-            var miniStageGridPos = GetGridPosition(miniStage.transform.position);
-            var relativeGridPos = gridPos - miniStageGridPos;
-            if (miniStage.StageData.IsValidTile(relativeGridPos))
-            {
-                return miniStage.StageData[relativeGridPos.x, relativeGridPos.y];
-            }
-        }
-        
-        return TileType.Air;
-    }
-
     public void ImportStage(string path, Vector2Int gridPos = default)
     {
         if (string.IsNullOrEmpty(path)) return;
@@ -249,70 +237,31 @@ public class LevelBuilder : Builder<LevelData>
         //Start bridge building
         if (Event.current.button == 0)
         {
-            if (RaycastMiniStage(out var miniStage) &&
-                miniStage.TileSelected(out var gridPos))
-            {
-                var stage = miniStage.StageData;
-                var mousePos = sceneView.SceneViewToWorld();
-                
-                if (stage.IsValidTile(gridPos))
-                {
-                    if (stage[gridPos.x, gridPos.y] == TileType.Exit)
-                    {
-                        editingBridge = new Bridge(Pathfinding.CountUniqueTiles(miniStage.StageData.Solution));
-                        editingBridge.bridgeParts.Add(GetGridPosition(mousePos));
-                        return;
-                    }
+            var mousePos = sceneView.SceneViewToWorld();
+            var gridPos = GetGridPosition(mousePos);
 
-                    if (IsBuildingBridge() &&
-                        stage[gridPos.x, gridPos.y] == TileType.Entrance &&
-                        stage.IsOnBorder(gridPos) &&
-                        editingBridge.IsValid())
-                    {
-                        //End bridge
-                        editingBridge.bridgeParts.Add(GetGridPosition(mousePos));
-                        bridges.Add(editingBridge);
-                        editingBridge = null;
-                        return;
-                    }
-                }
+            var miniStage = GetMiniStage(gridPos);
+            var gridTileType = GetTileType(gridPos);
+            if (gridTileType == TileType.Exit)
+            {
+                editingBridge = new Bridge(Pathfinding.CountUniqueTiles(miniStage.StageData.Solution));
+                editingBridge.bridgeParts.Add(GetGridPosition(mousePos));
+                return;
             }
-            
+
+            if (IsBuildingBridge() &&
+                gridTileType == TileType.Entrance &&
+                editingBridge.IsValid())
+            {
+                editingBridge.bridgeParts.Add(GetGridPosition(mousePos));
+                bridges.Add(editingBridge);
+                editingBridge = null;
+                return;
+            }
+
             editingBridge = null;
         }
 
-    }
-
-    private bool RaycastMiniStage(out MiniStage miniStage)
-    {
-        var worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
-
-        if (Physics.Raycast(worldRay, out var hitInfo))
-        {
-            if (hitInfo.collider.gameObject.GetComponent<MiniStage>() != null)
-            {
-                miniStage = hitInfo.collider.gameObject.GetComponent<MiniStage>();
-                return true;
-            }
-        }
-
-        miniStage = null;
-        return false;
-    }
-    
-    private bool RaycastMiniStage(Vector3 position, out MiniStage miniStage)
-    {
-        if (Physics.Raycast(position + Vector3.back * 45, Vector3.forward, out var hitInfo))
-        {
-            if (hitInfo.collider.gameObject.GetComponent<MiniStage>() != null)
-            {
-                miniStage = hitInfo.collider.gameObject.GetComponent<MiniStage>();
-                return true;
-            }
-        }
-
-        miniStage = null;
-        return false;
     }
 
     private void DrawBridgeBuilder()
@@ -350,7 +299,7 @@ public class LevelBuilder : Builder<LevelData>
             }
         }
     }
-
+    
     private void HandleBridgeBuilding(SceneView sceneView)
     {
         //Get current grid tile relative to bridge start
@@ -367,6 +316,32 @@ public class LevelBuilder : Builder<LevelData>
         }
         
         if (mouseGridPos != editingBridge.bridgeParts.Last()) editingBridge.bridgeParts.Add(mouseGridPos);
+    }
+    
+    private TileType GetTileType(Vector2Int gridPos)
+    {
+        var miniStage = GetMiniStage(gridPos);
+        if (miniStage == null) return TileType.Air;
+        
+        var miniStageGridPos = GetGridPosition(miniStage.transform.position);
+        var relativeGridPos = gridPos - miniStageGridPos - gridOffset.ToVector2Int();
+        return miniStage.StageData[relativeGridPos.x, relativeGridPos.y];
+
+    }
+    
+    private MiniStage GetMiniStage(Vector2Int gridPos)
+    {
+        foreach (var miniStage in miniStages)
+        {
+            var miniStageGridPos = GetGridPosition(miniStage.transform.position);
+            var relativeGridPos = gridPos - miniStageGridPos - gridOffset.ToVector2Int();
+            if (miniStage.StageData.IsValidTile(relativeGridPos))
+            {
+                return miniStage;
+            }
+        }
+
+        return null;
     }
 
     private bool IsBuildingBridge()
