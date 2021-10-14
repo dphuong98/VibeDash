@@ -13,11 +13,11 @@ public class PlayerLoader
         PlayerPrefab = Resources.Load<GameObject>("Prefabs/Avatars/PlayerObject");
     }
     
-    public GameObject LoadPlayerObject(Grid levelGrid, LevelData levelData)
+    public GameObject LoadPlayerObject(Level level)
     {
-        var entranceStage = levelData.StagePositions.First();
+        var entranceStage = level.LevelData.StagePositions.First();
         var playerGridPos = entranceStage.Key.GetEntrance();
-        var playerPos = levelGrid.CellToWorld(entranceStage.Value) + levelGrid.GetCellCenterWorld(playerGridPos);
+        var playerPos = level.LevelGrid.CellToWorld(entranceStage.Value) + level.LevelGrid.GetCellCenterWorld(playerGridPos);
 
         return Object.Instantiate(PlayerPrefab, playerPos, Quaternion.identity);
     }

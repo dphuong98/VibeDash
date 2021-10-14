@@ -19,9 +19,16 @@ public class PlayerController
 
     private void HandleSwipe(Vector2Int direction)
     {
+        //Movement logic
         var tmp = TryMove(direction.ToVector3Int(), out var path);
         if (path.Count != 0)
+        {
+            //Set player state
+            //Perform player movement
+            playerTransform.GetComponent<Animator>().SetBool("IsMoving", true);
             playerTransform.position = level.LevelGrid.GetCellCenterWorld(path.Last());
+            playerTransform.GetComponent<Animator>().SetBool("IsMoving", false);
+        }
     }
 
     /// <summary>

@@ -14,6 +14,7 @@ public class Level : MonoBehaviour
     
     public Grid LevelGrid { get; private set; }
 
+    public LevelData LevelData => levelData;
     public List<Portal> PortalPairs => new List<Portal>(portals);
     public TileDirection TileDirections => new TileDirection(tileDirections);
     

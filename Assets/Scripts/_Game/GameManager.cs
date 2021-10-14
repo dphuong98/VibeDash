@@ -59,10 +59,8 @@ public class GameManager : MonoBehaviour
         level = new LevelLoader().LoadLevel(levelData);
         if (level == null) return;
         
-        var levelGrid = level.gameObject.GetComponent<Grid>();
-        playerObject = new PlayerLoader().LoadPlayerObject(levelGrid, levelData);
+        playerObject = new PlayerLoader().LoadPlayerObject(level);
         playerController = new PlayerController(playerObject.transform, level);
-        playerObject.AddComponent<CameraController>();
     }
 
 }
