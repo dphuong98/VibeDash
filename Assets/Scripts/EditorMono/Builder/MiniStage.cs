@@ -84,7 +84,7 @@ public class MiniStage : MonoBehaviour
         
         try
         {
-            var stage = AssetDatabase.LoadAssetAtPath<StageData>(UnityEditor.FileUtil.GetProjectRelativePath(path));
+            var stage = AssetDatabase.LoadAssetAtPath<StageData>(FileUtil.GetProjectRelativePath(path));
             if (stage == null)
             {
                 Debug.LogErrorFormat("Cannot load {0} asset at {1}", "Stage", path);

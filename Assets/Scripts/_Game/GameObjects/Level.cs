@@ -14,7 +14,7 @@ public class Level : MonoBehaviour
     
     public Grid LevelGrid { get; private set; }
 
-    public List<Portal> Portals => new List<Portal>(portals);
+    public List<Portal> PortalPairs => new List<Portal>(portals);
     public TileDirection TileDirections => new TileDirection(tileDirections);
     
     public void SetLevel(LevelData levelData, Grid levelGrid)

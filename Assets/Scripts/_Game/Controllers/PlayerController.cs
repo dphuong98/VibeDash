@@ -60,33 +60,31 @@ public class PlayerController
                 break;
             }
             
-            /*if (currentTileType == TileType.PortalBlue)
+            if (currentTileType == TileType.PortalBlue)
             {
                 path.Add(currentGridPosition);
                 
                 //If exit does not exist act as stop
-                var portal = stageData.PortalPairs.Where(s => s.Blue == currentTilePosition);
+                var portal = level.PortalPairs.Where(s => s.Blue == currentGridPosition.ToVector2Int());
                 if (portal.Any() && portal.First().Orange != -Vector2Int.one)
                 {
-                    path.Add(portal.First().Orange);
+                    path.Add(portal.First().Orange.ToVector3Int());
                 }
-                
                 break;
             }
             
             if (currentTileType == TileType.PortalOrange)
             {
-                path.Add(currentTilePosition);
+                path.Add(currentGridPosition);
                 
                 //If there is no portal act as stop
-                var portal = stageData.PortalPairs.Where(s => s.Orange == currentTilePosition);
+                var portal = level.PortalPairs.Where(s => s.Orange == currentGridPosition.ToVector2Int());
                 if (portal.Any() && portal.First().Blue != -Vector2Int.one)
                 {
-                    path.Add(portal.First().Blue);
+                    path.Add(portal.First().Blue.ToVector3Int());
                 }
-                
                 break;
-            }*/
+            }
             
             if (currentTileType == TileType.Road || currentTileType == TileType.Entrance || currentTileType == TileType.Exit)
             {
