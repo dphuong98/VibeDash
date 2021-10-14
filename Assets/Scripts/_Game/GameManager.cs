@@ -12,12 +12,12 @@ public class GameManager : MonoBehaviour
     {
         get
         {
-            var path = Path.Combine(LevelBuilder.LevelFolder, "_autoload.asset");
+            var path = Path.Combine(LevelBuilder.LevelFolder, "_autoload_.asset");
             return AssetDatabase.LoadAssetAtPath<LevelData>(path);
         }
         set
         {
-            var path = Path.Combine(LevelBuilder.LevelFolder, "_autoload.asset");
+            var path = Path.Combine(LevelBuilder.LevelFolder, "_autoload_.asset");
             if (value == null)
             {
                 AssetDatabase.DeleteAsset(path);
@@ -57,7 +57,9 @@ public class GameManager : MonoBehaviour
     private void LoadGameplay(LevelData levelData)
     {
         level = new LevelLoader().LoadLevel(levelData);
-        var levelGrid = level.GetComponent<Grid>();
+        if (level == null) return;
+        
+        var levelGrid = level.gameObject.GetComponent<Grid>();
         playerObject = new PlayerLoader().LoadPlayerObject(levelGrid, levelData);
         playerController = new PlayerController(playerObject.transform, level);
         playerObject.AddComponent<CameraController>();

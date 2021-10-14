@@ -10,7 +10,6 @@ public class StagePosition : SerializableDictionary<StageData, Vector2Int>
 {
     public StagePosition() : base() {}
     public StagePosition(StagePosition otherStagePositions) : base(otherStagePositions) { }
-
     public StagePosition(IDictionary<StageData, Vector2Int> dictionary) : base(dictionary) { }
 }
 

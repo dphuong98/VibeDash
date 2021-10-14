@@ -326,7 +326,6 @@ public class LevelBuilder : Builder<LevelData>
         var miniStageGridPos = GetGridPosition(miniStage.transform.position);
         var relativeGridPos = gridPos - miniStageGridPos - gridOffset.ToVector2Int();
         return miniStage.StageData[relativeGridPos.x, relativeGridPos.y];
-
     }
     
     private MiniStage GetMiniStage(Vector2Int gridPos)
@@ -335,10 +334,7 @@ public class LevelBuilder : Builder<LevelData>
         {
             var miniStageGridPos = GetGridPosition(miniStage.transform.position);
             var relativeGridPos = gridPos - miniStageGridPos - gridOffset.ToVector2Int();
-            if (miniStage.StageData.IsValidTile(relativeGridPos))
-            {
-                return miniStage;
-            }
+            if (miniStage.StageData.IsValidTile(relativeGridPos)) return miniStage;
         }
 
         return null;

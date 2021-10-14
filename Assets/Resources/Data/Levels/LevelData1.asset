@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b600e0df47ceb74ca2d142a423ef708, type: 3}
+  m_Name: LevelData1
+  m_EditorClassIdentifier: 
+  stagePositions:
+    keyData:
+    - {fileID: 11400000, guid: 22eb801df7bf17149864b6afba20fc63, type: 2}
+    - {fileID: 11400000, guid: ba4e170bd7d4e8c42a47f9d65236b7a6, type: 2}
+    valueData:
+    - {x: 0, y: 0}
+    - {x: 0, y: 10}
+  bridges:
+  - bridgeParts:
+    - {x: 5, y: 6}
+    - {x: 5, y: 7}
+    - {x: 5, y: 8}
+    - {x: 5, y: 9}
+    - {x: 6, y: 9}
+    - {x: 6, y: 10}
+    - {x: 6, y: 11}
+    - {x: 6, y: 11}
