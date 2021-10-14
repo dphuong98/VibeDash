@@ -17,7 +17,7 @@ public class PlayerLoader
     {
         var entranceStage = levelData.StagePositions.First();
         var playerGridPos = entranceStage.Key.GetEntrance();
-        var playerPos = levelGrid.CellToWorld(entranceStage.Value.ToVector3Int()) + levelGrid.GetCellCenterWorld(playerGridPos);
+        var playerPos = levelGrid.CellToWorld(entranceStage.Value) + levelGrid.GetCellCenterWorld(playerGridPos);
 
         return Object.Instantiate(PlayerPrefab, playerPos, Quaternion.identity);
     }

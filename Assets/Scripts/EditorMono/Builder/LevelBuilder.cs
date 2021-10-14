@@ -181,7 +181,7 @@ public class LevelBuilder : Builder<LevelData>
         EditingLevelData.Import(stageData, bridges);
     }
 
-    public void ImportStage(string path, Vector2Int gridPos = default)
+    public void ImportStage(string path, Vector3Int gridPos = default)
     {
         if (string.IsNullOrEmpty(path)) return;
 
@@ -209,10 +209,10 @@ public class LevelBuilder : Builder<LevelData>
             if (gridPos == default && miniStages.Any())
             {
                 var highestStageTop = miniStages.Max(s => s.transform.position.y + s.GetComponent<MeshFilter>().sharedMesh.bounds.size.y);
-                gridPos = new Vector2Int(0, (int)Math.Round(highestStageTop + 2));
+                gridPos = new Vector3Int { y = (int)Math.Round(highestStageTop + 2) };
             }
 
-            var worldPos = levelGrid.CellToWorld(gridPos.ToVector3Int());
+            var worldPos = levelGrid.CellToWorld(gridPos);
             var miniStageObject = Instantiate(miniStagePrefab, worldPos, Quaternion.identity, transform.FindInChildren("MiniStages"));
             var miniStage = miniStageObject.GetComponentInChildren<MiniStage>();
             miniStage.SetStage(stage);
@@ -314,7 +314,7 @@ public class LevelBuilder : Builder<LevelData>
         if (mouseGridPos != editingBridge.bridgeParts.Last()) editingBridge.bridgeParts.Add(mouseGridPos);
     }
     
-    private TileType GetTileType(Vector2Int gridPos)
+    private TileType GetTileType(Vector3Int gridPos)
     {
         var miniStage = GetMiniStage(gridPos);
         if (miniStage == null) return TileType.Air;
@@ -324,13 +324,13 @@ public class LevelBuilder : Builder<LevelData>
         return miniStage.StageData[relativeGridPos.x, relativeGridPos.y];
     }
     
-    private MiniStage GetMiniStage(Vector2Int gridPos)
+    private MiniStage GetMiniStage(Vector3Int gridPos)
     {
         foreach (var miniStage in miniStages)
         {
             var miniStageGridPos = GetGridPosition(miniStage.transform.position);
             var relativeGridPos = gridPos - miniStageGridPos;
-            if (miniStage.StageData.IsValidTile(relativeGridPos)) return miniStage;
+            if (miniStage.StageData.IsValidTile(relativeGridPos.ToVector2Int())) return miniStage;
         }
 
         return null;
@@ -341,13 +341,13 @@ public class LevelBuilder : Builder<LevelData>
         return editingBridge != null && editingBridge.MaxLength != 0;
     }
     
-    private Vector2Int GetGridPosition(Vector3 worldPos)
+    private Vector3Int GetGridPosition(Vector3 worldPos)
     {
-        return (levelGrid.WorldToCell(worldPos)).ToVector2Int();
+        return levelGrid.WorldToCell(worldPos);
     }
 
-    private Vector3 GetWorldPosition(Vector2Int gridPos)
+    private Vector3 GetWorldPosition(Vector3Int gridPos)
     {
-        return levelGrid.GetCellCenterWorld(gridPos.ToVector3Int());
+        return levelGrid.GetCellCenterWorld(gridPos);
     }
 }

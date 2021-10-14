@@ -99,12 +99,12 @@ public class PlayerController
                 for (var i = 0; i < bridge.bridgeParts.Count; i++)
                 {
                     if (i == 0 || i == bridge.bridgeParts.Count - 1) continue;
-                    path.Add(bridge.bridgeParts[i].ToVector3Int());
+                    path.Add(bridge.bridgeParts[i]);
                 }
 
-                currentGridPosition = bridge.bridgeParts[bridge.bridgeParts.Count - 2].ToVector3Int();
+                currentGridPosition = bridge.bridgeParts[bridge.bridgeParts.Count - 2];
                 direction = (bridge.bridgeParts[bridge.bridgeParts.Count - 1] -
-                            bridge.bridgeParts[bridge.bridgeParts.Count - 2]).ToVector3Int();
+                            bridge.bridgeParts[bridge.bridgeParts.Count - 2]);
                 continue;
             }
             

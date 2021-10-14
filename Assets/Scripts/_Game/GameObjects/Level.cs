@@ -27,7 +27,7 @@ public class Level : MonoBehaviour
         {
             foreach (var portal in stagePos.Key.PortalPairs)
             {
-                portals.Add(new Portal(portal.Blue + stagePos.Value, portal.Orange + stagePos.Value));
+                portals.Add(new Portal(portal.Blue + stagePos.Value.ToVector2Int(), portal.Orange + stagePos.Value.ToVector2Int()));
             }
         }
 
@@ -35,7 +35,7 @@ public class Level : MonoBehaviour
         {
             foreach (var tileDirection in stagePos.Key.TileDirections)
             {
-                var gridPos = tileDirection.Key + stagePos.Value;
+                var gridPos = tileDirection.Key + stagePos.Value.ToVector2Int();
                 tileDirections.Add(gridPos, tileDirection.Value);
             }
         }
@@ -57,7 +57,7 @@ public class Level : MonoBehaviour
 
     public Bridge GetBridge(Vector3Int gridPos)
     {
-        var anyBridge = levelData.Bridges.Where(s => s.bridgeParts[1] == gridPos.ToVector2Int());
+        var anyBridge = levelData.Bridges.Where(s => s.bridgeParts[1] == gridPos);
         return anyBridge.Any() ? anyBridge.First() : null;
     }
 }
