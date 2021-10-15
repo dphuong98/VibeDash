@@ -5,18 +5,18 @@ using Lean.Touch;
 using UnityEngine;
 using UnityEngine.Events;
 
-[Serializable] public class Vector2IntEvent : UnityEvent<Vector2Int> {}
+[Serializable] public class Vector3IntEvent : UnityEvent<Vector3Int> {}
 
 public class InputManager : MonoBehaviour
 {
-    public static Vector2IntEvent OnSwipeDirection = new Vector2IntEvent(); 
-    
-    private void OnEnable()
+    public static Vector3IntEvent OnSwipeDirection { get; } = new Vector3IntEvent();
+
+    public static void EnableInput()
     {
         LeanTouch.OnFingerSwipe += HandleFingerSwipe;
     }
-    
-    private void OnDisable()
+
+    public static void DisableInput()
     {
         LeanTouch.OnFingerSwipe -= HandleFingerSwipe;
     }
@@ -31,15 +31,15 @@ public class InputManager : MonoBehaviour
         }
 
         var finalDelta = finger.StartScreenPosition - finger.ScreenPosition;
-        var direction = Vector2Int.zero;
+        var direction = Vector3Int.zero;
         
         if (Math.Abs(finalDelta.x) > Math.Abs(finalDelta.y))
         {
-            direction = finalDelta.x > 0 ? Vector2Int.left : Vector2Int.right;
+            direction = finalDelta.x > 0 ? Vector3Int.left : Vector3Int.right;
         }
         else
         {
-            direction = finalDelta.y > 0 ? Vector2Int.down : Vector2Int.up;
+            direction = finalDelta.y > 0 ? Vector3Int.down : Vector3Int.up;
         }
         
         OnSwipeDirection.Invoke(direction);

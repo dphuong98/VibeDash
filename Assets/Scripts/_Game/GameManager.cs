@@ -42,8 +42,7 @@ public class GameManager : MonoBehaviour
 
     private Level level;
     private GameObject playerObject;
-    private PlayerController playerController;
-    private CameraController cameraController;
+    private PathGenerator pathGenerator;
 
     private void Start()
     {
@@ -60,7 +59,7 @@ public class GameManager : MonoBehaviour
         if (level == null) return;
         
         playerObject = new PlayerLoader().LoadPlayerObject(level);
-        playerController = new PlayerController(playerObject.transform, level);
+        playerObject.GetComponent<Player>().Level = level;
     }
 
 }

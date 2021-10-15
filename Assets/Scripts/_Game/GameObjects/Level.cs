@@ -58,7 +58,12 @@ public class Level : MonoBehaviour
 
     public Bridge GetBridge(Vector3Int gridPos)
     {
-        var anyBridge = levelData.Bridges.Where(s => s.bridgeParts[1] == gridPos);
-        return anyBridge.Any() ? anyBridge.First() : null;
+        var frontBridge = levelData.Bridges.Where(s => s.bridgeParts[1] == gridPos);
+        if (frontBridge.Any()) return frontBridge.First();
+
+        var backBridge = levelData.Bridges.Where(s => s.bridgeParts[s.bridgeParts.Count - 2] == gridPos);
+        if (backBridge.Any()) return backBridge.First().ReverseBridge();
+        
+        return null;
     }
 }

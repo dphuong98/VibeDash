@@ -5,45 +5,21 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-public class PlayerController
+public class PathGenerator
 {
-    private Transform playerTransform;
-    private Level level;
-    
-    public PlayerController(Transform playerTransform, Level level)
-    {
-        this.playerTransform = playerTransform;
-        this.level = level;
-        InputManager.OnSwipeDirection.AddListener(HandleSwipe);
-    }
-
-    private void HandleSwipe(Vector2Int direction)
-    {
-        //Movement logic
-        var tmp = TryMove(direction.ToVector3Int(), out var path);
-        if (path.Count != 0)
-        {
-            //Set player state
-            //Perform player movement
-            playerTransform.GetComponent<Animator>().SetBool("IsMoving", true);
-            playerTransform.position = level.LevelGrid.GetCellCenterWorld(path.Last());
-            playerTransform.GetComponent<Animator>().SetBool("IsMoving", false);
-        }
-    }
-
     /// <summary>
     /// 
     /// </summary>
     /// <param name="direction"></param>
     /// <param name="path"></param>
     /// <returns>false if the player fell out of the map</returns>
-    private bool TryMove(Vector3Int direction, out List<Vector3Int> path)
+    public static bool TryMove(Transform playerTransform, Vector3Int direction, Level level, out List<Vector3Int> path)
     {
         path = new List<Vector3Int>();
-
-        if (playerTransform == null) return false;
+        
         var currentGridPosition = level.LevelGrid.WorldToCell(playerTransform.position);
-
+        path.Add(currentGridPosition);
+        
         while (true)
         {
             currentGridPosition += direction;

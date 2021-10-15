@@ -10,7 +10,7 @@ public class PlayerLoader
 
     public PlayerLoader()
     {
-        PlayerPrefab = Resources.Load<GameObject>("Prefabs/Avatars/PlayerObject");
+        PlayerPrefab = Resources.Load<GameObject>("Prefabs/Game/PlayerObject");
     }
     
     public GameObject LoadPlayerObject(Level level)
