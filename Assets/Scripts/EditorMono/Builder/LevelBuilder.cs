@@ -216,7 +216,7 @@ public class LevelBuilder : Builder<LevelData>
             var miniStageObject = Instantiate(miniStagePrefab, worldPos, Quaternion.identity, transform.FindInChildren("MiniStages"));
             var miniStage = miniStageObject.GetComponentInChildren<MiniStage>();
             miniStage.SetStage(stage);
-            miniStageObject.name = Path.GetFileNameWithoutExtension(path);
+            miniStageObject.name = System.IO.Path.GetFileNameWithoutExtension(path);
             miniStages.Add(miniStage);
         }
         catch (Exception ex)

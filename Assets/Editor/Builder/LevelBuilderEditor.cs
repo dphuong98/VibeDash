@@ -85,7 +85,7 @@ public class LevelBuilderEditor : BuilderEditor<LevelData>
             
             if (Application.isPlaying) return;
 
-            GameManager.AutoloadLevelData = levelBuilder.EditingLevelData;
+            Game.AutoloadLevelData = levelBuilder.EditingLevelData;
             AssetDatabase.SaveAssets();
             EditorSceneManager.OpenScene(GameScenePath);
             EditorApplication.isPlaying = true;

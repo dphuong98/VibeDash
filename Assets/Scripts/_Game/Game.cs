@@ -6,18 +6,18 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class GameManager : MonoBehaviour
+public class Game : MonoBehaviour
 {
     public static LevelData AutoloadLevelData
     {
         get
         {
-            var path = Path.Combine(LevelBuilder.LevelFolder, "_autoload_.asset");
+            var path = System.IO.Path.Combine(LevelBuilder.LevelFolder, "_autoload_.asset");
             return AssetDatabase.LoadAssetAtPath<LevelData>(path);
         }
         set
         {
-            var path = Path.Combine(LevelBuilder.LevelFolder, "_autoload_.asset");
+            var path = System.IO.Path.Combine(LevelBuilder.LevelFolder, "_autoload_.asset");
             if (value == null)
             {
                 AssetDatabase.DeleteAsset(path);

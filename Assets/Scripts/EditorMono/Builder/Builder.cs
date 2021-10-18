@@ -29,7 +29,7 @@ public abstract class Builder<T> : MonoBehaviour where T : ScriptableObject, IIn
         LoadedItem = default;
         EditingItem = ScriptableObject.CreateInstance<T>();
         EditingItem.Init();
-        AssetDatabase.CreateAsset(EditingItem, Path.Combine(DefaultFolder, "_tmp_.asset"));
+        AssetDatabase.CreateAsset(EditingItem, System.IO.Path.Combine(DefaultFolder, "_tmp_.asset"));
         AssetDatabase.SaveAssets();
         OnReload();
     }
@@ -51,7 +51,7 @@ public abstract class Builder<T> : MonoBehaviour where T : ScriptableObject, IIn
             EditingItem.CopyFrom(asset);
             OnReload();
 
-            gameObject.name = Path.GetFileNameWithoutExtension(path);
+            gameObject.name = System.IO.Path.GetFileNameWithoutExtension(path);
             Debug.LogFormat("Opened {0} from {1}", DefaultName, path);
         }
         catch (Exception ex)
@@ -89,7 +89,7 @@ public abstract class Builder<T> : MonoBehaviour where T : ScriptableObject, IIn
             AssetDatabase.SaveAssets();
             LoadedItem = asset;
 
-            gameObject.name = Path.GetFileNameWithoutExtension(path);
+            gameObject.name = System.IO.Path.GetFileNameWithoutExtension(path);
             Debug.LogFormat("Saved {0} to {1}", DefaultName, path);
             return true;
         }

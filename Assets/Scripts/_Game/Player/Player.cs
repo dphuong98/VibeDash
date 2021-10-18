@@ -8,12 +8,31 @@ public class Player : MonoBehaviour
 {
     public Level Level;
 
-    private List<Vector3Int> path;
-    public List<Vector3Int> Path => path != null ? new List<Vector3Int>(path) : null;
+    private bool isTraversing = false;
+    private float elapsedTime;
+    private const float speed = 12f; //tile/s
+    
+    private List<Vector3Int> waitingPath;
+    public List<Vector3Int> WaitingPath => waitingPath != null ? new List<Vector3Int>(waitingPath) : null;
 
     private void Awake()
     {
         InputManager.OnSwipeDirection.AddListener(GeneratePath);
+    }
+
+    private void FixedUpdate()
+    {
+        if (!isTraversing) return;
+        
+        elapsedTime += Time.deltaTime;
+        var totalTime = waitingPath.Count / speed;
+        var lerpValue = elapsedTime / totalTime;
+        transform.position = Path.LerpPath(Level, waitingPath, lerpValue);
+
+        if (lerpValue >= 1)
+        {
+            ResetPath();
+        }
     }
 
     private void OnDrawGizmos()
@@ -27,12 +46,19 @@ public class Player : MonoBehaviour
         PathGenerator.TryMove(transform, direction, Level, out var path);
         if (path.Count != 0)
         {
-            this.path = path;
+            waitingPath = path;
         }
     }
 
-    public void ResetPath()
+    private void ResetPath()
     {
-        path = null;
+        waitingPath = null;
+        isTraversing = false;
+    }
+    
+    public void StartTraversePath()
+    {
+        elapsedTime = 0f;
+        isTraversing = true;
     }
 }

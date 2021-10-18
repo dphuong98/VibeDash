@@ -4,8 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PathLerp
+public class Path
 {
+    //TODO: Primitive obsession, convert List<Vector3Int> to Path object
     public static Vector3 LerpPath(Level level, List<Vector3Int> path, float lerpValue)
     {
         lerpValue = Math.Min(Math.Max(lerpValue, 0), 1);

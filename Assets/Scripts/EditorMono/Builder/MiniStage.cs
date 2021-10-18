@@ -92,7 +92,7 @@ public class MiniStage : MonoBehaviour
             }
 
             SetStage(stage);
-            gameObject.name = Path.GetFileNameWithoutExtension(path);
+            gameObject.name = System.IO.Path.GetFileNameWithoutExtension(path);
         }
         catch (Exception ex)
         {

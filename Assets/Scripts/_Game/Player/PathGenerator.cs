@@ -28,9 +28,7 @@ public class PathGenerator
 
             if (currentTileType == TileType.Air)
             {
-                //Temporary let air behave like wall
-                break;
-                //return false
+                return false;
             }
             
             //Impassible

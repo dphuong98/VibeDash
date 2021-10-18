@@ -19,7 +19,9 @@ public class EditorMenu
             return;
         }
         
+        //EditorApplication.ExecuteMenuItem("Tools/ProGrids/Close ProGrids");
         EditorSceneManager.OpenScene(StageBuilderScenePath);
+        //EditorApplication.ExecuteMenuItem("Tools/ProGrids/ProGrids Window");
     }
     
     [MenuItem("VibeDash/StageBuilder", true)]
@@ -36,7 +38,9 @@ public class EditorMenu
             return;
         }
         
+        //EditorApplication.ExecuteMenuItem("Tools/ProGrids/Close ProGrids");
         EditorSceneManager.OpenScene(LevelBuilderScenePath);
+        //EditorApplication.ExecuteMenuItem("Tools/ProGrids/ProGrids Window");
     }
     
     [MenuItem("VibeDash/LevelBuilder", true)]
@@ -53,7 +57,9 @@ public class EditorMenu
             return;
         }
 
+        //EditorApplication.ExecuteMenuItem("Tools/ProGrids/Close ProGrids");
         EditorSceneManager.OpenScene(GameplayScenePath);
+        //EditorApplication.ExecuteMenuItem("Tools/ProGrids/ProGrids Window");
     }
     
     [MenuItem("VibeDash/Gameplay", true)]

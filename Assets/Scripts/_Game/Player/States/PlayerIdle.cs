@@ -15,9 +15,8 @@ public class PlayerIdle : StateMachineBehaviour
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if (animator.GetComponent<Player>().Path is var path &&
-            path != null &&
-            animator.GetComponent<Player>().Path.Count != 1)
+        if (animator.GetComponent<Player>().WaitingPath is var path &&
+            path != null && path.Count != 1)
         {
             animator.SetBool(IsMoving, true);
         }
