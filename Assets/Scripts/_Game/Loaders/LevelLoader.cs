@@ -37,6 +37,7 @@ public class LevelLoader
             {
                 if (i == 0 || i == bridge.bridgeParts.Count - 1) continue;
                 var part = bridge.bridgeParts[i];
+                //TODO place bridge
                 PlaceTile(levelGrid.GetCellCenterWorld(part), TileType.Bridge, levelObject.transform);
             }
         }

@@ -42,7 +42,6 @@ public class Game : MonoBehaviour
 
     private Level level;
     private GameObject playerObject;
-    private PathGenerator pathGenerator;
 
     private void Start()
     {
