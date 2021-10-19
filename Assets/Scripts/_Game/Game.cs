@@ -55,10 +55,10 @@ public class Game : MonoBehaviour
 
     private void LoadGameplay(LevelData levelData)
     {
-        level = new LevelLoader().LoadLevel(levelData);
+        level = LevelLoader.LoadLevel(levelData);
         if (level == null) return;
         
-        playerObject = new PlayerLoader().LoadPlayerObject(level);
+        playerObject = PlayerLoader.LoadPlayerObject(level);
         playerObject.GetComponent<Player>().Level = level;
     }
 

@@ -8,16 +8,11 @@ using Object = UnityEngine.Object;
 
 public class LevelLoader
 {
-    private LayerMask tileLayerMask;
-    public TilePrefabPack PrefabPack;
-
-    public LevelLoader()
-    {
-        PrefabPack = Resources.Load<TilePrefabPack>("Prefabs/StageTilePacks/DefaultPack/DefaultPack");
-        tileLayerMask = LayerMask.NameToLayer("Tiles");
-    }
+    public static int tileLayerMask = LayerMask.NameToLayer("Tiles");
     
-    public Level LoadLevel(LevelData levelData)
+    public static TilePrefabPack PrefabPack = Resources.Load<TilePrefabPack>("Prefabs/StageTilePacks/DefaultPack/DefaultPack");
+
+    public static Level LoadLevel(LevelData levelData)
     {
         if (levelData.StagePositions.Count == 0)
         {
@@ -27,7 +22,7 @@ public class LevelLoader
         var levelObject = new GameObject {name = "LevelObject"};
         var levelGrid = levelObject.AddComponent<Grid>();
         var levelComponent = levelObject.AddComponent<Level>();
-        levelComponent.SetLevel(levelData, levelGrid);
+        levelComponent.SetLevel(levelData, levelGrid, PrefabPack);
         levelGrid.cellSwizzle = GridLayout.CellSwizzle.XZY;
         
         foreach (var stage in levelData.StagePositions)
@@ -49,7 +44,7 @@ public class LevelLoader
         return levelComponent;
     }
 
-    private void LoadStage(Grid levelGrid, Vector3 position, StageData stageData)
+    private static void LoadStage(Grid levelGrid, Vector3 position, StageData stageData)
     {
         for (var y = 0; y < stageData.Size.y; y++)
         {
@@ -69,66 +64,70 @@ public class LevelLoader
         }
     }
 
-    private void PlaceTile(Vector3 position, TileType tile, Transform parentTransform)
+    public static void PlaceTile(Vector3 position, TileType tileType, Transform parentTransform)
     {
-        GameObject prefab = null;
-        
-        switch (tile)
+        switch (tileType)
         {
             case TileType.Wall:
-                prefab = PrefabPack.WallPrefab;
+                SpawnTile(tileType, PrefabPack.WallPrefab, position, parentTransform);
                 break;
             case TileType.Entrance: case TileType.Exit: case TileType.Road:
-                prefab = PrefabPack.RoadPrefab;
+                SpawnTile(TileType.Road, PrefabPack.RoadPrefab, position, parentTransform);
                 break;
             case TileType.Stop:
-                prefab = PrefabPack.StopPrefab;
+                SpawnTile(tileType, PrefabPack.StopPrefab, position, parentTransform);
+                SpawnTile(TileType.Blank, PrefabPack.BlankPrefab, position, parentTransform);
                 break;
             case TileType.PortalBlue:
-                prefab = PrefabPack.PortalBluePrefab;
+                SpawnTile(tileType, PrefabPack.PortalBluePrefab, position, parentTransform);
                 break;
             case TileType.PortalOrange:
-                prefab = PrefabPack.PortalOrangePrefab;
+                SpawnTile(tileType, PrefabPack.PortalOrangePrefab, position, parentTransform);
                 break;
             case TileType.Blank:
-                prefab = PrefabPack.BlankPrefab;
+                SpawnTile(tileType, PrefabPack.BlankPrefab, position, parentTransform);
                 break;
             case TileType.Bridge:
-                prefab = PrefabPack.BridgePrefab;
+                SpawnTile(tileType, PrefabPack.BridgePrefab, position, parentTransform);
                 break;
             default: case TileType.Air:
                 break;
         }
+    }
 
-        if (prefab)
+    private static void SpawnTile(TileType tileType, GameObject prefab, Vector3 position, Transform parentTransform)
+    {
+        if (!prefab) return;
+        
+        var tileObject = Object.Instantiate(prefab, position, Quaternion.identity, parentTransform);
+        tileObject.AddComponent<Tile>().TileType = tileType;
+        tileObject.layer = tileLayerMask;
+    }
+
+    private static void PlaceDirectionalTile(Vector3 position, Vector2Int direction, TileType tileType, Transform parentTransform)
+    {
+        switch (tileType)
         {
-            var tileObject = Object.Instantiate(prefab, position, Quaternion.identity, parentTransform);
-            tileObject.layer = tileLayerMask;
-            tileObject.AddComponent<Tile>().TileType = tile;
+            case TileType.Push:
+                SpawnDirectionalTile(tileType, PrefabPack.PushPrefab, position, direction, parentTransform);
+                SpawnTile(TileType.Blank, PrefabPack.BlankPrefab, position, parentTransform);
+                break;
+            case TileType.Corner:
+                SpawnDirectionalTile(tileType, PrefabPack.CornerPrefab, position, direction, parentTransform);
+                SpawnTile(TileType.Road, PrefabPack.RoadPrefab, position, parentTransform);
+                break;
         }
     }
 
-    private void PlaceDirectionalTile(Vector3 position, Vector2Int direction, TileType tile, Transform parentTransform)
+    public static void SpawnDirectionalTile(TileType tileType, GameObject prefab, Vector3 position, Vector2Int direction, Transform parentTransform)
     {
-        GameObject prefab = null;
+        if (!prefab) return;
         
-        switch (tile)
-        {
-            case TileType.Push:
-                prefab = PrefabPack.PushPrefab;
-                break;
-            case TileType.Corner:
-                prefab = PrefabPack.CornerPrefab;
-                break;
-        }
-
         var rotation = Quaternion.Euler(new Vector3
             {y = Vector3.Angle(Vector3.up, new Vector3(direction.x, direction.y, 0))});
-        if (prefab)
-        {
-            var tileObject = Object.Instantiate(prefab, position, rotation, parentTransform);
-            tileObject.layer = tileLayerMask;
-            tileObject.AddComponent<Tile>().TileType = tile;
-        }
+        
+        var tileObject = Object.Instantiate(prefab, position, rotation, parentTransform);
+        tileObject.AddComponent<Tile>().TileType = tileType;
+        tileObject.layer = tileLayerMask;
     }
 }

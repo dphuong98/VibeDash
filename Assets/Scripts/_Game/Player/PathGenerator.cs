@@ -67,7 +67,8 @@ public class PathGenerator
                 break;
             }
             
-            if (currentTileType == TileType.Road || currentTileType == TileType.Entrance || currentTileType == TileType.Exit)
+            if (currentTileType == TileType.Road || currentTileType == TileType.Blank ||
+                currentTileType == TileType.Entrance || currentTileType == TileType.Exit)
             {
                 path.Add(currentGridPosition);
                 continue;

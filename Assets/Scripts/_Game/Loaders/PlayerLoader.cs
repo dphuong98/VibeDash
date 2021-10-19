@@ -6,19 +6,13 @@ using UnityEngine;
 
 public class PlayerLoader
 {
-    public GameObject PlayerPrefab;
-
-    public PlayerLoader()
-    {
-        PlayerPrefab = Resources.Load<GameObject>("Prefabs/Game/PlayerObject");
-    }
-    
-    public GameObject LoadPlayerObject(Level level)
+    public static GameObject LoadPlayerObject(Level level)
     {
         var entranceStage = level.LevelData.StagePositions.First();
         var playerGridPos = entranceStage.Key.GetEntrance();
         var playerPos = level.LevelGrid.CellToWorld(entranceStage.Value) + level.LevelGrid.GetCellCenterWorld(playerGridPos);
-
-        return Object.Instantiate(PlayerPrefab, playerPos, Quaternion.identity);
+        var playerPrefab = Resources.Load<GameObject>("Prefabs/Game/PlayerObject");
+        
+        return Object.Instantiate(playerPrefab, playerPos, Quaternion.identity);
     }
 }
