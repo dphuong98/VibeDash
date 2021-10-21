@@ -9,8 +9,7 @@ using Object = UnityEngine.Object;
 public class LevelLoader
 {
     public static int tileLayerMask = LayerMask.NameToLayer("Tiles");
-
-    public static GameObject FinishTriggerPrefab = Resources.Load<GameObject>("Prefabs/Game/FinishTrigger");
+    
     public static TilePrefabPack PrefabPack = Resources.Load<TilePrefabPack>("Prefabs/StageTilePacks/DefaultPack/DefaultPack");
 
     public static Level LoadLevel(LevelData levelData)
@@ -44,17 +43,6 @@ public class LevelLoader
                 PlaceTile(levelGrid.GetCellCenterWorld(part), TileType.Bridge, levelObject.transform);
             }
         }
-        
-        //Place finish trigger
-        var lastStagePosition = levelData.StagePositions.Last();
-        var exitGridPos = lastStagePosition.Value + lastStagePosition.Key.GetExit().ToVector3Int();
-        var emptyNeighbor = levelComponent.GetEmptyNeighbor(exitGridPos);
-        if (emptyNeighbor == null)
-        {
-            Debug.LogError("There is no empty spot next to last stage's exit. Level loading is halted.");
-        }
-
-        Object.Instantiate(FinishTriggerPrefab, levelGrid.GetCellCenterWorld((Vector3Int) emptyNeighbor), Quaternion.identity, levelObject.transform);
         
         return levelComponent;
     }

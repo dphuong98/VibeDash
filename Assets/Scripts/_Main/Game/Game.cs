@@ -43,6 +43,7 @@ public class Game : MonoBehaviour
     public LevelData DebugLevelData;
 
     private Level levelComponent;
+    private GameObject finishTriggerObject;
     private GameObject playerObject;
 
     private void Start()
@@ -70,14 +71,14 @@ public class Game : MonoBehaviour
         levelComponent = LevelLoader.LoadLevel(levelData);
         if (levelComponent == null) return;
         
-        playerObject = PlayerLoader.LoadPlayerObject(levelComponent);
-        playerObject.GetComponent<Player>().Level = levelComponent;
+        finishTriggerObject = MiscLoader.LoadFinishTrigger(levelComponent);
+        playerObject = MiscLoader.LoadPlayerObject(levelComponent);
     }
 
     public void Restart()
     {
-        Destroy(levelComponent.gameObject);
-        Destroy(playerObject);
+        if (levelComponent) Destroy(levelComponent.gameObject);
+        if (playerObject) Destroy(playerObject);
         ExecuteLoadCommands();
     }
 
