@@ -8,12 +8,12 @@ public enum TileType
     Exit,
     Entrance,
     Road,
+    Blank,
     Wall,
     Stop,
     PortalBlue,
     PortalOrange,
     Push,
     Corner,
-    Blank,
     Bridge,
 }

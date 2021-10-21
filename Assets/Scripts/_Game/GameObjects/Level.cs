@@ -45,29 +45,62 @@ public class Level : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Get special tile
+    /// </summary>
+    /// <param name="gridPos"></param>
+    /// <returns></returns>
     public TileType GetTileType(Vector3Int gridPos)
+    {
+        var tileType = TileType.Air;
+        var position = LevelGrid.GetCellCenterWorld(gridPos);
+
+        var tileTypes = Physics.RaycastAll(position + Vector3.up, Vector3.down,
+            1 << LevelLoader.tileLayerMask)
+            .Where(s => s.transform.GetComponent<Tile>() != null)
+            .Select(s => s.transform.GetComponent<Tile>().TileType);
+        
+        foreach (var type in tileTypes)
+        {
+            if ((int)type > (int)tileType) tileType = type;
+        }
+        return tileType;
+    }
+
+    public bool HasTile(Vector3Int gridPos, TileType tileType)
     {
         var position = LevelGrid.GetCellCenterWorld(gridPos);
 
-        if (Physics.Raycast(position + Vector3.up, Vector3.down, out var hitInfo, Mathf.Infinity,
-                1 << LevelLoader.tileLayerMask) &&
-            hitInfo.transform.GetComponent<Tile>() is var tileComponent &&
-            tileComponent != null)
+        var tileTypes = Physics.RaycastAll(position + Vector3.up, Vector3.down,
+                1 << LevelLoader.tileLayerMask)
+            .Where(s => s.transform.GetComponent<Tile>() != null)
+            .Select(s => s.transform.GetComponent<Tile>().TileType);
+        return tileTypes.Contains(tileType);
+    }
+    
+    public Bridge GetBridge(Vector3Int gridPos, Vector3Int direction)
+    {
+        //TODO support overlapping of bridges
+        var bridge = levelData.Bridges.FirstOrDefault(s => s.bridgeParts.Contains(gridPos));
+        if (bridge != null)
         {
-            return tileComponent.TileType;
+            var currentIndex = bridge.bridgeParts.IndexOf(gridPos);
+            var previousGridPos = bridge.bridgeParts[currentIndex - 1];
+            var previousDirection = gridPos - previousGridPos;
+            if (previousDirection == direction)
+            {
+                var newBridge = bridge.bridgeParts.GetRange(currentIndex, bridge.bridgeParts.Count - currentIndex);
+                return new Bridge(0, newBridge);
+            }
+            else
+            {
+                //Reverse bridge
+                var newBridge = bridge.bridgeParts.GetRange(0, currentIndex);
+                newBridge.Reverse();
+                return new Bridge(0, newBridge);
+            }
         }
 
-        return TileType.Air;
-    }
-
-    public Bridge GetBridge(Vector3Int gridPos)
-    {
-        var frontBridge = levelData.Bridges.Where(s => s.bridgeParts[1] == gridPos);
-        if (frontBridge.Any()) return frontBridge.First();
-
-        var backBridge = levelData.Bridges.Where(s => s.bridgeParts[s.bridgeParts.Count - 2] == gridPos);
-        if (backBridge.Any()) return backBridge.First().ReverseBridge();
-        
         return null;
     }
 }

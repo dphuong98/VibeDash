@@ -33,7 +33,8 @@ public class StageBuilderEditor : BuilderEditor<StageData>
             if (0 <= stageBuilder.selectedTile.x && stageBuilder.selectedTile.x < stageBuilder.Cols &&
                 0 <= stageBuilder.selectedTile.y && stageBuilder.selectedTile.y < stageBuilder.Rows)
             {
-                GUILayout.Label("Selected Tile: (" + (stageBuilder.selectedTile.x+1) + ", " + (stageBuilder.selectedTile.y+1) + ")");
+                GUILayout.Label("Selected Tile: (" + (stageBuilder.selectedTile.x+1) + ", " + (stageBuilder.selectedTile.y+1) + ")" +
+                                ": " + stageBuilder.EditingStageData[stageBuilder.selectedTile.x, stageBuilder.selectedTile.y]);
             }
             else GUILayout.Label("Selected Tile: (  ,  )");
             

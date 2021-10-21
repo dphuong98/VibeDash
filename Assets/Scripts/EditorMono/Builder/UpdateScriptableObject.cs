@@ -32,7 +32,30 @@ public class UpdateScriptableObject : MonoBehaviour
         for (var x = 0; x < stageData.Size.x; x++)
         for (var y = 0; y < stageData.Size.y; y++)
         {
-            if (stageData[x, y] == TileType.Air) stageData[x, y] = TileType.Entrance;
+            switch (stageData[x, y])
+            {
+                case TileType.Blank:
+                    stageData[x, y] = TileType.Wall;
+                    break;
+                case TileType.Wall:
+                    stageData[x, y] = TileType.Stop;
+                    break;
+                case TileType.Stop:
+                    stageData[x, y] = TileType.PortalBlue;
+                    break;
+                case TileType.PortalBlue:
+                    stageData[x, y] = TileType.PortalOrange;
+                    break;
+                case TileType.PortalOrange:
+                    stageData[x, y] = TileType.Push;
+                    break;
+                case TileType.Push:
+                    stageData[x, y] = TileType.Corner;
+                    break;
+                case TileType.Corner:
+                    stageData[x, y] = TileType.Blank;
+                    break;
+            }
         }
     }
 }

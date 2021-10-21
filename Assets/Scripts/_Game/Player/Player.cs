@@ -10,12 +10,12 @@ public class Player : MonoBehaviour
     public Level Level;
 
     private int totalPoints;
-    private int usedPoints;
+    private int stackPoints;
     
     private bool isTraversing;
     private float elapsedTime;
     private float nextEdge;
-    private const float speed = 12f; //tile/s
+    private const float speed = 12; //tile/s
     
     private List<Vector3Int> waitingPath;
     public List<Vector3Int> WaitingPath => waitingPath != null ? new List<Vector3Int>(waitingPath) : null;
@@ -30,7 +30,8 @@ public class Player : MonoBehaviour
         PlayerMove();
 
         var text = "IsMoving: " + GetComponent<Animator>().GetBool("IsMoving") + "\n";
-        text += "Points: " + totalPoints;
+        text += "Points: " + totalPoints + "\n";
+        text += "Stack: " + stackPoints + "\n";
         DebugUI.Instance.SetText(text);
     }
 
@@ -40,9 +41,20 @@ public class Player : MonoBehaviour
         
         elapsedTime += Time.deltaTime;
         var totalTime = waitingPath.Count / speed;
-        var lerpValue = elapsedTime / totalTime;
-        transform.position = Path.LerpPath(Level, waitingPath, lerpValue);
+        var lerpValue = Mathf.Lerp(0, 1, elapsedTime / totalTime);
 
+        var nextGridPos = waitingPath[(int) Math.Ceiling(lerpValue * (waitingPath.Count - 1))];
+        if (Level.GetTileType(nextGridPos) == TileType.Bridge &&
+            !Level.HasTile(nextGridPos, TileType.Blank) &&
+            stackPoints == 0)
+        {
+            var pastGridPos = waitingPath[(int) Math.Floor(lerpValue * (waitingPath.Count - 1))];
+            transform.position = Level.LevelGrid.GetCellCenterWorld(pastGridPos);
+            ResetPath();
+            return;
+        }
+        
+        transform.position = Path.LerpPath(Level, waitingPath, lerpValue);
         if (lerpValue >= 1)
         {
             ResetPath();
@@ -52,13 +64,6 @@ public class Player : MonoBehaviour
         if (lerpValue * (waitingPath.Count - 1) >= nextEdge)
         {
             LeaveTile(waitingPath[(int)Math.Floor(nextEdge)]);
-
-            if ((int) Math.Ceiling(nextEdge) == waitingPath.Count)
-            {
-                nextEdge += 1f;
-                return;
-            }
-            
             EnterTile(waitingPath[(int)Math.Ceiling(nextEdge)]);
             nextEdge += 1f;
         }
@@ -80,7 +85,7 @@ public class Player : MonoBehaviour
                 tileComponent != null &&
                 tileComponent.TileType == TileType.Road)
             {
-                totalPoints++;
+                totalPoints++; stackPoints++;
                 LevelLoader.PlaceTile(tileComponent.transform.position, TileType.Blank, Level.LevelGrid.transform);
                 Destroy(tileComponent.gameObject);
             }
@@ -89,7 +94,12 @@ public class Player : MonoBehaviour
 
     private void EnterTile(Vector3Int gridPos)
     {
-        
+        if (Level.GetTileType(gridPos) == TileType.Bridge &&
+            stackPoints > 0)
+        {
+            LevelLoader.PlaceTile(Level.LevelGrid.GetCellCenterWorld(gridPos), TileType.Blank, Level.LevelGrid.transform);
+            stackPoints--;
+        }
     }
 
     private void ProbePath(Vector3Int direction)
@@ -135,10 +145,8 @@ public class Player : MonoBehaviour
             var currentTileType = level.GetTileType(currentGridPosition);
 
             if (currentTileType == TileType.Air)
-            {
                 return false;
-            }
-            
+    
             //Impassible
             if (currentTileType == TileType.Wall)
                 break;
@@ -175,8 +183,7 @@ public class Player : MonoBehaviour
                 break;
             }
             
-            if (currentTileType == TileType.Road || currentTileType == TileType.Blank ||
-                currentTileType == TileType.Entrance || currentTileType == TileType.Exit)
+            if (currentTileType == TileType.Road || currentTileType == TileType.Blank)
             {
                 path.Add(currentGridPosition);
                 continue;
@@ -184,19 +191,14 @@ public class Player : MonoBehaviour
 
             if (currentTileType == TileType.Bridge)
             {
-                var bridge = level.GetBridge(currentGridPosition);
-                /*
-                for (var i = 1; i != bridge.bridgeParts.Count - 1; i++)
+                var bridge = level.GetBridge(currentGridPosition, direction);
+                for (var i = 0; i < bridge.bridgeParts.Count - 1; i++)
                 {
-                    if (totalPoints - usedPoints < 0) break;
-                    
                     path.Add(bridge.bridgeParts[i]);
                     currentGridPosition = bridge.bridgeParts[i];
                     direction = bridge.bridgeParts[i+1] -
                                  bridge.bridgeParts[i];
-                    usedPoints++;
-                }*/
-                path.Add(currentGridPosition);
+                }
                 continue;
             }
             
