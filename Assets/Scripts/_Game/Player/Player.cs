@@ -98,6 +98,7 @@ public class Player : MonoBehaviour
     private void EnterTile(Vector3Int gridPos)
     {
         if (Level.GetTileType(gridPos) == TileType.Bridge &&
+            !Level.HasTile(gridPos, TileType.Blank) &&
             stackPoints > 0)
         {
             LevelLoader.PlaceTile(Level.LevelGrid.GetCellCenterWorld(gridPos), TileType.Blank, Level.LevelGrid.transform);
