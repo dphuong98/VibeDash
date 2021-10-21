@@ -7,7 +7,7 @@ using UnityEngine.Events;
 
 [Serializable] public class Vector3IntEvent : UnityEvent<Vector3Int> {}
 
-public class InputManager : MonoBehaviour
+public class GameInput : MonoBehaviour
 {
     public static Vector3IntEvent OnSwipeDirection { get; } = new Vector3IntEvent();
 

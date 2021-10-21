@@ -25,22 +25,26 @@ public class LevelLoader
         levelComponent.SetLevel(levelData, levelGrid, PrefabPack);
         levelGrid.cellSwizzle = GridLayout.CellSwizzle.XZY;
         
+        //Place stages
         foreach (var stage in levelData.StagePositions)
         {
             var stagePos = new Vector3(stage.Value.x, 0, stage.Value.y);
             LoadStage(levelGrid, stagePos, stage.Key);
         }
 
+        //Place bridge
         foreach (var bridge in levelData.Bridges)
         {
             for (var i = 0; i < bridge.bridgeParts.Count; i++)
             {
                 if (i == 0 || i == bridge.bridgeParts.Count - 1) continue;
                 var part = bridge.bridgeParts[i];
-                //TODO place bridge
+                //TODO place rectangle bridge
                 PlaceTile(levelGrid.GetCellCenterWorld(part), TileType.Bridge, levelObject.transform);
             }
         }
+        
+        //Place win trigger
 
         return levelComponent;
     }

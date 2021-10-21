@@ -7,6 +7,8 @@ public class TileStack : MonoBehaviour
 {
     [SerializeField]
     private Player player;
+    private Transform playerMeshTransform;
+    
     private int currentStackCount;
     private float stackFloorHeight;
     private float stackTileHeight;
@@ -14,6 +16,8 @@ public class TileStack : MonoBehaviour
 
     private void Start()
     {
+        playerMeshTransform = player.transform.Find("Model");
+        
         stackLayerMask = LayerMask.NameToLayer("Stacks");
         stackFloorHeight = player.Level.LevelGrid.GetCellCenterWorld(Vector2Int.one).y;
         var stackTileMesh = LevelLoader.PrefabPack.RoadPrefab.GetComponentInChildren<MeshFilter>();
@@ -33,16 +37,16 @@ public class TileStack : MonoBehaviour
     
     private void IncreaseStack()
     {
-        player.transform.position += new Vector3(0, stackTileHeight, 0);
+        playerMeshTransform.position += new Vector3(0, stackTileHeight, 0);
         var tilePlacementPos = GetPlayerPosition();
-        tilePlacementPos.y = stackFloorHeight;
+        tilePlacementPos.y = stackFloorHeight + currentStackCount * stackTileHeight;
         LevelLoader.PlaceTile(tilePlacementPos, TileType.Road, transform).layer = stackLayerMask;
         currentStackCount++;
     }
 
     private void DecreaseStack()
     {
-        player.transform.position -= new Vector3(0, stackTileHeight, 0);
+        playerMeshTransform.position -= new Vector3(0, stackTileHeight, 0);
         Destroy(transform.GetChild(transform.childCount - 1).gameObject);
         currentStackCount--;
     }

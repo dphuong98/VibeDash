@@ -23,7 +23,7 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
-        InputManager.OnSwipeDirection.AddListener(ProbePath);
+        GameInput.OnSwipeDirection.AddListener(ProbePath);
     }
 
     private void FixedUpdate()
