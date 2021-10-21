@@ -7,6 +7,7 @@ using UnityEngine;
 
 public class StageRenderer
 {
+    private static readonly string tileIconFolder = "Icons/Tiles/";
     private static readonly Color roadColor = new Color(0.64f, 0.66f, 0.64f);
 
     private static readonly Dictionary<TileType, Color> BackgroundColorMap = new Dictionary<TileType, Color>()
@@ -39,24 +40,24 @@ public class StageRenderer
 
     private static void Init()
     {
-        IconMap[TileType.Entrance] = Resources.Load<Texture>("Icons/Entrance");
-        IconMap[TileType.Exit] = Resources.Load<Texture>("Icons/Finish");
-        IconMap[TileType.PortalBlue] = Resources.Load<Texture>("Icons/PortalBlue");
-        IconMap[TileType.PortalOrange] = Resources.Load<Texture>("Icons/PortalOrange");
-        IconMap[TileType.Stop] = Resources.Load<Texture>("Icons/Stop");
+        IconMap[TileType.Entrance] = Resources.Load<Texture>(tileIconFolder + "Entrance");
+        IconMap[TileType.Exit] = Resources.Load<Texture>(tileIconFolder + "Finish");
+        IconMap[TileType.PortalBlue] = Resources.Load<Texture>(tileIconFolder + "PortalBlue");
+        IconMap[TileType.PortalOrange] = Resources.Load<Texture>(tileIconFolder + "PortalOrange");
+        IconMap[TileType.Stop] = Resources.Load<Texture>(tileIconFolder + "Stop");
         
         //Hint: 0 = Up; 1 = Right; 2 = Down; 3 = Left
         DirectionalIconMap[TileType.Push] = new List<Texture>();
-        DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/U_Arrow"));
-        DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/R_Arrow"));
-        DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/D_Arrow"));
-        DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>("Icons/Arrows/L_Arrow"));
+        DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>(tileIconFolder + "Arrows/U_Arrow"));
+        DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>(tileIconFolder + "Arrows/R_Arrow"));
+        DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>(tileIconFolder + "Arrows/D_Arrow"));
+        DirectionalIconMap[TileType.Push].AddUnique(Resources.Load<Texture>(tileIconFolder + "Arrows/L_Arrow"));
         
         DirectionalIconMap[TileType.Corner] = new List<Texture>();
-        DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>("Icons/Corners/U_Corner"));
-        DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>("Icons/Corners/R_Corner"));
-        DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>("Icons/Corners/D_Corner"));
-        DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>("Icons/Corners/L_Corner"));
+        DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>(tileIconFolder + "Corners/U_Corner"));
+        DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>(tileIconFolder + "Corners/R_Corner"));
+        DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>(tileIconFolder + "Corners/D_Corner"));
+        DirectionalIconMap[TileType.Corner].AddUnique(Resources.Load<Texture>(tileIconFolder + "Corners/L_Corner"));
 
         initialized = true;
     }

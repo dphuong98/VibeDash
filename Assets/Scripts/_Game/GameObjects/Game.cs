@@ -42,15 +42,19 @@ public class Game : MonoBehaviour
 
     public LevelData DebugLevelData;
 
-    private Level level;
+    private Level levelComponent;
     private GameObject playerObject;
 
     private void Start()
     {
+        ExecuteLoadCommands();
+    }
+
+    private void ExecuteLoadCommands()
+    {
         if (AutoloadLevelData != null)
         {
             LoadGameplay(AutoloadLevelData);
-            AutoloadLevelData = null;
             return;
         }
 
@@ -63,11 +67,22 @@ public class Game : MonoBehaviour
 
     private void LoadGameplay(LevelData levelData)
     {
-        level = LevelLoader.LoadLevel(levelData);
-        if (level == null) return;
+        levelComponent = LevelLoader.LoadLevel(levelData);
+        if (levelComponent == null) return;
         
-        playerObject = PlayerLoader.LoadPlayerObject(level);
-        playerObject.GetComponent<Player>().Level = level;
+        playerObject = PlayerLoader.LoadPlayerObject(levelComponent);
+        playerObject.GetComponent<Player>().Level = levelComponent;
     }
 
+    public void Restart()
+    {
+        Destroy(levelComponent.gameObject);
+        Destroy(playerObject);
+        ExecuteLoadCommands();
+    }
+
+    private void OnApplicationQuit()
+    {
+        AutoloadLevelData = null;
+    }
 }
