@@ -11,6 +11,7 @@ public class Player : MonoBehaviour
 
     private int totalPoints;
     private int stackPoints;
+    public int StackPoints => stackPoints;
     
     private bool isTraversing;
     private float elapsedTime;
@@ -49,12 +50,14 @@ public class Player : MonoBehaviour
             stackPoints == 0)
         {
             var pastGridPos = waitingPath[(int) Math.Floor(lerpValue * (waitingPath.Count - 1))];
-            transform.position = Level.LevelGrid.GetCellCenterWorld(pastGridPos);
+            var pastGridCenter = Level.LevelGrid.GetCellCenterWorld(pastGridPos);
+            transform.position = new Vector3(pastGridCenter.x, transform.position.y, pastGridCenter.z);
             ResetPath();
             return;
         }
-        
-        transform.position = Path.LerpPath(Level, waitingPath, lerpValue);
+
+        var nextWorldPos = Path.LerpPath(Level, waitingPath, lerpValue);
+        transform.position = new Vector3(nextWorldPos.x, transform.position.y, nextWorldPos.z);
         if (lerpValue >= 1)
         {
             ResetPath();
@@ -131,11 +134,12 @@ public class Player : MonoBehaviour
     /// <param name="direction"></param>
     /// <param name="path"></param>
     /// <returns>false if the player fell out of the map</returns>
-    public bool TryMove(Transform playerTransform, Vector3Int direction, Level level, out List<Vector3Int> path)
+    public void TryMove(Transform playerTransform, Vector3Int direction, Level level, out List<Vector3Int> path)
     {
         path = new List<Vector3Int>();
         
         var currentGridPosition = level.LevelGrid.WorldToCell(playerTransform.position);
+        currentGridPosition.z = 0;
         path.Add(currentGridPosition);
         
         while (true)
@@ -145,8 +149,11 @@ public class Player : MonoBehaviour
             var currentTileType = level.GetTileType(currentGridPosition);
 
             if (currentTileType == TileType.Air)
-                return false;
-    
+            {
+                path.Add(currentGridPosition);
+                break;
+            }
+
             //Impassible
             if (currentTileType == TileType.Wall)
                 break;
@@ -225,7 +232,5 @@ public class Player : MonoBehaviour
 
             break;
         }
-
-        return true;
     }
 }

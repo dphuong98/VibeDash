@@ -65,44 +65,39 @@ public class LevelLoader
         }
     }
 
-    public static void PlaceTile(Vector3 position, TileType tileType, Transform parentTransform)
+    public static GameObject PlaceTile(Vector3 position, TileType tileType, Transform parentTransform)
     {
         switch (tileType)
         {
             case TileType.Wall:
-                SpawnTile(tileType, PrefabPack.WallPrefab, position, parentTransform);
-                break;
+                return SpawnTile(tileType, PrefabPack.WallPrefab, position, parentTransform);
             case TileType.Entrance: case TileType.Exit: case TileType.Road:
-                SpawnTile(TileType.Road, PrefabPack.RoadPrefab, position, parentTransform);
-                break;
+                return SpawnTile(TileType.Road, PrefabPack.RoadPrefab, position, parentTransform);
             case TileType.Stop:
-                SpawnTile(tileType, PrefabPack.StopPrefab, position, parentTransform);
                 SpawnTile(TileType.Blank, PrefabPack.BlankPrefab, position, parentTransform);
-                break;
+                return SpawnTile(tileType, PrefabPack.StopPrefab, position, parentTransform);
             case TileType.PortalBlue:
-                SpawnTile(tileType, PrefabPack.PortalBluePrefab, position, parentTransform);
-                break;
+                return SpawnTile(tileType, PrefabPack.PortalBluePrefab, position, parentTransform);
             case TileType.PortalOrange:
-                SpawnTile(tileType, PrefabPack.PortalOrangePrefab, position, parentTransform);
-                break;
+                return SpawnTile(tileType, PrefabPack.PortalOrangePrefab, position, parentTransform);
             case TileType.Blank:
-                SpawnTile(tileType, PrefabPack.BlankPrefab, position, parentTransform);
-                break;
+                return SpawnTile(tileType, PrefabPack.BlankPrefab, position, parentTransform);
             case TileType.Bridge:
-                SpawnTile(tileType, PrefabPack.BridgePrefab, position, parentTransform);
-                break;
-            default: case TileType.Air:
-                break;
+                return SpawnTile(tileType, PrefabPack.BridgePrefab, position, parentTransform);
         }
+
+        return null;
     }
 
-    private static void SpawnTile(TileType tileType, GameObject prefab, Vector3 position, Transform parentTransform)
+    private static GameObject SpawnTile(TileType tileType, GameObject prefab, Vector3 position, Transform parentTransform)
     {
-        if (!prefab) return;
+        if (!prefab) return null;
         
         var tileObject = Object.Instantiate(prefab, position, Quaternion.identity, parentTransform);
         tileObject.AddComponent<Tile>().TileType = tileType;
         tileObject.layer = tileLayerMask;
+
+        return tileObject;
     }
 
     private static void PlaceDirectionalTile(Vector3 position, Vector2Int direction, TileType tileType, Transform parentTransform)

@@ -269,7 +269,7 @@ public class LevelBuilder : Builder<LevelData>
             return;
         }
 
-        var remainingBridgeLength = editingBridge.MaxLength - editingBridge.bridgeParts.Count + 1;
+        var remainingBridgeLength = editingBridge.MaxLength - editingBridge.bridgeParts.Count;
         HandlesExt.DrawText(GetWorldPosition(editingBridge.bridgeParts.Last()), "" + remainingBridgeLength, 150, Color.white);
         
         Handles.color = remainingBridgeLength < 0 ? Color.red : Color.green;

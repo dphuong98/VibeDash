@@ -40,6 +40,8 @@ public class Game : MonoBehaviour
         }
     }
 
+    public LevelData DebugLevelData;
+
     private Level level;
     private GameObject playerObject;
 
@@ -49,6 +51,13 @@ public class Game : MonoBehaviour
         {
             LoadGameplay(AutoloadLevelData);
             AutoloadLevelData = null;
+            return;
+        }
+
+        if (DebugLevelData != null)
+        {
+            LoadGameplay(DebugLevelData);
+            return;
         }
     }
 
