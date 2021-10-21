@@ -8,8 +8,6 @@ using UnityEngine;
 
 public class Level : MonoBehaviour
 {
-    private TilePrefabPack prefabPack;
-    
     private LevelData levelData;
     private List<Portal> portals = new List<Portal>();
     private TileDirection tileDirections = new TileDirection();
@@ -20,12 +18,11 @@ public class Level : MonoBehaviour
     public List<Portal> PortalPairs => new List<Portal>(portals);
     public TileDirection TileDirections => new TileDirection(tileDirections);
     
-    public void SetLevel(LevelData levelData, Grid levelGrid, TilePrefabPack prefabPack)
+    public void SetLevel(LevelData levelData, Grid levelGrid)
     {
         this.levelData = levelData;
         this.LevelGrid = levelGrid;
-        this.prefabPack = prefabPack;
-        
+
         //Combine portal and tile direction data from all stages
         foreach (var stagePos in levelData.StagePositions)
         {
@@ -100,6 +97,21 @@ public class Level : MonoBehaviour
                 return new Bridge(0, newBridge);
             }
         }
+
+        return null;
+    }
+
+    public Vector3Int? GetEmptyNeighbor(Vector3Int gridPos)
+    {
+        var scoutDirection = Vector3Int.up;
+        do
+        {
+            if (GetTileType(gridPos + scoutDirection) == TileType.Air)
+            {
+                return gridPos + scoutDirection;
+            }
+            scoutDirection.RotateClockwise();
+        } while (scoutDirection != Vector3Int.up);
 
         return null;
     }

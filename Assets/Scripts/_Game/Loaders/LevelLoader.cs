@@ -9,7 +9,8 @@ using Object = UnityEngine.Object;
 public class LevelLoader
 {
     public static int tileLayerMask = LayerMask.NameToLayer("Tiles");
-    
+
+    public static GameObject FinishTriggerPrefab = Resources.Load<GameObject>("Prefabs/Game/FinishTrigger");
     public static TilePrefabPack PrefabPack = Resources.Load<TilePrefabPack>("Prefabs/StageTilePacks/DefaultPack/DefaultPack");
 
     public static Level LoadLevel(LevelData levelData)
@@ -22,7 +23,7 @@ public class LevelLoader
         var levelObject = new GameObject {name = "LevelObject"};
         var levelGrid = levelObject.AddComponent<Grid>();
         var levelComponent = levelObject.AddComponent<Level>();
-        levelComponent.SetLevel(levelData, levelGrid, PrefabPack);
+        levelComponent.SetLevel(levelData, levelGrid);
         levelGrid.cellSwizzle = GridLayout.CellSwizzle.XZY;
         
         //Place stages
@@ -44,8 +45,17 @@ public class LevelLoader
             }
         }
         
-        //Place win trigger
+        //Place finish trigger
+        var lastStagePosition = levelData.StagePositions.Last();
+        var exitGridPos = lastStagePosition.Value + lastStagePosition.Key.GetExit().ToVector3Int();
+        var emptyNeighbor = levelComponent.GetEmptyNeighbor(exitGridPos);
+        if (emptyNeighbor == null)
+        {
+            Debug.LogError("There is no empty spot next to last stage's exit. Level loading is halted.");
+        }
 
+        Object.Instantiate(FinishTriggerPrefab, levelGrid.GetCellCenterWorld((Vector3Int) emptyNeighbor), Quaternion.identity, levelObject.transform);
+        
         return levelComponent;
     }
 
@@ -104,24 +114,25 @@ public class LevelLoader
         return tileObject;
     }
 
-    private static void PlaceDirectionalTile(Vector3 position, Vector2Int direction, TileType tileType, Transform parentTransform)
+    private static GameObject PlaceDirectionalTile(Vector3 position, Vector2Int direction, TileType tileType, Transform parentTransform)
     {
         switch (tileType)
         {
             case TileType.Push:
-                SpawnDirectionalTile(tileType, PrefabPack.PushPrefab, position, direction, parentTransform);
                 SpawnTile(TileType.Blank, PrefabPack.BlankPrefab, position, parentTransform);
-                break;
+                return SpawnDirectionalTile(tileType, PrefabPack.PushPrefab, position, direction, parentTransform);
             case TileType.Corner:
-                SpawnDirectionalTile(tileType, PrefabPack.CornerPrefab, position, direction, parentTransform);
                 SpawnTile(TileType.Road, PrefabPack.RoadPrefab, position, parentTransform);
-                break;
+                return SpawnDirectionalTile(tileType, PrefabPack.CornerPrefab, position, direction, 
+                    parentTransform);
         }
+
+        return null;
     }
 
-    public static void SpawnDirectionalTile(TileType tileType, GameObject prefab, Vector3 position, Vector2Int direction, Transform parentTransform)
+    public static GameObject SpawnDirectionalTile(TileType tileType, GameObject prefab, Vector3 position, Vector2Int direction, Transform parentTransform)
     {
-        if (!prefab) return;
+        if (!prefab) return null;
         
         var rotation = Quaternion.Euler(new Vector3
             {y = Vector3.Angle(Vector3.up, new Vector3(direction.x, direction.y, 0))});
@@ -129,5 +140,7 @@ public class LevelLoader
         var tileObject = Object.Instantiate(prefab, position, rotation, parentTransform);
         tileObject.AddComponent<Tile>().TileType = tileType;
         tileObject.layer = tileLayerMask;
+
+        return tileObject;
     }
 }
