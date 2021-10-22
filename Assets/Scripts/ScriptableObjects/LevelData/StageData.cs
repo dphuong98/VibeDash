@@ -39,7 +39,7 @@ public class StageData : ScriptableObject, IInit, ICopiable<StageData>
     [SerializeField, HideInInspector] private TileDirection tileDirections = new TileDirection();
 
     public Vector2Int Size => size;
-    public List<Vector2Int> Solution => new List<Vector2Int>(solution);
+    public List<Vector2Int> Solution => solution != null ? new List<Vector2Int>(solution) : null;
     public List<Portal> PortalPairs => new List<Portal>(portalPairs);
     public Dictionary<Vector2Int, Vector2Int> TileDirections => new Dictionary<Vector2Int, Vector2Int>(tileDirections);
 

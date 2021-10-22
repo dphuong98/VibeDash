@@ -22,7 +22,7 @@ public static class Pathfinding
             
         //Brute force
         //Find all path from entrance to exit -> Get path that covers the most tiles -> Get shortest path from which
-        if (MapNode(stageData, new Graph<Vector2Int>(), stageData.GetEntrance(), out var allExitPaths))
+        if (MapNode(stageData, new List<Vector2Int>(), stageData.GetEntrance(), out var allExitPaths))
         {
             var tmp = allExitPaths.GroupBy(s => s.Distinct().Count());
             var fullPath = allExitPaths.GroupBy(s => s.Distinct().Count()).Aggregate((i1,i2) => i1.Key > i2.Key ? i1 : i2);
@@ -35,57 +35,82 @@ public static class Pathfinding
     }
     
     //TODO Refactor this
-    private static bool MapNode(StageData stageData, Graph<Vector2Int> traceGraph, Vector2Int currentNode, out List<List<Vector2Int>> exitPaths)
+    private static bool MapNode(StageData stageData, List<Vector2Int> nodeCache, Vector2Int currentNode, out List<List<Vector2Int>> exitPaths)
     {
-        exitPaths = new List<List<Vector2Int>>();
-        
-        if (stageData[currentNode.x, currentNode.y] == TileType.Exit)
-            return true;
-
-        var direction = Vector2Int.up;
-
-        do
+        try
         {
-            //Exit path detected
-            if (stageData.TryMove(currentNode, direction, out var scoutPath))
+            exitPaths = new List<List<Vector2Int>>();
+
+            if (stageData[currentNode.x, currentNode.y] == TileType.Exit)
+                return true;
+
+            var direction = Vector2Int.up;
+
+            do
             {
-                if (scoutPath.Count == 0)
+                //Exit path detected
+                if (stageData.TryMove(currentNode, direction, out var scoutPath))
                 {
-                    direction = direction.RotateClockwise(); continue;
-                }
-                
-                if (scoutPath.Count != 0 && traceGraph.ExistDirectedPath(currentNode, scoutPath.Last()))
-                {
-                    direction = direction.RotateClockwise(); continue;
-                }
-
-                //Trace Stacks
-                traceGraph.AddDirected(currentNode, scoutPath.Last());
-
-                //Recursion ends when DFS meet an exit. Only return false when exit doesnt exist
-                if (MapNode(stageData, traceGraph, scoutPath.Last(), out var scoutPath2))
-                {
-                    if (scoutPath2.Count == 0)
+                    if (scoutPath.Count == 0)
                     {
-                        exitPaths.Add(scoutPath);
+                        direction = direction.RotateClockwise();
+                        continue;
                     }
-                    
-                    foreach (var i in scoutPath2)
+
+                    if (IsInfiniteLoop(nodeCache, scoutPath.Last()))
                     {
-                        exitPaths.Add(scoutPath.Concat(i).ToList());
+                        direction = direction.RotateClockwise();
+                        continue;
                     }
+
+                    //Trace Stacks
+                    nodeCache.Add(scoutPath.Last());
+
+                    //Recursion ends when DFS meet an exit. Only return false when exit doesnt exist
+                    if (MapNode(stageData, nodeCache, scoutPath.Last(), out var scoutPath2))
+                    {
+                        if (scoutPath2.Count == 0)
+                        {
+                            exitPaths.Add(scoutPath);
+                        }
+
+                        foreach (var i in scoutPath2)
+                        {
+                            exitPaths.Add(scoutPath.Concat(i).ToList());
+                        }
+                    }
+
+                    //Remove Trace Stacks
+                    nodeCache.RemoveAt(nodeCache.Count - 1);
                 }
 
-                //Remove Trace Stacks
-                traceGraph.RemoveDirected(currentNode, scoutPath.Last());
-            }
-            
-            direction = direction.RotateClockwise();
-        } while (direction != Vector2Int.up);
+                direction = direction.RotateClockwise();
+            } while (direction != Vector2Int.up);
 
-        return exitPaths.Count > 0;
+            return exitPaths.Count > 0;
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("goon");
+        }
+        
+        exitPaths = new List<List<Vector2Int>>();
+        return false;
     }
-    
+
+    private static bool IsInfiniteLoop(List<Vector2Int> nodeCache, Vector2Int nextNode)
+    {
+        if (nodeCache.Count < 7) return false;
+        
+        var cacheRange = nodeCache.GetRange(nodeCache.Count - 7, 7);
+        cacheRange.Add(nextNode);
+        for (var i = 0; i < 4; i++)
+        {
+            if (cacheRange[i] != cacheRange[i + 4]) return false;
+        }
+
+        return true;
+    }
     
     /// <returns>true if there is a line with the direction from start to end</returns>
     public static bool ExistDirectedPath(List<Vector2Int> path, params Vector2Int[] subPath)
