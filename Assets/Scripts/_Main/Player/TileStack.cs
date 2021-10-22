@@ -40,7 +40,9 @@ public class TileStack : MonoBehaviour
         playerMeshTransform.position += new Vector3(0, stackTileHeight, 0);
         var tilePlacementPos = GetPlayerPosition();
         tilePlacementPos.y = stackFloorHeight + currentStackCount * stackTileHeight;
-        LevelLoader.PlaceTile(tilePlacementPos, TileType.Road, transform).layer = stackLayerMask;
+        var stackTile = LevelLoader.PlaceTile(tilePlacementPos, TileType.Road, transform);
+        stackTile.layer = stackLayerMask;
+        Destroy(stackTile.GetComponent<BoxCollider>());
         currentStackCount++;
     }
 

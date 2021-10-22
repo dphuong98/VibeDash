@@ -26,14 +26,17 @@ public class Player : MonoBehaviour
         GameInput.OnSwipeDirection.AddListener(ProbePath);
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
-        PlayerMove();
-
         var text = "IsMoving: " + GetComponent<Animator>().GetBool("IsMoving") + "\n";
         text += "Points: " + totalPoints + "\n";
         text += "Stack: " + stackPoints + "\n";
-        DebugUI.Instance.SetText(text);
+        DebugUI.Instance.AddText(text);
+    }
+
+    private void FixedUpdate()
+    {
+        PlayerMove();
     }
 
     private void PlayerMove()

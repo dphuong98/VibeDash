@@ -29,6 +29,6 @@ public class MiscLoader
         }
 
         var finishTriggerPrefab = Resources.Load<GameObject>("Prefabs/Game/FinishTrigger");
-        return Object.Instantiate(finishTriggerPrefab, level.LevelGrid.GetCellCenterWorld((Vector3Int) emptyNeighbor), Quaternion.identity, level.transform);
+        return Object.Instantiate(finishTriggerPrefab, level.LevelGrid.GetCellCenterWorld((Vector3Int) emptyNeighbor), Quaternion.identity);
     }
 }

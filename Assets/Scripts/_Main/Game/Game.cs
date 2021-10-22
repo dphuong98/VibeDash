@@ -51,6 +51,15 @@ public class Game : MonoBehaviour
         ExecuteLoadCommands();
     }
 
+    private void Update()
+    {
+        var stateMachine = GetComponent<Animator>();
+        var text = "GameState: " + (stateMachine.GetBool("FinishTriggered") ? "Win" :
+                                     (stateMachine.GetBool("PlayerFellOffMap") ? "Lose" : "Playing"))
+                                 + "\n";
+        DebugUI.Instance.AddText(text);
+    }
+
     private void ExecuteLoadCommands()
     {
         if (AutoloadLevelData != null)
@@ -77,9 +86,27 @@ public class Game : MonoBehaviour
 
     public void Restart()
     {
-        if (levelComponent) Destroy(levelComponent.gameObject);
-        if (playerObject) Destroy(playerObject);
+        UnloadGameplay();
         ExecuteLoadCommands();
+    }
+
+    private void UnloadGameplay()
+    {
+        if (playerObject) Destroy(playerObject);
+        if (finishTriggerObject) Destroy(finishTriggerObject);
+        
+        if (levelComponent) Destroy(levelComponent.gameObject);
+    }
+
+    public bool PlayerTriggeredFinish()
+    {
+        return finishTriggerObject.GetComponent<PlayerDetector>().PlayerEntered;
+    }
+
+    public bool PlayerFellOffMap()
+    {
+        var playerGridPos = levelComponent.LevelGrid.WorldToCell(playerObject.transform.position);
+        return levelComponent.GetTileType(playerGridPos) == TileType.Air;
     }
 
     private void OnApplicationQuit()
