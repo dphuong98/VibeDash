@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml;
 using UnityEngine;
 
 public static class Pathfinding
@@ -37,76 +38,68 @@ public static class Pathfinding
     //TODO Refactor this
     private static bool MapNode(StageData stageData, List<Vector2Int> nodeCache, Vector2Int currentNode, out List<List<Vector2Int>> exitPaths)
     {
-        try
+        exitPaths = new List<List<Vector2Int>>();
+
+        if (stageData[currentNode.x, currentNode.y] == TileType.Exit)
+            return true;
+
+        var direction = Vector2Int.up;
+
+        do
         {
-            exitPaths = new List<List<Vector2Int>>();
-
-            if (stageData[currentNode.x, currentNode.y] == TileType.Exit)
-                return true;
-
-            var direction = Vector2Int.up;
-
-            do
+            //Exit path detected
+            if (stageData.TryMove(currentNode, direction, out var scoutPath))
             {
-                //Exit path detected
-                if (stageData.TryMove(currentNode, direction, out var scoutPath))
+                if (scoutPath.Count == 0 ||
+                    nodeCache.Count >= 2 && direction.IsSameDirection(nodeCache[nodeCache.Count - 2] - nodeCache[nodeCache.Count - 1]) ||
+                    IsInfiniteLoop(nodeCache, scoutPath.Last()))
                 {
-                    if (scoutPath.Count == 0)
-                    {
-                        direction = direction.RotateClockwise();
-                        continue;
-                    }
-
-                    if (IsInfiniteLoop(nodeCache, scoutPath.Last()))
-                    {
-                        direction = direction.RotateClockwise();
-                        continue;
-                    }
-
-                    //Trace Stacks
-                    nodeCache.Add(scoutPath.Last());
-
-                    //Recursion ends when DFS meet an exit. Only return false when exit doesnt exist
-                    if (MapNode(stageData, nodeCache, scoutPath.Last(), out var scoutPath2))
-                    {
-                        if (scoutPath2.Count == 0)
-                        {
-                            exitPaths.Add(scoutPath);
-                        }
-
-                        foreach (var i in scoutPath2)
-                        {
-                            exitPaths.Add(scoutPath.Concat(i).ToList());
-                        }
-                    }
-
-                    //Remove Trace Stacks
-                    nodeCache.RemoveAt(nodeCache.Count - 1);
+                    direction = direction.RotateClockwise();
+                    continue;
                 }
 
-                direction = direction.RotateClockwise();
-            } while (direction != Vector2Int.up);
+                //Trace Stacks
+                nodeCache.Add(scoutPath.Last());
 
-            return exitPaths.Count > 0;
-        }
-        catch (Exception ex)
-        {
-            Debug.Log("goon");
-        }
-        
-        exitPaths = new List<List<Vector2Int>>();
-        return false;
+                //Recursion ends when DFS meet an exit. Only return false when exit doesnt exist
+                if (MapNode(stageData, nodeCache, scoutPath.Last(), out var scoutPath2))
+                {
+                    if (scoutPath2.Count == 0)
+                    {
+                        exitPaths.Add(scoutPath);
+                    }
+
+                    foreach (var i in scoutPath2)
+                    {
+                        exitPaths.Add(scoutPath.Concat(i).ToList());
+                    }
+                }
+
+                //Remove Trace Stacks
+                nodeCache.RemoveAt(nodeCache.Count - 1);
+            }
+
+            direction = direction.RotateClockwise();
+        } while (direction != Vector2Int.up);
+
+        return exitPaths.Count > 0;
     }
 
     private static bool IsInfiniteLoop(List<Vector2Int> nodeCache, Vector2Int nextNode)
     {
-        if (nodeCache.Count < 7) return false;
+        var indices = nodeCache.IndicesOf(nextNode).ToList();
+        if (indices.Count < 3) return false;
         
-        var cacheRange = nodeCache.GetRange(nodeCache.Count - 7, 7);
-        cacheRange.Add(nextNode);
-        for (var i = 0; i < 4; i++)
+        var firstSegment = nodeCache.GetRange(indices[indices.Count - 3],
+            indices[indices.Count - 2] - indices[indices.Count - 3]);
+        var secondSegment = nodeCache.GetRange(indices[indices.Count - 2],
+            indices[indices.Count - 1] - indices[indices.Count - 2]);
+
+        if (firstSegment.Count != secondSegment.Count) return false;
+
+        for (var i = 0; i != firstSegment.Count; i++)
         {
-            if (cacheRange[i] != cacheRange[i + 4]) return false;
+            if (firstSegment[i] != secondSegment[i]) return false;
         }
 
         return true;

@@ -3,27 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class testspam : MonoBehaviour
 {
     [ContextMenu("Test")]
     public void Test()
     {
-        EditorApplication.ExecuteMenuItem("Tools/ProGrids/Close ProGrids");
-    }
-
-    private void Update()
-    {
-        transform.position += Vector3.down * 0.1f;
-    }
-
-    private void OnCollisionEnter(Collision other)
-    {
-        Debug.Log("Collision");
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        Debug.Log("Trigger");
+        Debug.Log(new Vector2Int(0, 0).IsSameDirection(new Vector2Int(0, 0)));
     }
 }

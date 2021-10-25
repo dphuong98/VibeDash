@@ -30,4 +30,10 @@ public static class Vector2IntExt
     {
         return (v1 - v2).magnitude == 1;
     }
+
+    public static bool IsSameDirection(this Vector2Int v1, Vector2Int v2)
+    {
+        return (v1.x == v2.x || v1.x * v2.x > 0) &&
+               (v1.y == v2.y || v1.y * v2.y > 0);
+    }
 }
