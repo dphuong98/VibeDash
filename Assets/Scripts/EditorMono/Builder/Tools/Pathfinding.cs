@@ -25,7 +25,6 @@ public static class Pathfinding
         //Find all path from entrance to exit -> Get path that covers the most tiles -> Get shortest path from which
         if (MapNode(stageData, new List<Vector2Int>(), stageData.GetEntrance(), out var allExitPaths))
         {
-            var tmp = allExitPaths.GroupBy(s => s.Distinct().Count());
             var fullPath = allExitPaths.GroupBy(s => s.Distinct().Count()).Aggregate((i1,i2) => i1.Key > i2.Key ? i1 : i2);
             var shortestFullPath = fullPath.GroupBy(s => s.Count).Aggregate((i1,i2) => i1.Key < i2.Key ? i1 : i2);
             solution = new List<Vector2Int>(shortestFullPath.First());
@@ -39,7 +38,7 @@ public static class Pathfinding
     private static bool MapNode(StageData stageData, List<Vector2Int> nodeCache, Vector2Int currentNode, out List<List<Vector2Int>> exitPaths)
     {
         exitPaths = new List<List<Vector2Int>>();
-
+        
         if (stageData[currentNode.x, currentNode.y] == TileType.Exit)
             return true;
 
@@ -50,26 +49,27 @@ public static class Pathfinding
             //Exit path detected
             if (stageData.TryMove(currentNode, direction, out var scoutPath))
             {
-                if (scoutPath.Count == 0 ||
-                    nodeCache.Count >= 2 && direction.IsSameDirection(nodeCache[nodeCache.Count - 2] - nodeCache[nodeCache.Count - 1]) ||
-                    IsInfiniteLoop(nodeCache, scoutPath.Last()))
+                if (scoutPath.Count == 0
+                    //HasJiggle(nodeCache, scoutPath.Last()) ||
+                    //HasInfiniteLoop(nodeCache, scoutPath.Last())
+                    )
                 {
                     direction = direction.RotateClockwise();
                     continue;
                 }
-
+                
                 //Trace Stacks
                 nodeCache.Add(scoutPath.Last());
 
                 //Recursion ends when DFS meet an exit. Only return false when exit doesnt exist
-                if (MapNode(stageData, nodeCache, scoutPath.Last(), out var scoutPath2))
+                if (MapNode(stageData, nodeCache, scoutPath.Last(), out var endPaths))
                 {
-                    if (scoutPath2.Count == 0)
+                    if (endPaths.Count == 0)
                     {
                         exitPaths.Add(scoutPath);
                     }
 
-                    foreach (var i in scoutPath2)
+                    foreach (var i in endPaths)
                     {
                         exitPaths.Add(scoutPath.Concat(i).ToList());
                     }
@@ -85,24 +85,57 @@ public static class Pathfinding
         return exitPaths.Count > 0;
     }
 
-    private static bool IsInfiniteLoop(List<Vector2Int> nodeCache, Vector2Int nextNode)
+    private static bool HasJiggle(List<Vector2Int> nodeCache, Vector2Int nextNode)
     {
+        //Jiggle: a -> b -> c -> b -> a -> b -> c
         var indices = nodeCache.IndicesOf(nextNode).ToList();
-        if (indices.Count < 3) return false;
+        if (indices.Count == 0)
+            return false;
         
-        var firstSegment = nodeCache.GetRange(indices[indices.Count - 3],
-            indices[indices.Count - 2] - indices[indices.Count - 3]);
-        var secondSegment = nodeCache.GetRange(indices[indices.Count - 2],
-            indices[indices.Count - 1] - indices[indices.Count - 2]);
+        var c2 = nodeCache.Count;
+        var c1 = indices[indices.Count - 1];
+        if ((c1 + c2) % 2 != 0) return false;
+        
+        var a2 = (c1 + c2) / 2;
+        var a1 = c1 - (a2 - c1);
 
-        if (firstSegment.Count != secondSegment.Count) return false;
+        if (a1 < 0) return false;
 
-        for (var i = 0; i != firstSegment.Count; i++)
+        var firstSegment = nodeCache.GetRange(a1, c1 - a1 + 1);
+        var secondSegment = nodeCache.GetRange(c1, a2 - c1 + 1);
+        secondSegment.Reverse();
+        var thirdSegment = nodeCache.GetRange(a2, c2 - a2);
+        thirdSegment.Add(nextNode);
+
+        if (firstSegment.SequenceEqual(secondSegment) &&
+            firstSegment.SequenceEqual(thirdSegment))
         {
-            if (firstSegment[i] != secondSegment[i]) return false;
+            return true;
+        }
+        
+        return false;
+    }
+
+    private static bool HasInfiniteLoop(List<Vector2Int> nodeCache, Vector2Int nextNode)
+    {
+        //If a loop happens twice, it can only lead to an infinite loop, only apply for this pathfinding algorithm
+        var indices = nodeCache.IndicesOf(nextNode).ToList();
+        if (indices.Count < 2) return false;
+        
+        var lastLoop = nodeCache.GetRange(indices[indices.Count - 1],
+            nodeCache.Count - indices[indices.Count - 1]);
+
+        for (var i = 0; i != indices.Count - 1; i++)
+        {
+            var currentLoop = nodeCache.GetRange(indices[i], indices[i + 1] - indices[i]);
+
+            if (currentLoop.SequenceEqual(lastLoop))
+            {
+                return true;
+            }
         }
 
-        return true;
+        return false;
     }
     
     /// <returns>true if there is a line with the direction from start to end</returns>
