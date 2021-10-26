@@ -49,9 +49,8 @@ public static class Pathfinding
             //Exit path detected
             if (stageData.TryMove(currentNode, direction, out var scoutPath))
             {
-                if (scoutPath.Count == 0
-                    //HasJiggle(nodeCache, scoutPath.Last()) ||
-                    //HasInfiniteLoop(nodeCache, scoutPath.Last())
+                if (scoutPath.Count == 0 ||
+                    HasInfiniteLoop(nodeCache, scoutPath.Last())
                     )
                 {
                     direction = direction.RotateClockwise();
@@ -85,57 +84,27 @@ public static class Pathfinding
         return exitPaths.Count > 0;
     }
 
-    private static bool HasJiggle(List<Vector2Int> nodeCache, Vector2Int nextNode)
-    {
-        //Jiggle: a -> b -> c -> b -> a -> b -> c
-        var indices = nodeCache.IndicesOf(nextNode).ToList();
-        if (indices.Count == 0)
-            return false;
-        
-        var c2 = nodeCache.Count;
-        var c1 = indices[indices.Count - 1];
-        if ((c1 + c2) % 2 != 0) return false;
-        
-        var a2 = (c1 + c2) / 2;
-        var a1 = c1 - (a2 - c1);
-
-        if (a1 < 0) return false;
-
-        var firstSegment = nodeCache.GetRange(a1, c1 - a1 + 1);
-        var secondSegment = nodeCache.GetRange(c1, a2 - c1 + 1);
-        secondSegment.Reverse();
-        var thirdSegment = nodeCache.GetRange(a2, c2 - a2);
-        thirdSegment.Add(nextNode);
-
-        if (firstSegment.SequenceEqual(secondSegment) &&
-            firstSegment.SequenceEqual(thirdSegment))
-        {
-            return true;
-        }
-        
-        return false;
-    }
-
     private static bool HasInfiniteLoop(List<Vector2Int> nodeCache, Vector2Int nextNode)
     {
-        //If a loop happens twice, it can only lead to an infinite loop, only apply for this pathfinding algorithm
-        var indices = nodeCache.IndicesOf(nextNode).ToList();
-        if (indices.Count < 2) return false;
+        if (nextNode == new Vector2Int(1,4)) Debug.Log("goon");
         
-        var lastLoop = nodeCache.GetRange(indices[indices.Count - 1],
+        var indices = nodeCache.IndicesOf(nextNode).ToList();
+        if (indices.Count == 0) return false;
+        
+        var previousSegment = nodeCache.GetRange(0,
+            indices[indices.Count - 1]);
+        var lastSegment = nodeCache.GetRange(indices[indices.Count - 1],
             nodeCache.Count - indices[indices.Count - 1]);
 
-        for (var i = 0; i != indices.Count - 1; i++)
+        for (var i = 1; i != lastSegment.Count; i++)
         {
-            var currentLoop = nodeCache.GetRange(indices[i], indices[i + 1] - indices[i]);
-
-            if (currentLoop.SequenceEqual(lastLoop))
+            if (!previousSegment.Contains(lastSegment[i]))
             {
-                return true;
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
     
     /// <returns>true if there is a line with the direction from start to end</returns>
