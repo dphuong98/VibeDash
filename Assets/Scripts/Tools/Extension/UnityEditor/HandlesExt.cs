@@ -69,13 +69,13 @@ public class HandlesExt
         Handles.Label(position, new GUIContent(icon), style);
     }
 
-    public static void DrawText(Vector3 position, string text, float textSize, Color color = default)
+    public static void DrawText(Vector3 position, string text, float textSize, Color color = default, TextAnchor alignment = TextAnchor.UpperLeft)
     {
         // this is the internal camera rendering the scene view, not the main camera!
         var zoom = SceneView.lastActiveSceneView.camera.orthographicSize;
 
         // the style object allows you to control font size, among many other settings
-        var style = new GUIStyle {fontSize = Mathf.FloorToInt(textSize / zoom), normal = {textColor = color == default? Color.black : color}};
+        var style = new GUIStyle {fontSize = Mathf.FloorToInt(textSize / zoom), normal = {textColor = color == default? Color.black : color}, alignment = alignment};
         Handles.Label(position + Vector3.back * 3, text, style);
     }
 

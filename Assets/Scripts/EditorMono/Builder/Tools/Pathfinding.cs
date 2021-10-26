@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
+using UnityEditor;
 using UnityEngine;
 
 public static class Pathfinding
@@ -20,18 +21,57 @@ public static class Pathfinding
         {
             return solution;
         }
-            
+        
+        // var scoutGraph = new Graph<Vector2Int>();
+        // var visited = new List<Vector2Int>();
+        // GraphNode(scoutGraph, stageData, visited, stageData.GetEntrance());
+        // scoutGraph.PrintGraph();
+        
         //Brute force
         //Find all path from entrance to exit -> Get path that covers the most tiles -> Get shortest path from which
-        if (MapNode(stageData, new List<Vector2Int>(), stageData.GetEntrance(), out var allExitPaths))
+        try
         {
-            var fullPath = allExitPaths.GroupBy(s => s.Distinct().Count()).Aggregate((i1,i2) => i1.Key > i2.Key ? i1 : i2);
-            var shortestFullPath = fullPath.GroupBy(s => s.Count).Aggregate((i1,i2) => i1.Key < i2.Key ? i1 : i2);
-            solution = new List<Vector2Int>(shortestFullPath.First());
-            solution.Insert(0, stageData.GetEntrance());
-        }
+            if (MapNode(stageData, new List<Vector2Int>(), stageData.GetEntrance(), out var allExitPaths))
+            {
+                var fullPath = allExitPaths.GroupBy(s => s.Distinct().Count()).Aggregate((i1,i2) => i1.Key > i2.Key ? i1 : i2);
+                var shortestFullPath = fullPath.GroupBy(s => s.Count).Aggregate((i1,i2) => i1.Key < i2.Key ? i1 : i2);
+                solution = new List<Vector2Int>(shortestFullPath.First());
+                solution.Insert(0, stageData.GetEntrance());
+            }
 
+            return solution;
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("goon");
+        }
+        
         return solution;
+    }
+
+    private static void GraphNode(Graph<Vector2Int> graph, StageData stageData, List<Vector2Int> visited, Vector2Int currentNode)
+    {
+        visited.Add(currentNode);
+        var direction = Vector2Int.up;
+
+        do
+        {
+            if (stageData.TryMove(currentNode, direction, out var scoutPath))
+            {
+                if (scoutPath.Count == 0)
+                {
+                    direction = direction.RotateClockwise();
+                    continue;
+                }
+                
+                graph.AddDirected(currentNode, scoutPath.Last());
+                
+                if (!visited.Contains(scoutPath.Last()))
+                    GraphNode(graph, stageData, visited, scoutPath.Last());
+            }
+
+            direction = direction.RotateClockwise();
+        } while (direction != Vector2Int.up);
     }
     
     //TODO Refactor this
@@ -41,13 +81,16 @@ public static class Pathfinding
         
         if (stageData[currentNode.x, currentNode.y] == TileType.Exit)
             return true;
+        
+        //Trace Stacks
+        nodeCache.Add(currentNode);
 
-        var direction = Vector2Int.up;
+        var direction = Vector2Int.up; //
 
         do
         {
             //Exit path detected
-            if (stageData.TryMove(currentNode, direction, out var scoutPath))
+            if (stageData.TryMove(currentNode, direction, out var scoutPath)) //
             {
                 if (scoutPath.Count == 0 ||
                     HasInfiniteLoop(nodeCache, scoutPath.Last())
@@ -55,15 +98,12 @@ public static class Pathfinding
                 {
                     direction = direction.RotateClockwise();
                     continue;
-                }
-                
-                //Trace Stacks
-                nodeCache.Add(scoutPath.Last());
+                } //
 
                 //Recursion ends when DFS meet an exit. Only return false when exit doesnt exist
                 if (MapNode(stageData, nodeCache, scoutPath.Last(), out var endPaths))
                 {
-                    if (endPaths.Count == 0)
+                    if (endPaths.Count == 0)s
                     {
                         exitPaths.Add(scoutPath);
                     }
@@ -73,32 +113,25 @@ public static class Pathfinding
                         exitPaths.Add(scoutPath.Concat(i).ToList());
                     }
                 }
-
-                //Remove Trace Stacks
-                nodeCache.RemoveAt(nodeCache.Count - 1);
             }
 
-            direction = direction.RotateClockwise();
-        } while (direction != Vector2Int.up);
+            direction = direction.RotateClockwise(); //
+        } while (direction != Vector2Int.up); //
+        
+        //Remove Trace Stacks
+        nodeCache.RemoveAt(nodeCache.Count - 1);
 
         return exitPaths.Count > 0;
     }
 
     private static bool HasInfiniteLoop(List<Vector2Int> nodeCache, Vector2Int nextNode)
     {
-        if (nextNode == new Vector2Int(1,4)) Debug.Log("goon");
-        
-        var indices = nodeCache.IndicesOf(nextNode).ToList();
-        if (indices.Count == 0) return false;
-        
-        var previousSegment = nodeCache.GetRange(0,
-            indices[indices.Count - 1]);
-        var lastSegment = nodeCache.GetRange(indices[indices.Count - 1],
-            nodeCache.Count - indices[indices.Count - 1]);
+        var latestOccurence = nodeCache.LastIndexOf(nextNode);
+        if (latestOccurence == -1) return false;
 
-        for (var i = 1; i != lastSegment.Count; i++)
+        for (var i = latestOccurence + 1; i != nodeCache.Count; i++)
         {
-            if (!previousSegment.Contains(lastSegment[i]))
+            if (nodeCache.IndexOf(nodeCache[i], 0, latestOccurence) == -1)
             {
                 return false;
             }
