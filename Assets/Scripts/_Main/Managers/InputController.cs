@@ -9,24 +9,14 @@ using UnityEngine.Events;
 
 public interface IInputController: IBasicObject
 {
-    
+    Vector3IntEvent OnSwipeDirection { get; }
 }
 
 public class InputController : MonoBehaviour, IInputController
 {
-    public static Vector3IntEvent OnSwipeDirection { get; } = new Vector3IntEvent();
+    public Vector3IntEvent OnSwipeDirection { get; } = new Vector3IntEvent();
 
-    public static void EnableInput()
-    {
-        LeanTouch.OnFingerSwipe += HandleFingerSwipe;
-    }
-
-    public static void DisableInput()
-    {
-        LeanTouch.OnFingerSwipe -= HandleFingerSwipe;
-    }
-
-    private static void HandleFingerSwipe(LeanFinger finger)
+    private void HandleFingerSwipe(LeanFinger finger)
     {
         if (finger.StartedOverGui ||
             finger.IsOverGui
@@ -52,11 +42,11 @@ public class InputController : MonoBehaviour, IInputController
 
     public void Setup()
     {
-        
+        LeanTouch.OnFingerSwipe += HandleFingerSwipe;
     }
 
     public void CleanUp()
     {
-        
+        LeanTouch.OnFingerSwipe -= HandleFingerSwipe;
     }
 }

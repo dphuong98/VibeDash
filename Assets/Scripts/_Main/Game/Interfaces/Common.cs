@@ -13,7 +13,7 @@ public interface ISetup
 public interface ICleanUp
 {
     /// <summary>
-    /// Reset class state to just after dependencies loading
+    /// Prepare class for destruction
     /// </summary>
     void CleanUp();
 }
