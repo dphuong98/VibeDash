@@ -26,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3481347035086994766}
   m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 1.2, z: 0}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4164052131905617310}
@@ -202,7 +202,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d0843bb3cedf3c45ae92576cc46ebb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 1628208255774161703}
 --- !u!1 &8572301229440925915
 GameObject:
   m_ObjectHideFlags: 0
@@ -213,8 +212,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8572301229440925919}
   - component: {fileID: 1628208255774161703}
-  - component: {fileID: 7415541547384381380}
-  - component: {fileID: 8235635982159503561}
   - component: {fileID: 1732875263560209242}
   - component: {fileID: 7252720179373487838}
   m_Layer: 0
@@ -252,40 +249,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66b53be5199837c4a907952ae48ac1ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Level: {fileID: 0}
---- !u!114 &7415541547384381380
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8572301229440925915}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d8a0ae5c9556c745a2b5ef336092d7f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PositionOffset: {x: 0, y: 10, z: -10}
-  RotationOffset: {x: 45, y: 0, z: 0}
---- !u!95 &8235635982159503561
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8572301229440925915}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: e7bb6c20e55a8f642b8f7ff386707e24, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  level: {fileID: 0}
 --- !u!65 &1732875263560209242
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -298,7 +262,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 2, z: 1}
-  m_Center: {x: 0, y: 1, z: 0}
+  m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!54 &7252720179373487838
 Rigidbody:
   m_ObjectHideFlags: 0

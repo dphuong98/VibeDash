@@ -3,7 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tile : MonoBehaviour
+public interface ITile
 {
-    public TileType TileType;
+    TileType TileType { get; }
+}
+
+public class Tile : MonoBehaviour, ITile
+{
+    public TileType TileType { get; }
 }

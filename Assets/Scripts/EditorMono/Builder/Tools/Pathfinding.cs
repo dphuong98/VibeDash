@@ -29,23 +29,14 @@ public static class Pathfinding
         
         //Brute force
         //Find all path from entrance to exit -> Get path that covers the most tiles -> Get shortest path from which
-        try
+        if (MapNode(stageData, new List<Vector2Int>(), stageData.GetEntrance(), out var allExitPaths))
         {
-            if (MapNode(stageData, new List<Vector2Int>(), stageData.GetEntrance(), out var allExitPaths))
-            {
-                var fullPath = allExitPaths.GroupBy(s => s.Distinct().Count()).Aggregate((i1,i2) => i1.Key > i2.Key ? i1 : i2);
-                var shortestFullPath = fullPath.GroupBy(s => s.Count).Aggregate((i1,i2) => i1.Key < i2.Key ? i1 : i2);
-                solution = new List<Vector2Int>(shortestFullPath.First());
-                solution.Insert(0, stageData.GetEntrance());
-            }
+            var fullPath = allExitPaths.GroupBy(s => s.Distinct().Count()).Aggregate((i1,i2) => i1.Key > i2.Key ? i1 : i2);
+            var shortestFullPath = fullPath.GroupBy(s => s.Count).Aggregate((i1,i2) => i1.Key < i2.Key ? i1 : i2);
+            solution = new List<Vector2Int>(shortestFullPath.First());
+            solution.Insert(0, stageData.GetEntrance());
+        }
 
-            return solution;
-        }
-        catch (Exception ex)
-        {
-            Debug.Log("goon");
-        }
-        
         return solution;
     }
 
@@ -93,7 +84,8 @@ public static class Pathfinding
             if (stageData.TryMove(currentNode, direction, out var scoutPath)) //
             {
                 if (scoutPath.Count == 0 ||
-                    HasInfiniteLoop(nodeCache, scoutPath.Last())
+                    ExistDirectedPath(nodeCache, currentNode, scoutPath.Last())
+                   // HasInfiniteLoop(nodeCache, scoutPath.Last())
                     )
                 {
                     direction = direction.RotateClockwise();
@@ -103,7 +95,7 @@ public static class Pathfinding
                 //Recursion ends when DFS meet an exit. Only return false when exit doesnt exist
                 if (MapNode(stageData, nodeCache, scoutPath.Last(), out var endPaths))
                 {
-                    if (endPaths.Count == 0)s
+                    if (endPaths.Count == 0)
                     {
                         exitPaths.Add(scoutPath);
                     }

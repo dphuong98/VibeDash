@@ -4,9 +4,24 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Serialization;
 
-public class Game : MonoBehaviour
+public interface IGame : IBasicObject
+{
+    Transform FinishLine { get; }
+    IInputController InputController { get; }
+    ILevelLoader LevelLoader { get; }
+    IPlayer Player { get; }
+    
+    UnityEvent OnWin { get; }
+    UnityEvent OnLose { get; }
+    
+    void Play();
+    void Restart();
+}
+
+public class Game : MonoBehaviour, IGame
 {
     public static LevelData AutoloadLevelData
     {
@@ -42,75 +57,87 @@ public class Game : MonoBehaviour
 
     public LevelData DebugLevelData;
 
-    private Level levelComponent;
-    private GameObject finishTriggerObject;
-    private GameObject playerObject;
+    [SerializeField] private Transform finishLine;
+    [SerializeField] private InputController inputController;
+    [SerializeField] private LevelLoader levelLoader;
+    [SerializeField] private Player player;
+
+    public Transform FinishLine { get; private set; }
+    public IInputController InputController { get; private set; }
+    public ILevelLoader LevelLoader { get; private set; }
+    public IPlayer Player { get; private set; }
+    
+    public UnityEvent OnWin { get; }
+    public UnityEvent OnLose { get; }
+
+    private void Awake()
+    {
+        Setup();
+    }
 
     private void Start()
     {
-        ExecuteLoadCommands();
+        Play();
     }
-
-    private void Update()
+    
+    public void Setup()
     {
-        var stateMachine = GetComponent<Animator>();
-        var text = "GameState: " + (stateMachine.GetBool("FinishTriggered") ? "Win" :
-                                     (stateMachine.GetBool("PlayerFellOffMap") ? "Lose" : "Playing"))
-                                 + "\n";
-        DebugUI.Instance.AddText(text);
-    }
+        FinishLine = finishLine;
+        LevelLoader = levelLoader;
+        InputController = inputController;
+        Player = player;
 
-    private void ExecuteLoadCommands()
-    {
-        if (AutoloadLevelData != null)
-        {
-            LoadGameplay(AutoloadLevelData);
-            return;
-        }
-
-        if (DebugLevelData != null)
-        {
-            LoadGameplay(DebugLevelData);
-            return;
-        }
-    }
-
-    private void LoadGameplay(LevelData levelData)
-    {
-        levelComponent = LevelLoader.LoadLevel(levelData);
-        if (levelComponent == null) return;
+        LevelLoader.Setup();
+        InputController.Setup();
+        Player.Setup();
         
-        finishTriggerObject = MiscLoader.LoadFinishTrigger(levelComponent);
-        playerObject = MiscLoader.LoadPlayerObject(levelComponent);
+        //Load player progression
+    }
+    
+    public void CleanUp()
+    {
+        LevelLoader.CleanUp();
+        InputController.CleanUp();
+        Player.CleanUp();
+
+        AutoloadLevelData = null;
+    }
+
+    public void Play()
+    {
+        Load();
+
+        //Set state or sth
+    }
+
+    private void Load()
+    {
+        //TODO: Add player progression current level
+        if (AutoloadLevelData != null)
+            LevelLoader.LoadLevel(AutoloadLevelData);
+        else if (DebugLevelData != null)
+            LevelLoader.LoadLevel(DebugLevelData);
+        else return;
+        
+        //Place Player and FinishLine
+        var level = LevelLoader.GetLevel();
+        Player.Root.position = level.GetStartingLinePos();
+        var finishLinePos = level.GetFinishLinePos();
+        if (finishLinePos == null)
+        {
+            Debug.LogError("No empty space near last stage exit is found");
+            return;
+        }
+        FinishLine.position = (Vector3) finishLinePos;
     }
 
     public void Restart()
     {
-        UnloadGameplay();
-        ExecuteLoadCommands();
-    }
-
-    private void UnloadGameplay()
-    {
-        if (playerObject) Destroy(playerObject);
-        if (finishTriggerObject) Destroy(finishTriggerObject);
-        
-        if (levelComponent) Destroy(levelComponent.gameObject);
-    }
-
-    public bool PlayerTriggeredFinish()
-    {
-        return finishTriggerObject.GetComponent<PlayerDetector>().PlayerEntered;
-    }
-
-    public bool PlayerFellOffMap()
-    {
-        var playerGridPos = levelComponent.LevelGrid.WorldToCell(playerObject.transform.position);
-        return levelComponent.GetTileType(playerGridPos) == TileType.Air;
+        //throw new NotImplementedException();
     }
 
     private void OnApplicationQuit()
     {
-        AutoloadLevelData = null;
+        CleanUp();
     }
 }

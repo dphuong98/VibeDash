@@ -7,7 +7,12 @@ using UnityEngine.Events;
 
 [Serializable] public class Vector3IntEvent : UnityEvent<Vector3Int> {}
 
-public class GameInput : MonoBehaviour
+public interface IInputController: IBasicObject
+{
+    
+}
+
+public class InputController : MonoBehaviour, IInputController
 {
     public static Vector3IntEvent OnSwipeDirection { get; } = new Vector3IntEvent();
 
@@ -43,5 +48,15 @@ public class GameInput : MonoBehaviour
         }
         
         OnSwipeDirection.Invoke(direction);
+    }
+
+    public void Setup()
+    {
+        
+    }
+
+    public void CleanUp()
+    {
+        
     }
 }

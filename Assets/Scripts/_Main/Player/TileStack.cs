@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class TileStack : MonoBehaviour
 {
-    [SerializeField]
+    /*[SerializeField]
     private Player player;
     private Transform playerMeshTransform;
     
@@ -56,5 +56,5 @@ public class TileStack : MonoBehaviour
     private Vector3 GetPlayerPosition()
     {
         return player.transform.position;
-    }
+    }*/
 }

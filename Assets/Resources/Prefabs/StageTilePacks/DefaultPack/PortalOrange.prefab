@@ -4787,7 +4787,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6823038255725418794}
   - component: {fileID: 7718041135163315047}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: PortalOrange
   m_TagString: Untagged
   m_Icon: {fileID: 0}
