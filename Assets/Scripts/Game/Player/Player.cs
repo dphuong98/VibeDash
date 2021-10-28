@@ -158,6 +158,9 @@ public class Player : MonoBehaviour, IPlayer
                     CurrentState = PlayerState.Idle;
                 }
                 break;
+            case TileType.Stop:
+                CurrentState = PlayerState.Idle;
+                break;
         }
         
         nextTile.OnEnter();
