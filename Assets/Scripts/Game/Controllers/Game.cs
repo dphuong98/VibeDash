@@ -10,7 +10,7 @@ using UnityEngine.Serialization;
 public interface IGame : IBasicObject
 {
     Transform FinishLine { get; }
-    IInputController InputController { get; }
+    ICameraController CameraController { get; }
     ILevelLoader LevelLoader { get; }
     IPlayer Player { get; }
     
@@ -55,21 +55,22 @@ public class Game : MonoBehaviour, IGame
         }
     }
 
-    public LevelData DebugLevelData;
+    [SerializeField] private LevelData debugLevelData;
 
     [SerializeField] private Transform finishLine;
-    [SerializeField] private InputController inputController;
+    [SerializeField] private CameraController cameraController;
     [SerializeField] private LevelLoader levelLoader;
     [SerializeField] private Player player;
 
-    public Transform FinishLine { get; private set; }
-    public IInputController InputController { get; private set; }
-    public ILevelLoader LevelLoader { get; private set; }
-    public IPlayer Player { get; private set; }
+    public Transform FinishLine => finishLine;
+    public ICameraController CameraController => cameraController;
+    public ILevelLoader LevelLoader => levelLoader;
+    public IPlayer Player => player;
     
     public UnityEvent OnWin { get; }
     public UnityEvent OnLose { get; }
 
+    
     private void Awake()
     {
         Setup();
@@ -82,13 +83,7 @@ public class Game : MonoBehaviour, IGame
     
     public void Setup()
     {
-        FinishLine = finishLine;
-        LevelLoader = levelLoader;
-        InputController = inputController;
-        Player = player;
-
         LevelLoader.Setup();
-        InputController.Setup();
         Player.Setup();
         
         //Load player progression
@@ -97,7 +92,6 @@ public class Game : MonoBehaviour, IGame
     public void CleanUp()
     {
         LevelLoader.CleanUp();
-        InputController.CleanUp();
         Player.CleanUp();
 
         AutoloadLevelData = null;
@@ -115,8 +109,8 @@ public class Game : MonoBehaviour, IGame
         //TODO: Add player progression current level
         if (AutoloadLevelData != null)
             LevelLoader.LoadLevel(AutoloadLevelData);
-        else if (DebugLevelData != null)
-            LevelLoader.LoadLevel(DebugLevelData);
+        else if (debugLevelData != null)
+            LevelLoader.LoadLevel(debugLevelData);
         else return;
         
         //Place Player and FinishLine

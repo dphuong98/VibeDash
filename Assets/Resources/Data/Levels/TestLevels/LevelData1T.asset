@@ -13,25 +13,27 @@ MonoBehaviour:
   m_Name: LevelData1T
   m_EditorClassIdentifier: 
   stagePositions:
-    keyData: []
-    valueData: []
+    keyData:
+    - {fileID: 11400000, guid: 70760b097936d734f98851eb936a721e, type: 2}
+    - {fileID: 11400000, guid: 7fd6d4e6d128a9a4298f0c81865009fc, type: 2}
+    - {fileID: 11400000, guid: 46056642877a0bc41849570b90537fea, type: 2}
+    valueData:
+    - {x: 0, y: 0, z: 0}
+    - {x: 6, y: 8, z: 0}
+    - {x: 0, y: 15, z: 0}
   bridges:
   - bridgeParts:
     - {x: 4, y: 5, z: 0}
     - {x: 4, y: 6, z: 0}
     - {x: 4, y: 7, z: 0}
-    - {x: 5, y: 7, z: 0}
-    - {x: 6, y: 7, z: 0}
-    - {x: 7, y: 7, z: 0}
-    - {x: 8, y: 7, z: 0}
-    - {x: 9, y: 7, z: 0}
-    - {x: 10, y: 7, z: 0}
+    - {x: 4, y: 8, z: 0}
+    - {x: 4, y: 9, z: 0}
+    - {x: 5, y: 9, z: 0}
+    - {x: 6, y: 9, z: 0}
   - bridgeParts:
-    - {x: 13, y: 10, z: 0}
-    - {x: 13, y: 11, z: 0}
-    - {x: 12, y: 11, z: 0}
-    - {x: 11, y: 11, z: 0}
-    - {x: 10, y: 11, z: 0}
-    - {x: 9, y: 11, z: 0}
     - {x: 9, y: 12, z: 0}
     - {x: 9, y: 13, z: 0}
+    - {x: 8, y: 13, z: 0}
+    - {x: 8, y: 14, z: 0}
+    - {x: 7, y: 14, z: 0}
+    - {x: 7, y: 15, z: 0}

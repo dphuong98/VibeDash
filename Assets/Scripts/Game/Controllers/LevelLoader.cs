@@ -3,7 +3,7 @@ using UnityEngine;
 public interface ILevelLoader: IBasicObject
 {
     TilePrefabPack Pack { get; }
-    Transform Root { get; }
+    Transform LevelRoot { get; }
 
     Level GetLevel();
     void LoadLevel(LevelData levelData); 
@@ -11,33 +11,30 @@ public interface ILevelLoader: IBasicObject
 
 public class LevelLoader : MonoBehaviour, ILevelLoader
 {
-    [SerializeField] private Transform root;
     [SerializeField] private TilePrefabPack pack;
+    [SerializeField] private Transform levelRoot;
 
-    public TilePrefabPack Pack { get; private set; }
-    public Transform Root { get; private set; }
+    public TilePrefabPack Pack => pack;
+    public Transform LevelRoot => levelRoot;
     
-
+    
     public void Setup()
     {
         // TODO: Load player prefs environment pack
-        Root = root;
-        Pack = pack;
-
         GetLevel().Setup();
     }
 
     public void CleanUp()
     {
-        if (!Root) return;
+        if (!LevelRoot) return;
         
-        foreach (Transform child in Root)
+        foreach (Transform child in LevelRoot)
             Destroy(child);
     }
 
     public Level GetLevel()
     {
-        return Root.GetComponent<Level>();
+        return LevelRoot.GetComponent<Level>();
     }
     
     public void LoadLevel(LevelData levelData)
@@ -46,10 +43,9 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
         {
             Debug.LogError("Level contains no stage"); return;
         }
-
-        var level = GetLevel();
-        level.SetLevelData(levelData);
-        var levelGrid = Root.GetComponent<Grid>();
+        
+        GetLevel().SetLevelData(levelData);
+        var levelGrid = LevelRoot.GetComponent<Grid>();
         
         //Place stages
         foreach (var stage in levelData.StagePositions)
@@ -68,7 +64,7 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
                 worldPos.y = 0;
                 
                 //TODO place directional bridge
-                PlaceTile(worldPos, TileType.Bridge, Root);
+                PlaceTile(worldPos, TileType.Bridge, LevelRoot);
             }
         }
     }
@@ -86,11 +82,11 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
                 
                 if (stageData.TileDirections.TryGetValue(gridPos, out var direction))
                 {
-                    PlaceDirectionalTile(worldPos, direction, tile, Root);
+                    PlaceDirectionalTile(worldPos, direction, tile, LevelRoot);
                     continue;
                 }
                 
-                PlaceTile(worldPos, tile, Root);
+                PlaceTile(worldPos, tile, LevelRoot);
             }
         }
     }

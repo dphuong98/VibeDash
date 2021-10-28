@@ -233,8 +233,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 1391648510}
   - {fileID: 5219848136205776807}
+  - {fileID: 1391648510}
   - {fileID: 706560434}
   m_Father: {fileID: 0}
   m_RootOrder: 3
@@ -681,7 +681,7 @@ PrefabInstance:
     - target: {fileID: 3298110373406058795, guid: d63748b84db76784d9eaf141289b364d,
         type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3298110373406058795, guid: d63748b84db76784d9eaf141289b364d,
         type: 3}
@@ -770,9 +770,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 571e8bd6ce4add74d86ba9757d38ae98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DebugLevelData: {fileID: 11400000, guid: ced90fb26e30fef4a8ce49bd0ab56561, type: 2}
+  debugLevelData: {fileID: 11400000, guid: ced90fb26e30fef4a8ce49bd0ab56561, type: 2}
   finishLine: {fileID: 1391648510}
-  inputController: {fileID: 2093051225}
+  cameraController: {fileID: 0}
   levelLoader: {fileID: 2096834428}
   player: {fileID: 5219848136205776808}
 --- !u!4 &1600742062
@@ -788,9 +788,56 @@ Transform:
   m_Children:
   - {fileID: 2096834427}
   - {fileID: 2093051224}
+  - {fileID: 2007389697}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2007389696
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2007389697}
+  - component: {fileID: 2007389698}
+  m_Layer: 0
+  m_Name: CameraController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2007389697
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2007389696}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1600742062}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2007389698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2007389696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d8a0ae5c9556c745a2b5ef336092d7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PositionOffset: {x: 0, y: 10, z: -10}
+  RotationOffset: {x: 45, y: 0, z: 0}
+  target: {fileID: 5219848136205776807}
 --- !u!1 &2069602481
 GameObject:
   m_ObjectHideFlags: 0
@@ -1032,8 +1079,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7a7e95809db39647b720bd448d6ce9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  root: {fileID: 706560434}
   pack: {fileID: 11400000, guid: 98cd8d4b52965734ab4cb5eff4d796fa, type: 2}
+  levelRoot: {fileID: 706560434}
 --- !u!1001 &5219848136205776806
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1046,6 +1093,16 @@ PrefabInstance:
       propertyPath: level
       value: 
       objectReference: {fileID: 706560435}
+    - target: {fileID: 1628208255774161703, guid: dd8d392e3fc5bb145934817ceb542aec,
+        type: 3}
+      propertyPath: inputController
+      value: 
+      objectReference: {fileID: 2093051225}
+    - target: {fileID: 1628208255774161703, guid: dd8d392e3fc5bb145934817ceb542aec,
+        type: 3}
+      propertyPath: cameraController
+      value: 
+      objectReference: {fileID: 2007389698}
     - target: {fileID: 8572301229440925915, guid: dd8d392e3fc5bb145934817ceb542aec,
         type: 3}
       propertyPath: m_Name
@@ -1059,7 +1116,7 @@ PrefabInstance:
     - target: {fileID: 8572301229440925919, guid: dd8d392e3fc5bb145934817ceb542aec,
         type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8572301229440925919, guid: dd8d392e3fc5bb145934817ceb542aec,
         type: 3}

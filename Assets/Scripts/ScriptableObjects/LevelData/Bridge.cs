@@ -26,8 +26,6 @@ public class Bridge
 
     public bool IsValid()
     {
-        Debug.Log(bridgeParts.Count);
-        Debug.Log(MaxLength);
         return bridgeParts.Count <= MaxLength;
     }
 

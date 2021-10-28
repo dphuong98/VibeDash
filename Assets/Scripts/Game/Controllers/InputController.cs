@@ -15,6 +15,17 @@ public interface IInputController: IBasicObject
 public class InputController : MonoBehaviour, IInputController
 {
     public Vector3IntEvent OnSwipeDirection { get; } = new Vector3IntEvent();
+    
+    
+    public void Setup()
+    {
+        LeanTouch.OnFingerSwipe += HandleFingerSwipe;
+    }
+
+    public void CleanUp()
+    {
+        LeanTouch.OnFingerSwipe -= HandleFingerSwipe;
+    }
 
     private void HandleFingerSwipe(LeanFinger finger)
     {
@@ -38,15 +49,5 @@ public class InputController : MonoBehaviour, IInputController
         }
         
         OnSwipeDirection.Invoke(direction);
-    }
-
-    public void Setup()
-    {
-        LeanTouch.OnFingerSwipe += HandleFingerSwipe;
-    }
-
-    public void CleanUp()
-    {
-        LeanTouch.OnFingerSwipe -= HandleFingerSwipe;
     }
 }
