@@ -5,7 +5,7 @@ public interface ILevelLoader: IBasicObject
     TilePrefabPack Pack { get; }
     Transform LevelRoot { get; }
 
-    Level GetLevel();
+    ILevel GetLevel();
     void LoadLevel(LevelData levelData); 
 }
 
@@ -26,15 +26,12 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
 
     public void CleanUp()
     {
-        if (!LevelRoot) return;
-        
-        foreach (Transform child in LevelRoot)
-            Destroy(child.gameObject);
+        GetLevel().CleanUp();
     }
 
-    public Level GetLevel()
+    public ILevel GetLevel()
     {
-        return LevelRoot.GetComponent<Level>();
+        return LevelRoot.GetComponent<ILevel>();
     }
     
     public void LoadLevel(LevelData levelData)

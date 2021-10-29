@@ -11,10 +11,14 @@ public interface ILevel: IBasicObject
     LevelData LevelData { get; }
     Grid LevelGrid { get; }
     
+    Vector3 GetStartingLinePos();
+    Vector3? GetFinishLinePos();
+    
     ITile GetTile(Vector3Int gridPos);
     Bridge GetBridge(Vector3Int gridPos, Vector3Int direction);
     Vector3Int GetTileDirection(Vector3Int gridPos);
     Vector3Int? GetOtherPortal(Vector3Int gridPos);
+    
     void SetLevelData(LevelData levelData);
 }
 
@@ -24,7 +28,7 @@ public class Level : MonoBehaviour, ILevel
     [SerializeField] private LayerMask tileLayerMask;
     
     public LevelData LevelData { get; private set; }
-    public Grid LevelGrid { get; private set; }
+    public Grid LevelGrid => levelGrid;
 
     private List<Portal> portals;
     private TileDirection tileDirections;
@@ -32,15 +36,14 @@ public class Level : MonoBehaviour, ILevel
     
     public void Setup()
     {
-        LevelGrid = levelGrid;
-
         portals = new List<Portal>();
         tileDirections = new TileDirection();
     }
 
     public void CleanUp()
     {
-        
+        foreach (Transform child in transform)
+            Destroy(child.gameObject);
     }
 
     public void SetLevelData(LevelData levelData)

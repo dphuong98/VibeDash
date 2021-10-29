@@ -51,13 +51,14 @@ public class Player : MonoBehaviour, IPlayer
     public void Setup()
     {
         InputController.Setup();
-
         InputController.OnSwipeDirection.AddListener(HandleInput);
+        
         CurrentState = PlayerState.Idle;
     }
 
     public void CleanUp()
     {
+        InputController.OnSwipeDirection.RemoveListener(HandleInput);
         InputController.CleanUp();
     }
 
