@@ -283,10 +283,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5470ac613ddb3846b2a7aa423d738b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelGrid: {fileID: 706560436}
   tileLayerMask:
     serializedVersion: 2
     m_Bits: 256
+  levelGrid: {fileID: 706560436}
 --- !u!156049354 &706560436
 Grid:
   m_ObjectHideFlags: 0
@@ -524,7 +524,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -533,7 +533,7 @@ MonoBehaviour:
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 50
-    m_FontStyle: 0
+    m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 5
     m_MaxSize: 50
@@ -752,6 +752,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 330300288}
     m_Modifications:
+    - target: {fileID: 3298110373406058788, guid: d63748b84db76784d9eaf141289b364d,
+        type: 3}
+      propertyPath: m_Center.y
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3298110373406058789, guid: d63748b84db76784d9eaf141289b364d,
         type: 3}
       propertyPath: m_Name
@@ -1167,6 +1172,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 330300288}
     m_Modifications:
+    - target: {fileID: 514134313158716663, guid: dd8d392e3fc5bb145934817ceb542aec,
+        type: 3}
+      propertyPath: stackCountText
+      value: 
+      objectReference: {fileID: 1063170302}
     - target: {fileID: 1628208255774161703, guid: dd8d392e3fc5bb145934817ceb542aec,
         type: 3}
       propertyPath: level
@@ -1177,6 +1187,21 @@ PrefabInstance:
       propertyPath: inputController
       value: 
       objectReference: {fileID: 2093051225}
+    - target: {fileID: 1732875263560209242, guid: dd8d392e3fc5bb145934817ceb542aec,
+        type: 3}
+      propertyPath: m_Center.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3377603203895005142, guid: dd8d392e3fc5bb145934817ceb542aec,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6814563554382106538, guid: dd8d392e3fc5bb145934817ceb542aec,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8572301229440925915, guid: dd8d392e3fc5bb145934817ceb542aec,
         type: 3}
       propertyPath: m_Name

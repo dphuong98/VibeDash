@@ -17,7 +17,6 @@ public interface ITileStack: IBasicObject
 
 public class TileStack : MonoBehaviour, ITileStack
 {
-    [SerializeField] private const string stackLayerName = "Stacks";
     [SerializeField] private Text stackCountText;
     [SerializeField] private Transform playerModel;
     [SerializeField] private Transform tileStackRoot;
@@ -27,34 +26,37 @@ public class TileStack : MonoBehaviour, ITileStack
     public Transform TileStackRoot => tileStackRoot;
     public int StackCount { get; private set; }
     
-    private float stackFloorHeight;
+    private const string stackLayerName = "Stacks";
     private float stackTileHeight;
+    private Transform stackCube;
     
     
     public void Setup()
     {
-        stackFloorHeight = tileStackRoot.position.y;
         stackTileHeight = RoadPrefab.GetComponent<BoxCollider>().size.y;
+        stackCube = Instantiate(RoadPrefab, tileStackRoot.position, Quaternion.identity, tileStackRoot).transform;
+        stackCube.gameObject.layer = LayerMask.NameToLayer(stackLayerName);
     }
 
     public void CleanUp()
     {
-        
+        Destroy(stackCube.gameObject);
     }
 
     public void IncreaseStack()
     {
         StackCount++; stackCountText.text = StackCount.ToString();
         playerModel.position += new Vector3 {y = stackTileHeight};
-        var tilePlacementPos = tileStackRoot.position;
-        tilePlacementPos.y = stackFloorHeight + StackCount * stackTileHeight;
-        Instantiate(RoadPrefab, tilePlacementPos, Quaternion.identity, tileStackRoot).layer = LayerMask.NameToLayer(stackLayerName);
+        stackCube.position += new Vector3 {y = stackTileHeight};
+        //scale here
+        //Instantiate(RoadPrefab, tilePlacementPos, Quaternion.identity, tileStackRoot).layer = LayerMask.NameToLayer(stackLayerName);
     }
 
     public void DecreaseStack()
     {
         StackCount--; stackCountText.text = StackCount.ToString();
         playerModel.position -= new Vector3 {y = stackTileHeight};
-        Destroy(TileStackRoot.GetChild(TileStackRoot.childCount - 1).gameObject);
+        stackCube.position -= new Vector3 {y = stackTileHeight};
+        //Destroy(TileStackRoot.GetChild(TileStackRoot.childCount - 1).gameObject);
     }
 }

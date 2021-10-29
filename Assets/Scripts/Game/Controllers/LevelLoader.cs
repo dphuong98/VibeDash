@@ -46,8 +46,9 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
         //Place stages
         foreach (var stage in levelData.StagePositions)
         {
-            var stagePos = new Vector3(stage.Value.x, 0, stage.Value.y);
-            LoadStage(levelGrid, stagePos, stage.Key);
+            var stageWorldPos = levelGrid.CellToWorld(stage.Value);
+            stageWorldPos.y = 0;
+            LoadStage(levelGrid, stageWorldPos, stage.Key);
         }
         
         //Place bridges

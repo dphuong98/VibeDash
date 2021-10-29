@@ -24,12 +24,12 @@ public interface ILevel: IBasicObject
 
 public class Level : MonoBehaviour, ILevel
 {
-    [SerializeField] private Grid levelGrid;
     [SerializeField] private LayerMask tileLayerMask;
-    
+    [SerializeField] private Grid levelGrid;
+
     public LevelData LevelData { get; private set; }
     public Grid LevelGrid => levelGrid;
-
+    
     private List<Portal> portals;
     private TileDirection tileDirections;
     
@@ -72,8 +72,8 @@ public class Level : MonoBehaviour, ILevel
     public ITile GetTile(Vector3Int gridPos)
     {
         var position = levelGrid.GetCellCenterWorld(gridPos);
-
-        if (Physics.Raycast(position + Vector3.down, Vector3.up, out var hitInfo, tileLayerMask))
+        
+        if (Physics.Raycast(position + Vector3.up, Vector3.down, out var hitInfo, Mathf.Infinity, tileLayerMask))
         {
             return hitInfo.transform.GetComponent<ITile>();
         }

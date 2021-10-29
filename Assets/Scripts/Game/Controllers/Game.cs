@@ -132,14 +132,18 @@ public class Game : MonoBehaviour, IGame
         
         //Place Player and FinishLine
         var level = LevelLoader.GetLevel();
-        Player.Root.position = level.GetStartingLinePos();
-        var finishLinePos = level.GetFinishLinePos();
-        if (finishLinePos == null)
+        var playerPos = level.GetStartingLinePos();
+        playerPos.y = 0;
+        Player.Root.position = playerPos;
+        if (level.GetFinishLinePos() == null)
         {
             Debug.LogError("No empty space near last stage exit is found");
             return;
         }
-        FinishLine.position = (Vector3) finishLinePos;
+
+        var finishLinePos = (Vector3) level.GetFinishLinePos();
+        finishLinePos.y = 0;
+        FinishLine.position = finishLinePos;
     }
 
     public void Restart()
