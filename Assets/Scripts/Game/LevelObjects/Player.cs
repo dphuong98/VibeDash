@@ -44,7 +44,7 @@ public class Player : MonoBehaviour, IPlayer
     public UnityEvent OnPlayerWin { get; set; } = new UnityEvent();
     public UnityEvent OnPlayerFell { get; set; } = new UnityEvent();
     
-    private const int speed = 6;
+    private const int speed = 15;
     private Vector3Int currentGridPos;
     private Vector3Int direction;
     
@@ -114,6 +114,7 @@ public class Player : MonoBehaviour, IPlayer
         
         //Reposition
         var moveDistance = speed * Time.deltaTime * (Vector3) direction;
+        FloatExt.Swap(ref moveDistance.y, ref moveDistance.z);
         if (Vector3Ext.IsCBetweenAB(levelGrid.GetCellCenterWorld(currentGridPos),
             levelGrid.GetCellCenterWorld(nextGridPos),
             Root.position + moveDistance))
