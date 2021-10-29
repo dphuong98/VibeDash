@@ -633,7 +633,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 55
+    m_FontSize: 40
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 0
@@ -771,6 +771,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   debugLevelData: {fileID: 11400000, guid: ced90fb26e30fef4a8ce49bd0ab56561, type: 2}
+  pack: {fileID: 11400000, guid: 98cd8d4b52965734ab4cb5eff4d796fa, type: 2}
   finishLine: {fileID: 1391648510}
   cameraController: {fileID: 2007389698}
   levelLoader: {fileID: 2096834428}
@@ -1079,7 +1080,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7a7e95809db39647b720bd448d6ce9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pack: {fileID: 11400000, guid: 98cd8d4b52965734ab4cb5eff4d796fa, type: 2}
   levelRoot: {fileID: 706560434}
 --- !u!1001 &5219848136205776806
 PrefabInstance:
@@ -1098,19 +1098,9 @@ PrefabInstance:
       propertyPath: inputController
       value: 
       objectReference: {fileID: 2093051225}
-    - target: {fileID: 1628208255774161703, guid: dd8d392e3fc5bb145934817ceb542aec,
-        type: 3}
-      propertyPath: cameraController
-      value: 
-      objectReference: {fileID: 2007389698}
     - target: {fileID: 8572301229440925915, guid: dd8d392e3fc5bb145934817ceb542aec,
         type: 3}
       propertyPath: m_Name
-      value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 8572301229440925915, guid: dd8d392e3fc5bb145934817ceb542aec,
-        type: 3}
-      propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 8572301229440925919, guid: dd8d392e3fc5bb145934817ceb542aec,

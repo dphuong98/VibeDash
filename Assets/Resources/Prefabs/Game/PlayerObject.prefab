@@ -169,7 +169,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6814563554382106538}
   - component: {fileID: 514134313158716663}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: TileStacks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -202,6 +202,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d0843bb3cedf3c45ae92576cc46ebb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stackLayerMask:
+    serializedVersion: 2
+    m_Bits: 512
+  playerModel: {fileID: 3377603203895005142}
+  tileStackRoot: {fileID: 6814563554382106538}
 --- !u!1 &8572301229440925915
 GameObject:
   m_ObjectHideFlags: 0
@@ -216,7 +221,7 @@ GameObject:
   - component: {fileID: 7252720179373487838}
   m_Layer: 0
   m_Name: PlayerObject
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -249,7 +254,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66b53be5199837c4a907952ae48ac1ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inputController: {fileID: 0}
   level: {fileID: 0}
+  tileStack: {fileID: 514134313158716663}
 --- !u!65 &1732875263560209242
 BoxCollider:
   m_ObjectHideFlags: 0

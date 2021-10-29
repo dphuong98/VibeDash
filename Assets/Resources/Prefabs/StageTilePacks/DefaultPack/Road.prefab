@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4110161850952430380}
   - component: {fileID: 2250008140198973783}
   - component: {fileID: 7709470014156291201}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: BlankModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -152,7 +152,7 @@ GameObject:
   - component: {fileID: 7395299262527045085}
   - component: {fileID: 6905513810487197180}
   - component: {fileID: 770127718570375794}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: RoadModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}

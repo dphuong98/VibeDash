@@ -51,7 +51,7 @@ public class Level : MonoBehaviour, ILevel
         LevelData = levelData;
         
         //Merge TileDirections, Portals
-        foreach (var stagePos in levelData.StagePositions)
+        foreach (var stagePos in LevelData.StagePositions)
         {
             foreach (var portal in stagePos.Key.PortalPairs)
             {
@@ -59,7 +59,7 @@ public class Level : MonoBehaviour, ILevel
             }
         }
 
-        foreach (var stagePos in levelData.StagePositions)
+        foreach (var stagePos in LevelData.StagePositions)
         {
             foreach (var tileDirection in stagePos.Key.TileDirections)
             {
@@ -73,7 +73,7 @@ public class Level : MonoBehaviour, ILevel
     {
         var position = levelGrid.GetCellCenterWorld(gridPos);
 
-        if (Physics.Raycast(position + Vector3.up, Vector3.down, out var hitInfo, tileLayerMask))
+        if (Physics.Raycast(position + Vector3.down, Vector3.up, out var hitInfo, tileLayerMask))
         {
             return hitInfo.transform.GetComponent<ITile>();
         }

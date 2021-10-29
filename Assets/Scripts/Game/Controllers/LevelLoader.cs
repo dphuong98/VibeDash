@@ -2,7 +2,7 @@
 using UnityEngine;
 public interface ILevelLoader: IBasicObject
 {
-    TilePrefabPack Pack { get; }
+    TilePrefabPack Pack { get; set; }
     Transform LevelRoot { get; }
 
     ILevel GetLevel();
@@ -11,10 +11,9 @@ public interface ILevelLoader: IBasicObject
 
 public class LevelLoader : MonoBehaviour, ILevelLoader
 {
-    [SerializeField] private TilePrefabPack pack;
     [SerializeField] private Transform levelRoot;
 
-    public TilePrefabPack Pack => pack;
+    public TilePrefabPack Pack { get; set; }
     public Transform LevelRoot => levelRoot;
     
     

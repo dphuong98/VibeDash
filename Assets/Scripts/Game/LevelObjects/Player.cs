@@ -22,6 +22,7 @@ public interface IPlayer: IBasicObject, SimpleStateMachine<PlayerState>
     Transform Root { get; }
     IInputController InputController { get; }
     ILevel Level { get; }
+    ITileStack TileStack { get; }
     
     UnityEvent OnPlayerWin { get; set; }
     UnityEvent OnPlayerFell { get; set; }
@@ -33,15 +34,16 @@ public class Player : MonoBehaviour, IPlayer
 {
     [SerializeField] private InputController inputController;
     [SerializeField] private Level level;
+    [SerializeField] private TileStack tileStack;
 
     public Transform Root => transform;
     public IInputController InputController => inputController;
     public ILevel Level => level;
+    public ITileStack TileStack => tileStack;
 
     public UnityEvent OnPlayerWin { get; set; } = new UnityEvent();
     public UnityEvent OnPlayerFell { get; set; } = new UnityEvent();
-
-    private int stackCount;
+    
     private const int speed = 6;
     private Vector3Int currentGridPos;
     private Vector3Int direction;
@@ -50,21 +52,20 @@ public class Player : MonoBehaviour, IPlayer
 
     public void Setup()
     {
-        InputController.Setup();
         InputController.OnSwipeDirection.AddListener(HandleInput);
+        InputController.Setup();
         
+        TileStack.Setup();
+
         CurrentState = PlayerState.Idle;
     }
 
     public void CleanUp()
     {
         InputController.OnSwipeDirection.RemoveListener(HandleInput);
+        TileStack.CleanUp();
+        
         InputController.CleanUp();
-    }
-
-    private void Update()
-    {
-        DebugUI.Instance.AddText("StackCount: " + stackCount);
     }
 
     private void FixedUpdate()
@@ -96,7 +97,7 @@ public class Player : MonoBehaviour, IPlayer
         if (Root.position == levelGrid.GetCellCenterWorld(currentGridPos))
         {
             if (nextTile != null && 
-                (!nextTile.IsPassable() || nextTile.TileType == TileType.Bridge && !nextTile.IsTraversed() && stackCount == 0))
+                (!nextTile.IsPassable() || nextTile.TileType == TileType.Bridge && !nextTile.IsTraversed() && TileStack.StackCount == 0))
             {
                 CurrentState = PlayerState.Idle;
                 return;
@@ -105,7 +106,7 @@ public class Player : MonoBehaviour, IPlayer
             var currentTile = Level.GetTile(currentGridPos);
             if (currentTile.HasRoad() && !currentTile.IsTraversed())
             {
-                stackCount++;
+                TileStack.IncreaseStack();
             }
             
             currentTile.OnExit();
@@ -146,7 +147,7 @@ public class Player : MonoBehaviour, IPlayer
         switch (nextTile.TileType)
         {
             case TileType.Bridge:
-                if (!nextTile.IsTraversed()) stackCount--;
+                if (!nextTile.IsTraversed()) TileStack.DecreaseStack();
                 var bridge = Level.GetBridge(nextGridPos, direction);
                 direction = bridge.bridgeParts[1] - bridge.bridgeParts[0];
                 break;

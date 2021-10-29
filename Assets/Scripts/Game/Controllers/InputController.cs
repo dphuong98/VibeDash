@@ -10,8 +10,6 @@ using UnityEngine.Events;
 public interface IInputController: IBasicObject
 {
     Vector3IntEvent OnSwipeDirection { get; }
-
-    void HandleFingerSwipe(LeanFinger finger);
 }
 
 public class InputController : MonoBehaviour, IInputController

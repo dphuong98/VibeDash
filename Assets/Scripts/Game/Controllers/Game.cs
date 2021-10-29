@@ -12,12 +12,14 @@ using UnityEngine.Serialization;
 
 public enum GameState
 {
+    Playing,
     Win,
     Lose
 }
 
 public interface IGame : IBasicObject, SimpleStateMachine<GameState>
 {
+    TilePrefabPack Pack { get; }
     Transform FinishLine { get; }
     ICameraController CameraController { get; }
     ILevelLoader LevelLoader { get; }
@@ -63,11 +65,13 @@ public class Game : MonoBehaviour, IGame
 
     [SerializeField] private LevelData debugLevelData;
 
+    [SerializeField] private TilePrefabPack pack;
     [SerializeField] private Transform finishLine;
     [SerializeField] private CameraController cameraController;
     [SerializeField] private LevelLoader levelLoader;
     [SerializeField] private Player player;
 
+    public TilePrefabPack Pack => pack;
     public Transform FinishLine => finishLine;
     public ICameraController CameraController => cameraController;
     public ILevelLoader LevelLoader => levelLoader;
@@ -86,19 +90,19 @@ public class Game : MonoBehaviour, IGame
         Play();
     }
 
-    private void Update()
-    {
-        DebugUI.Instance.AddText("GameState: " + CurrentState);
-    }
-
     public void Setup()
     {
         CameraController.Setup();
+        
+        LevelLoader.Pack = Pack;
         LevelLoader.Setup();
-        Player.Setup();
-
+        
+        Player.TileStack.RoadPrefab = Pack.RoadPrefab;
         Player.OnPlayerWin.AddListener(GameWin);
         Player.OnPlayerFell.AddListener(GameLost);
+        Player.Setup();
+        
+        CurrentState = GameState.Playing;
 
         //Load player progression
     }
@@ -153,10 +157,12 @@ public class Game : MonoBehaviour, IGame
     private void GameWin()
     {
         Debug.Log("Win");
+        CurrentState = GameState.Win;
     }
 
     private void GameLost()
     {
         Debug.Log("Lose");
+        CurrentState = GameState.Lose;
     }
 }

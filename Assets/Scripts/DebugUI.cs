@@ -15,6 +15,6 @@ public class DebugUI : Singleton<DebugUI>
 
     public void AddText(string text)
     {
-        this.text.text += text;
+        this.text.text += text + "\n";
     }
 }

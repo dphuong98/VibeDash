@@ -8,8 +8,6 @@ using UnityEngine.Serialization;
 public interface ICameraController: IBasicObject
 {
     Transform Target { get; }
-
-    void Track();
 }
 
 public class CameraController : MonoBehaviour, ICameraController
@@ -39,7 +37,7 @@ public class CameraController : MonoBehaviour, ICameraController
     
     public void Track()
     {
-        if (Camera.main == null) return;
+        if (Camera.main == null || Target == null) return;
         
         Camera.main.transform.position = Target.position + PositionOffset;
         Camera.main.transform.rotation = Quaternion.Euler(RotationOffset);
