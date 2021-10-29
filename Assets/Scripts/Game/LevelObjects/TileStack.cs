@@ -47,16 +47,15 @@ public class TileStack : MonoBehaviour, ITileStack
     {
         StackCount++; stackCountText.text = StackCount.ToString();
         playerModel.position += new Vector3 {y = stackTileHeight};
-        stackCube.position += new Vector3 {y = stackTileHeight};
-        //scale here
-        //Instantiate(RoadPrefab, tilePlacementPos, Quaternion.identity, tileStackRoot).layer = LayerMask.NameToLayer(stackLayerName);
+        stackCube.position = new Vector3(stackCube.position.x, stackTileHeight * StackCount / 2, stackCube.position.z);
+        stackCube.localScale = new Vector3(1, StackCount, 1);
     }
 
     public void DecreaseStack()
     {
         StackCount--; stackCountText.text = StackCount.ToString();
         playerModel.position -= new Vector3 {y = stackTileHeight};
-        stackCube.position -= new Vector3 {y = stackTileHeight};
-        //Destroy(TileStackRoot.GetChild(TileStackRoot.childCount - 1).gameObject);
+        stackCube.position = new Vector3(stackCube.position.x, stackTileHeight * StackCount / 2, stackCube.position.z);
+        stackCube.localScale = new Vector3(1, StackCount, 1);
     }
 }
