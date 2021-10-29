@@ -13,7 +13,7 @@ public interface ISetup
 public interface ICleanUp
 {
     /// <summary>
-    /// Prepare class for destruction
+    /// Prepare class for destruction. Should be the opposite of Setup()
     /// </summary>
     void CleanUp();
 }

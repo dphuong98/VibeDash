@@ -2,21 +2,27 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using _Main.Game.Interfaces;
+using Packages.Rider.Editor.Util;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.PlayerLoop;
 using UnityEngine.Serialization;
 
-public interface IGame : IBasicObject
+public enum GameState
+{
+    Win,
+    Lose
+}
+
+public interface IGame : IBasicObject, SimpleStateMachine<GameState>
 {
     Transform FinishLine { get; }
     ICameraController CameraController { get; }
     ILevelLoader LevelLoader { get; }
     IPlayer Player { get; }
-    
-    UnityEvent OnWin { get; }
-    UnityEvent OnLose { get; }
-    
+
     void Play();
     void Restart();
 }
@@ -67,10 +73,9 @@ public class Game : MonoBehaviour, IGame
     public ILevelLoader LevelLoader => levelLoader;
     public IPlayer Player => player;
     
-    public UnityEvent OnWin { get; }
-    public UnityEvent OnLose { get; }
+    public GameState CurrentState { get; private set; }
 
-    
+
     private void Awake()
     {
         Setup();
@@ -80,17 +85,27 @@ public class Game : MonoBehaviour, IGame
     {
         Play();
     }
-    
+
+    private void Update()
+    {
+        DebugUI.Instance.AddText("GameState: " + CurrentState);
+    }
+
     public void Setup()
     {
+        CameraController.Setup();
         LevelLoader.Setup();
         Player.Setup();
-        
+
+        Player.OnPlayerWin.AddListener(GameWin);
+        Player.OnPlayerFell.AddListener(GameLost);
+
         //Load player progression
     }
     
     public void CleanUp()
     {
+        CameraController.CleanUp();
         LevelLoader.CleanUp();
         Player.CleanUp();
 
@@ -100,8 +115,6 @@ public class Game : MonoBehaviour, IGame
     public void Play()
     {
         Load();
-
-        //Set state or sth
     }
 
     private void Load()
@@ -127,11 +140,23 @@ public class Game : MonoBehaviour, IGame
 
     public void Restart()
     {
-        //throw new NotImplementedException();
+        CleanUp();
+        Setup();
+        Play();
     }
 
     private void OnApplicationQuit()
     {
         CleanUp();
+    }
+    
+    private void GameWin()
+    {
+        Debug.Log("Win");
+    }
+
+    private void GameLost()
+    {
+        Debug.Log("Lose");
     }
 }

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public interface ICameraController
+public interface ICameraController: IBasicObject
 {
     Transform Target { get; }
 
@@ -21,6 +21,16 @@ public class CameraController : MonoBehaviour, ICameraController
 
     public Transform Target => target;
     
+    
+    public void Setup()
+    {
+        
+    }
+
+    public void CleanUp()
+    {
+        
+    }
     
     private void Update()
     {

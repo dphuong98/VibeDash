@@ -29,7 +29,7 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
         if (!LevelRoot) return;
         
         foreach (Transform child in LevelRoot)
-            Destroy(child);
+            Destroy(child.gameObject);
     }
 
     public Level GetLevel()

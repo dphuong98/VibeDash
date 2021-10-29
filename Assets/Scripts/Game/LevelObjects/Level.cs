@@ -26,13 +26,16 @@ public class Level : MonoBehaviour, ILevel
     public LevelData LevelData { get; private set; }
     public Grid LevelGrid { get; private set; }
 
-    private List<Portal> portals = new List<Portal>();
-    private TileDirection tileDirections = new TileDirection();
+    private List<Portal> portals;
+    private TileDirection tileDirections;
     
     
     public void Setup()
     {
         LevelGrid = levelGrid;
+
+        portals = new List<Portal>();
+        tileDirections = new TileDirection();
     }
 
     public void CleanUp()

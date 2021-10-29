@@ -13,7 +13,8 @@ public enum PlayerState
 {
     Idle,
     Moving,
-    Dead
+    Win,
+    Dead,
 }
 
 public interface IPlayer: IBasicObject, SimpleStateMachine<PlayerState>
@@ -22,8 +23,8 @@ public interface IPlayer: IBasicObject, SimpleStateMachine<PlayerState>
     IInputController InputController { get; }
     ILevel Level { get; }
     
-    UnityEvent OnWin { get; }
-    UnityEvent OnLose { get; }
+    UnityEvent OnPlayerWin { get; set; }
+    UnityEvent OnPlayerFell { get; set; }
     
     void HandleInput(Vector3Int direction);
 }
@@ -37,10 +38,10 @@ public class Player : MonoBehaviour, IPlayer
     public IInputController InputController => inputController;
     public ILevel Level => level;
 
-    public UnityEvent OnWin { get; }
-    public UnityEvent OnLose { get; }
+    public UnityEvent OnPlayerWin { get; set; } = new UnityEvent();
+    public UnityEvent OnPlayerFell { get; set; } = new UnityEvent();
 
-    private int stackCount = 0;
+    private int stackCount;
     private const int speed = 6;
     private Vector3Int currentGridPos;
     private Vector3Int direction;
@@ -124,12 +125,19 @@ public class Player : MonoBehaviour, IPlayer
         Root.position = levelGrid.GetCellCenterWorld(nextGridPos);
 
         //Check WinCondition
+        var raycastHits = Physics.RaycastAll(Root.position + 3 * Vector3.up, Vector3.down);
+        if (raycastHits.Any(hit => hit.transform.CompareTag("FinishLine")))
+        {
+            CurrentState = PlayerState.Win;
+            OnPlayerWin.Invoke();
+            return;
+        }
         
         //Check LoseCondition
         if (nextTile == null)
         {
             CurrentState = PlayerState.Dead;
-            //OnLose.Invoke();
+            OnPlayerFell.Invoke();
             return;
         }
         

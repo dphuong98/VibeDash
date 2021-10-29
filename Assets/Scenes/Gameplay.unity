@@ -772,7 +772,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   debugLevelData: {fileID: 11400000, guid: ced90fb26e30fef4a8ce49bd0ab56561, type: 2}
   finishLine: {fileID: 1391648510}
-  cameraController: {fileID: 0}
+  cameraController: {fileID: 2007389698}
   levelLoader: {fileID: 2096834428}
   player: {fileID: 5219848136205776808}
 --- !u!4 &1600742062
