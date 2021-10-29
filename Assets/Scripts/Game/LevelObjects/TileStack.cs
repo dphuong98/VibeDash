@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public interface ITileStack: IBasicObject
 {
@@ -17,6 +18,7 @@ public interface ITileStack: IBasicObject
 public class TileStack : MonoBehaviour, ITileStack
 {
     [SerializeField] private const string stackLayerName = "Stacks";
+    [SerializeField] private Text stackCountText;
     [SerializeField] private Transform playerModel;
     [SerializeField] private Transform tileStackRoot;
 
@@ -42,7 +44,7 @@ public class TileStack : MonoBehaviour, ITileStack
 
     public void IncreaseStack()
     {
-        StackCount++;
+        StackCount++; stackCountText.text = StackCount.ToString();
         playerModel.position += new Vector3 {y = stackTileHeight};
         var tilePlacementPos = tileStackRoot.position;
         tilePlacementPos.y = stackFloorHeight + StackCount * stackTileHeight;
@@ -51,7 +53,7 @@ public class TileStack : MonoBehaviour, ITileStack
 
     public void DecreaseStack()
     {
-        StackCount--;
+        StackCount--; stackCountText.text = StackCount.ToString();
         playerModel.position -= new Vector3 {y = stackTileHeight};
         Destroy(TileStackRoot.GetChild(TileStackRoot.childCount - 1).gameObject);
     }
