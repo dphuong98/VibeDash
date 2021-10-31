@@ -47,6 +47,7 @@ public class Player : MonoBehaviour, IPlayer
     private const int Speed = 30;
     private Vector3Int currentGridPos;
     private Vector3Int direction;
+    private Animator animator;
     
     public PlayerState CurrentState { get; private set; }
 
@@ -57,7 +58,8 @@ public class Player : MonoBehaviour, IPlayer
         
         TileStack.Setup();
 
-        CurrentState = PlayerState.Idle;
+        animator = GetComponent<Animator>();
+        SetState(PlayerState.Idle);
     }
 
     public void CleanUp()
@@ -82,7 +84,7 @@ public class Player : MonoBehaviour, IPlayer
         this.direction = direction;
         if (Level.GetTile(currentGridPos + direction) == null) return;
 
-        CurrentState = PlayerState.Moving;
+        SetState(PlayerState.Moving);
     }
 
     private void Move()
@@ -99,7 +101,7 @@ public class Player : MonoBehaviour, IPlayer
             if (nextTile != null && 
                 (!nextTile.IsPassable() || nextTile.TileType == TileType.Bridge && !nextTile.IsTraversed() && TileStack.StackCount == 0))
             {
-                CurrentState = PlayerState.Idle;
+                SetState(PlayerState.Idle);
                 return;
             }
             
@@ -131,7 +133,7 @@ public class Player : MonoBehaviour, IPlayer
         var raycastHits = Physics.RaycastAll(Root.position + 3 * Vector3.up, Vector3.down);
         if (raycastHits.Any(hit => hit.transform.CompareTag("FinishLine")))
         {
-            CurrentState = PlayerState.Win;
+            SetState(PlayerState.Win);
             OnPlayerWin.Invoke();
             return;
         }
@@ -139,7 +141,7 @@ public class Player : MonoBehaviour, IPlayer
         //Check LoseCondition
         if (nextTile == null)
         {
-            CurrentState = PlayerState.Dead;
+            SetState(PlayerState.Dead);
             OnPlayerFell.Invoke();
             return;
         }
@@ -166,15 +168,30 @@ public class Player : MonoBehaviour, IPlayer
                 if (otherPortal != null)
                 {
                     Root.position = levelGrid.GetCellCenterWorld((Vector3Int) otherPortal);
-                    CurrentState = PlayerState.Idle;
+                    SetState(PlayerState.Idle);
                 }
                 break;
             case TileType.Stop:
-                CurrentState = PlayerState.Idle;
+                SetState(PlayerState.Idle);
                 break;
         }
         
         nextTile.OnEnter();
         currentGridPos = nextGridPos;
+    }
+
+    private void SetState(PlayerState newState)
+    {
+        CurrentState = newState;
+
+        switch (newState)
+        {
+            case PlayerState.Moving:
+                animator.SetBool("IsMoving", true);
+                break;
+            case PlayerState.Idle:
+                animator.SetBool("IsMoving", false);
+                break;
+        }
     }
 }
