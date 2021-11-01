@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -239,6 +239,12 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &348344262 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6814563554382106538, guid: dd8d392e3fc5bb145934817ceb542aec,
+    type: 3}
+  m_PrefabInstance: {fileID: 5219848136205776806}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &706560433
 GameObject:
   m_ObjectHideFlags: 0
@@ -1165,6 +1171,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelRoot: {fileID: 706560434}
+--- !u!1 &2124344479
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2124344480}
+  m_Layer: 9
+  m_Name: StackCube
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2124344480
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2124344479}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 348344262}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &5219848136205776806
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1172,6 +1208,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 330300288}
     m_Modifications:
+    - target: {fileID: 514134313158716663, guid: dd8d392e3fc5bb145934817ceb542aec,
+        type: 3}
+      propertyPath: stackCube
+      value: 
+      objectReference: {fileID: 2124344480}
+    - target: {fileID: 514134313158716663, guid: dd8d392e3fc5bb145934817ceb542aec,
+        type: 3}
+      propertyPath: stackPivot
+      value: 
+      objectReference: {fileID: 2124344480}
     - target: {fileID: 514134313158716663, guid: dd8d392e3fc5bb145934817ceb542aec,
         type: 3}
       propertyPath: stackCountText

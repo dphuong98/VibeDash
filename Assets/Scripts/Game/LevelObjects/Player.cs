@@ -82,7 +82,9 @@ public class Player : MonoBehaviour, IPlayer
 
         currentGridPos = Level.LevelGrid.WorldToCell(Root.position);
         this.direction = direction;
+        
         if (Level.GetTile(currentGridPos + direction) == null) return;
+        tileStack.LookAt(direction);
 
         SetState(PlayerState.Moving);
     }
@@ -131,7 +133,7 @@ public class Player : MonoBehaviour, IPlayer
 
         //Check WinCondition
         var raycastHits = Physics.RaycastAll(Root.position + 3 * Vector3.up, Vector3.down);
-        if (raycastHits.Any(hit => hit.transform.CompareTag("FinishLine")))
+        if (raycastHits.Any(hit => hit.transform.CompareTag("FinishLine"))) //TODO raycast all
         {
             SetState(PlayerState.Win);
             OnPlayerWin.Invoke();
