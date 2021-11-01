@@ -19,6 +19,7 @@ public enum PlayerState
 
 public interface IPlayer: IBasicObject, SimpleStateMachine<PlayerState>
 {
+    GameObject PlayerPrefab { get; }
     Transform Root { get; }
     IInputController InputController { get; }
     ILevel Level { get; }
@@ -32,12 +33,15 @@ public interface IPlayer: IBasicObject, SimpleStateMachine<PlayerState>
 
 public class Player : MonoBehaviour, IPlayer
 {
+    [SerializeField] private GameObject playerPrefab; // TODO remove unity assignment and place default in playerprefs
     [SerializeField] private InputController inputController;
     [SerializeField] private Level level;
     [SerializeField] private TileStack tileStack;
+    [SerializeField] private Transform modelPivot;
     [SerializeField] private Animator playerAnimation;
     [SerializeField] private Animator playerModelAnimation;
 
+    public GameObject PlayerPrefab => playerPrefab;
     public Transform Root => transform;
     public IInputController InputController => inputController;
     public ILevel Level => level;
@@ -58,7 +62,8 @@ public class Player : MonoBehaviour, IPlayer
         InputController.Setup();
         
         TileStack.Setup();
-        
+
+        //Instantiate(playerPrefab, modelPivot.position, Quaternion.Euler(0, 150, 0), modelPivot).GetComponent<Animator>().;
         SetState(PlayerState.Idle);
     }
 
