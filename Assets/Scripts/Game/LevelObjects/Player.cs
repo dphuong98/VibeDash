@@ -84,7 +84,6 @@ public class Player : MonoBehaviour, IPlayer
         this.direction = direction;
         
         if (Level.GetTile(currentGridPos + direction) == null) return;
-        tileStack.LookAt(direction);
 
         SetState(PlayerState.Moving);
     }
@@ -193,6 +192,8 @@ public class Player : MonoBehaviour, IPlayer
                 break;
             case PlayerState.Idle:
                 animator.SetBool("IsMoving", false);
+                animator.SetFloat("xAxis", direction.x);
+                animator.SetFloat("yAxis", direction.y);
                 break;
         }
     }

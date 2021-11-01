@@ -28,7 +28,7 @@ public class TileStack : MonoBehaviour, ITileStack
     public int StackCount { get; private set; }
 
     private Transform stackCube;
-    private float tileStackScale = 2.5f;
+    private float tileStackScale = 2;
     private const string stackLayerName = "Stacks";
     private float stackTileHeight;
 
@@ -60,15 +60,15 @@ public class TileStack : MonoBehaviour, ITileStack
         stackCube.position = new Vector3(stackCube.position.x, tileStackScale * stackTileHeight * StackCount / 2, stackCube.position.z);
         stackCube.localScale = new Vector3(1, tileStackScale * StackCount, 1);
     }
-
-    public void LookAt(Vector3Int direction)
-    {
-        var angle = 0;
-        if (direction == Vector3Int.up) angle = -90;
-        if (direction == Vector3Int.right) angle = 0;
-        if (direction == Vector3Int.down) angle = 90;
-        if (direction == Vector3Int.left) angle = 180;
-        
-        tileStackRoot.eulerAngles = new Vector3(0, angle, 0);
-    }
+    
+    // public void LookAt(Vector3Int direction)
+    // {
+    //     var angle = 0;
+    //     if (direction == Vector3Int.up) angle = -90;
+    //     if (direction == Vector3Int.right) angle = 0;
+    //     if (direction == Vector3Int.down) angle = 90;
+    //     if (direction == Vector3Int.left) angle = 180;
+    //     
+    //     tileStackRoot.eulerAngles = new Vector3(0, angle, 0);
+    // } TODO scrap this
 }
