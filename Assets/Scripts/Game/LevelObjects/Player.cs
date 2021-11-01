@@ -35,6 +35,8 @@ public class Player : MonoBehaviour, IPlayer
     [SerializeField] private InputController inputController;
     [SerializeField] private Level level;
     [SerializeField] private TileStack tileStack;
+    [SerializeField] private Animator playerAnimation;
+    [SerializeField] private Animator playerModelAnimation;
 
     public Transform Root => transform;
     public IInputController InputController => inputController;
@@ -47,8 +49,7 @@ public class Player : MonoBehaviour, IPlayer
     private const int Speed = 30;
     private Vector3Int currentGridPos;
     private Vector3Int direction;
-    private Animator animator;
-    
+
     public PlayerState CurrentState { get; private set; }
 
     public void Setup()
@@ -57,8 +58,7 @@ public class Player : MonoBehaviour, IPlayer
         InputController.Setup();
         
         TileStack.Setup();
-
-        animator = GetComponent<Animator>();
+        
         SetState(PlayerState.Idle);
     }
 
@@ -188,12 +188,14 @@ public class Player : MonoBehaviour, IPlayer
         switch (newState)
         {
             case PlayerState.Moving:
-                animator.SetBool("IsMoving", true);
+                playerAnimation.SetBool("IsMoving", true);
+                playerModelAnimation.SetBool("IsMoving", true);
                 break;
             case PlayerState.Idle:
-                animator.SetBool("IsMoving", false);
-                animator.SetFloat("xAxis", direction.x);
-                animator.SetFloat("yAxis", direction.y);
+                playerAnimation.SetBool("IsMoving", false);
+                playerAnimation.SetFloat("xAxis", direction.x);
+                playerAnimation.SetFloat("yAxis", direction.y);
+                playerModelAnimation.SetBool("IsMoving", false);
                 break;
         }
     }
