@@ -75,6 +75,8 @@ public class Player : MonoBehaviour, IPlayer
         TileStack.CleanUp();
         
         InputController.CleanUp();
+
+        DestroyPlayerModel();
     }
 
     private void FixedUpdate()
@@ -84,13 +86,19 @@ public class Player : MonoBehaviour, IPlayer
 
     private void SpawnPlayerModel()
     {
-        var prefabPath = System.IO.Path.Combine(ResourcePaths.PlayerModelFolder,
-            PlayerPrefs.GetString(SaveDataKeys.PlayerModelName));
-        var playerPrefab = Resources.Load<GameObject>(prefabPath);
-        playerModel = Instantiate(playerPrefab, modelPivot.position, Quaternion.Euler(0, 150, 0), modelPivot);
+        var defaultModelName = "Mousey";
+        var modelPath = System.IO.Path.Combine(ResourcePaths.PlayerModelFolder, PlayerPrefs.GetString(SaveDataKeys.PlayerModelName));
+        var model = Resources.Load<GameObject>(modelPath);
+        if (!model) model = Resources.Load<GameObject>(System.IO.Path.Combine(ResourcePaths.PlayerModelFolder, defaultModelName));
+        playerModel = Instantiate(model, modelPivot);
         playerModelAnimation = playerModel.GetComponent<Animator>();
         playerModelAnimation.runtimeAnimatorController = modelAnimationController;
         playerModelAnimation.applyRootMotion = false;
+    }
+
+    private void DestroyPlayerModel()
+    {
+        if (playerModel) Destroy(playerModel);
     }
 
     private void Move()

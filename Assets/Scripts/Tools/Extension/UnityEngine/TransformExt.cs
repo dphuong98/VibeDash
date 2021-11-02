@@ -13,4 +13,10 @@ public static class TransformExt
 
         return null;
     }
+    
+    public static void SetLayer(this Transform root, int layer) {
+        root.gameObject.layer = layer;
+        foreach(Transform child in root)
+            SetLayer(child, layer);
+    }
 }

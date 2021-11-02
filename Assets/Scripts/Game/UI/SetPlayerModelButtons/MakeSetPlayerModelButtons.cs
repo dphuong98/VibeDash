@@ -13,7 +13,8 @@ public class MakeSetPlayerModelButtons : MonoBehaviour
         var playerModels = Resources.LoadAll<GameObject>(ResourcePaths.PlayerModelFolder);
         foreach (var playerModel in playerModels)
         {
-            
+            var button = Instantiate(buttonPrefab, transform);
+            button.GetComponent<SetPlayerModelButton>().SetPlayerModel(playerModel);
         }
     }
 }
