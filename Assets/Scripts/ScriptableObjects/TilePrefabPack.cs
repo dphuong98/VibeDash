@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Pack", menuName = "ScriptableObjects/TilePrefabPack", order = 1)]
+[CreateAssetMenu(fileName = "Pack", menuName = "VibeDash/TilePrefabPack", order = 1)]
 public class TilePrefabPack : ScriptableObject
 {
     public GameObject WallPrefab;

@@ -1,10 +1,11 @@
-﻿using System;
+﻿
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using _Main.Game.Interfaces;
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -19,7 +20,6 @@ public enum PlayerState
 
 public interface IPlayer: IBasicObject, SimpleStateMachine<PlayerState>
 {
-    GameObject PlayerPrefab { get; }
     Transform Root { get; }
     IInputController InputController { get; }
     ILevel Level { get; }
@@ -33,15 +33,16 @@ public interface IPlayer: IBasicObject, SimpleStateMachine<PlayerState>
 
 public class Player : MonoBehaviour, IPlayer
 {
-    [SerializeField] private GameObject playerPrefab; // TODO remove unity assignment and place default in playerprefs
     [SerializeField] private InputController inputController;
     [SerializeField] private Level level;
     [SerializeField] private TileStack tileStack;
     [SerializeField] private Transform modelPivot;
+
+    [Space]
+    [SerializeField] private AnimatorController modelAnimationController;
     [SerializeField] private Animator playerAnimation;
     [SerializeField] private Animator playerModelAnimation;
-
-    public GameObject PlayerPrefab => playerPrefab;
+    
     public Transform Root => transform;
     public IInputController InputController => inputController;
     public ILevel Level => level;
@@ -50,6 +51,7 @@ public class Player : MonoBehaviour, IPlayer
     public UnityEvent OnPlayerWin { get; set; } = new UnityEvent();
     public UnityEvent OnPlayerFell { get; set; } = new UnityEvent();
     
+    private GameObject playerModel;
     private const int Speed = 30;
     private Vector3Int currentGridPos;
     private Vector3Int direction;
@@ -63,7 +65,7 @@ public class Player : MonoBehaviour, IPlayer
         
         TileStack.Setup();
 
-        //Instantiate(playerPrefab, modelPivot.position, Quaternion.Euler(0, 150, 0), modelPivot).GetComponent<Animator>().;
+        SpawnPlayerModel();
         SetState(PlayerState.Idle);
     }
 
@@ -80,17 +82,15 @@ public class Player : MonoBehaviour, IPlayer
         Move();
     }
 
-    public void HandleInput(Vector3Int direction)
+    private void SpawnPlayerModel()
     {
-        //Check movable
-        if (CurrentState == PlayerState.Moving || CurrentState == PlayerState.Dead) return;
-
-        currentGridPos = Level.LevelGrid.WorldToCell(Root.position);
-        this.direction = direction;
-        
-        if (Level.GetTile(currentGridPos + direction) == null) return;
-
-        SetState(PlayerState.Moving);
+        var prefabPath = System.IO.Path.Combine(ResourcePaths.PlayerModelFolder,
+            PlayerPrefs.GetString(SaveDataKeys.PlayerModelName));
+        var playerPrefab = Resources.Load<GameObject>(prefabPath);
+        playerModel = Instantiate(playerPrefab, modelPivot.position, Quaternion.Euler(0, 150, 0), modelPivot);
+        playerModelAnimation = playerModel.GetComponent<Animator>();
+        playerModelAnimation.runtimeAnimatorController = modelAnimationController;
+        playerModelAnimation.applyRootMotion = false;
     }
 
     private void Move()
@@ -203,5 +203,18 @@ public class Player : MonoBehaviour, IPlayer
                 playerModelAnimation.SetBool("IsMoving", false);
                 break;
         }
+    }
+    
+    public void HandleInput(Vector3Int direction)
+    {
+        //Check movable
+        if (CurrentState == PlayerState.Moving || CurrentState == PlayerState.Dead) return;
+
+        currentGridPos = Level.LevelGrid.WorldToCell(Root.position);
+        this.direction = direction;
+        
+        if (Level.GetTile(currentGridPos + direction) == null) return;
+
+        SetState(PlayerState.Moving);
     }
 }
