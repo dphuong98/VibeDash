@@ -11,6 +11,7 @@ public class SetPlayerModelButton : MonoBehaviour
 
     [SerializeField] private AnimatorController idlePose;
     [SerializeField] private Transform modelPivot;
+    [SerializeField] private Transform checkIcon;
 
     public void SetPlayerPref()
     {
@@ -25,5 +26,10 @@ public class SetPlayerModelButton : MonoBehaviour
         var playerAnim = Instantiate(playerModel, modelPivot); 
         playerAnim.transform.SetLayer(LayerMask.NameToLayer("UI"));
         playerAnim.GetComponent<Animator>().runtimeAnimatorController = idlePose;
+    }
+
+    public void SetSelected(bool selected)
+    {
+        checkIcon.gameObject.SetActive(selected);
     }
 }
