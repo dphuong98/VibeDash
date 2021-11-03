@@ -28,7 +28,7 @@ public class TileStack : MonoBehaviour, ITileStack
     public int StackCount { get; private set; }
 
     private Transform stackCube;
-    private float tileStackScale = 2;
+    private const float tileStackScale = 2;
     private const string stackLayerName = "Stacks";
     private float stackTileHeight;
 
@@ -38,11 +38,15 @@ public class TileStack : MonoBehaviour, ITileStack
         stackTileHeight = RoadPrefab.GetComponent<BoxCollider>().size.y;
         stackCube = Instantiate(RoadPrefab, Root.position, Quaternion.identity, stackPivot).transform;
         stackCube.gameObject.layer = LayerMask.NameToLayer(stackLayerName);
+
+        StackCount = 0;  stackCountText.text = StackCount.ToString();
     }
 
     public void CleanUp()
     {
         Destroy(stackCube.gameObject);
+
+        playerModel.position = new Vector3(playerModel.position.x, 0, playerModel.position.z);
     }
 
     public void IncreaseStack()
