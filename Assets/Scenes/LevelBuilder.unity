@@ -374,5 +374,25 @@ PrefabInstance:
       propertyPath: m_Name
       value: LevelData1
       objectReference: {fileID: 0}
+    - target: {fileID: 6449468126653184659, guid: 3074441433d0e104da2ca63a1ade0ef2,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6449468126653184659, guid: 3074441433d0e104da2ca63a1ade0ef2,
+        type: 3}
+      propertyPath: path.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6449468126653184659, guid: 3074441433d0e104da2ca63a1ade0ef2,
+        type: 3}
+      propertyPath: path.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6449468126653184659, guid: 3074441433d0e104da2ca63a1ade0ef2,
+        type: 3}
+      propertyPath: path.Array.data[1]
+      value: 
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3074441433d0e104da2ca63a1ade0ef2, type: 3}

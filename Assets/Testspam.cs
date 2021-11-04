@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using PathCreation;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class testspam : MonoBehaviour
+public class Testspam : MonoBehaviour
 {
-    [ContextMenu("Test")]
+    public PathCreator path;
+    
     public void Test()
     {
-        Debug.Log(new Vector2Int(0, 0).IsSameDirection(new Vector2Int(0, 0)));
+        
     }
 }

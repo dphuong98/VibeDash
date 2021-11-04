@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using PathCreation;
 using UnityEditor;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
@@ -19,8 +20,9 @@ public class LevelBuilder : Builder<LevelData>
     public LevelData EditingLevelData => EditingItem;
 
     //Members
+    private BridgeRenderer bridgeRenderer;
     private Grid levelGrid;
-    private Bridge editingBridge = null;
+    private Bridge editingBridge;
     
     private List<MiniStage> miniStages = new List<MiniStage>();
     private List<Bridge> bridges = new List<Bridge>();
@@ -40,10 +42,11 @@ public class LevelBuilder : Builder<LevelData>
     private void Init()
     {
         miniStagePrefab = Resources.Load<GameObject>("Prefabs/Editor/MiniStage");
-        
+
         if (miniStages == null) miniStages = new List<MiniStage>();
         if (bridges == null) bridges = new List<Bridge>();
 
+        bridgeRenderer = GetComponentInChildren<BridgeRenderer>(true);
         base.Init(levelFolder);
     }
     
@@ -62,8 +65,6 @@ public class LevelBuilder : Builder<LevelData>
 
         //Render and handle bridge connections
         DrawBridge();
-        DrawBridgeBuilder();
-        HandleBridgeBuilding(sceneView);
 
         //Other GUI option
     }
@@ -155,14 +156,14 @@ public class LevelBuilder : Builder<LevelData>
         for (var i = bridges.Count - 1; i >= 0; i--)
         {
             var bridgeStart = bridges[i].bridgeParts.First();
-            if (GetTileType(bridgeStart) != TileType.Exit)
+            if (GetTileType(GetMiniStage(bridgeStart), bridgeStart) != TileType.Exit)
             {
                 bridges.RemoveAt(i);
                 return;
             }
 
             var bridgeEnd = bridges[i].bridgeParts.Last();
-            if (GetTileType(bridgeEnd) != TileType.Entrance)
+            if (GetTileType(GetMiniStage(bridgeEnd), bridgeEnd) != TileType.Entrance)
             {
                 bridges.RemoveAt(i);
                 return;
@@ -223,57 +224,91 @@ public class LevelBuilder : Builder<LevelData>
             Event.current.modifiers != EventModifiers.None)
             return;
         
-        //Start bridge building
+        //Handle left mouse click
         if (Event.current.button == 0)
         {
             var mousePos = sceneView.SceneViewToWorld();
-            var gridPos = GetGridPosition(mousePos);
+            var mouseGridPos = GetGridPosition(mousePos);
 
-            var miniStage = GetMiniStage(gridPos);
-            var gridTileType = GetTileType(gridPos);
+            var miniStage = GetMiniStage(mouseGridPos);
+            var gridTileType = GetTileType(miniStage, mouseGridPos);
+            
+            //Start bridge building
             if (gridTileType == TileType.Exit)
             {
-                editingBridge = new Bridge(Pathfinding.CountUniqueTiles(miniStage.StageData.Solution));
-                editingBridge.bridgeParts.Add(GetGridPosition(mousePos));
+                var nearestNeighbor = GetEmptyNeighbor(mouseGridPos);
+                if (nearestNeighbor != null)
+                {
+                    editingBridge = new Bridge(Pathfinding.CountUniqueTiles(miniStage.StageData.Solution));
+                    editingBridge.bridgeParts.Add(mouseGridPos);
+                    editingBridge.bridgeParts.Add((Vector3Int)nearestNeighbor);
+                    StartBridgeBuilding(editingBridge.bridgeParts);
+                }
                 return;
             }
 
+            //Finish building bridge
             if (IsBuildingBridge() &&
                 gridTileType == TileType.Entrance &&
                 editingBridge.IsValid())
             {
-                bridges.Add(editingBridge);
-                editingBridge = null;
+                var nearestNeighbor = GetEmptyNeighbor(mouseGridPos);
+                if (nearestNeighbor != null)
+                {
+                    editingBridge.bridgeParts.Add((Vector3Int)nearestNeighbor);
+                    editingBridge.bridgeParts.Add(mouseGridPos);
+                    bridges.Add(editingBridge);
+                    StopBridgeBuilding();
+                }
                 return;
             }
 
-            editingBridge = null;
+            if (IsBuildingBridge())
+            {
+                //Cancel bridge building if clicked on stage
+                if (miniStage != null)
+                {
+                    StopBridgeBuilding();
+                }
+                else
+                {
+                    editingBridge.bridgeParts.Add(mouseGridPos);
+                    UpdateBridge(editingBridge.bridgeParts);
+                }
+            }
         }
 
+        //Handle right mouse click
+        if (Event.current.button == 1)
+        {
+            if (editingBridge == null) return;
+            
+            if (editingBridge.bridgeParts.Count > 2)
+            {
+                editingBridge.bridgeParts.RemoveAt(editingBridge.bridgeParts.Count - 1);
+                UpdateBridge(editingBridge.bridgeParts);
+                return;
+            }
+            
+            StopBridgeBuilding();
+        }
     }
 
-    private void DrawBridgeBuilder()
+    private void StartBridgeBuilding(List<Vector3Int> bridgeParts)
     {
-        if (!IsBuildingBridge())
-        {
-            //Render exit blinking
-            
-            return;
-        }
+        bridgeRenderer.gameObject.SetActive(true);
+        bridgeRenderer.SetBridge(bridgeParts.Select(s => levelGrid.GetCellCenterWorld(s)));
+    }
 
-        var remainingBridgeLength = editingBridge.MaxLength - editingBridge.bridgeParts.Count;
-        HandlesExt.DrawText(GetWorldPosition(editingBridge.bridgeParts.Last()), "" + remainingBridgeLength, 150, Color.white);
-        
-        Handles.color = remainingBridgeLength < 0 ? Color.red : Color.green;
-        
-        //Render entrance for bridge end
-        
+    private void UpdateBridge(List<Vector3Int> bridgeParts)
+    {
+        bridgeRenderer.SetBridge(bridgeParts.Select(s => levelGrid.GetCellCenterWorld(s)));
+    }
 
-        //Render editing bridge
-        for (int i = 0; i < editingBridge.bridgeParts.Count - 1; i++)
-        {
-            Handles.DrawLine(GetWorldPosition(editingBridge.bridgeParts[i]),  GetWorldPosition(editingBridge.bridgeParts[i+1]));
-        }
+    private void StopBridgeBuilding()
+    {
+        editingBridge = null;
+        bridgeRenderer.gameObject.SetActive(false);
     }
 
     private void DrawBridge()
@@ -287,32 +322,15 @@ public class LevelBuilder : Builder<LevelData>
             }
         }
     }
-    
-    private void HandleBridgeBuilding(SceneView sceneView)
-    {
-        //Get current grid tile relative to bridge start
-        if (!IsBuildingBridge()) return;
 
-        var mousePos = sceneView.SceneViewToWorld();
-        var mouseGridPos = GetGridPosition(mousePos);
-
-        if (editingBridge.bridgeParts.Count >= 2 && mouseGridPos == editingBridge.bridgeParts[editingBridge.bridgeParts.Count - 2])
-        {
-            //Delete if backtrack
-            editingBridge.bridgeParts.RemoveAt(editingBridge.bridgeParts.Count - 1);
-            return;
-        }
-        
-        if (mouseGridPos != editingBridge.bridgeParts.Last()) editingBridge.bridgeParts.Add(mouseGridPos);
-    }
-    
-    private TileType GetTileType(Vector3Int gridPos)
+    private TileType GetTileType(MiniStage miniStage, Vector3Int gridPos)
     {
-        var miniStage = GetMiniStage(gridPos);
         if (miniStage == null) return TileType.Air;
         
         var miniStageGridPos = GetGridPosition(miniStage.transform.position);
         var relativeGridPos = gridPos - miniStageGridPos;
+        if (relativeGridPos.x < 0 || relativeGridPos.y < 0) return TileType.Air;
+        
         return miniStage.StageData[relativeGridPos.x, relativeGridPos.y];
     }
     
@@ -331,6 +349,19 @@ public class LevelBuilder : Builder<LevelData>
     private bool IsBuildingBridge()
     {
         return editingBridge != null && editingBridge.MaxLength != 0;
+    }
+
+    private Vector3Int? GetEmptyNeighbor(Vector3Int gridPos)
+    {
+        var scoutDirection = Vector3Int.up;
+        do
+        {
+            var scoutGridPos = gridPos + scoutDirection;
+            if (GetTileType(GetMiniStage(scoutGridPos), scoutGridPos) == TileType.Air) return gridPos + scoutDirection;
+            scoutDirection = scoutDirection.RotateClockwise();
+        } while (scoutDirection != Vector3Int.up);
+
+        return null;
     }
     
     private Vector3Int GetGridPosition(Vector3 worldPos)
