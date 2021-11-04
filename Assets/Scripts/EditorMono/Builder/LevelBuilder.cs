@@ -297,12 +297,13 @@ public class LevelBuilder : Builder<LevelData>
     private void StartBridgeBuilding(List<Vector3Int> bridgeParts)
     {
         bridgeRenderer.gameObject.SetActive(true);
-        bridgeRenderer.SetBridge(bridgeParts.Select(s => levelGrid.GetCellCenterWorld(s)));
+        UpdateBridge(bridgeParts);
     }
 
     private void UpdateBridge(List<Vector3Int> bridgeParts)
     {
         bridgeRenderer.SetBridge(bridgeParts.Select(s => levelGrid.GetCellCenterWorld(s)));
+        Debug.Log(bridgeRenderer.GetMaxTile());
     }
 
     private void StopBridgeBuilding()
@@ -313,14 +314,14 @@ public class LevelBuilder : Builder<LevelData>
 
     private void DrawBridge()
     {
-        Handles.color = Color.yellow;
-        foreach (var bridge in bridges)
-        {
-            for (int i = 0; i < bridge.bridgeParts.Count - 1; i++)
-            {
-                Handles.DrawLine(GetWorldPosition(bridge.bridgeParts[i]), GetWorldPosition(bridge.bridgeParts[i+1]));
-            }
-        }
+        // Handles.color = Color.yellow;
+        // foreach (var bridge in bridges)
+        // {
+        //     for (int i = 0; i < bridge.bridgeParts.Count - 1; i++)
+        //     {
+        //         Handles.DrawLine(GetWorldPosition(bridge.bridgeParts[i]), GetWorldPosition(bridge.bridgeParts[i+1]));
+        //     }
+        // }
     }
 
     private TileType GetTileType(MiniStage miniStage, Vector3Int gridPos)

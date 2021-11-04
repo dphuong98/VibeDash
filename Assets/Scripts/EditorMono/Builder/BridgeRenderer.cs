@@ -13,12 +13,13 @@ public class BridgeRenderer : MonoBehaviour
     
     public void SetBridge(IEnumerable<Vector3> path)
     {
-        pathCreator.bezierPath = new BezierPath(path, false, PathSpace.xy);
-        pathCreator.bezierPath.AutoControlLength = 0.31f;
+        var noGlitchPath = path.ToList();
+        noGlitchPath[0] = new Vector3(noGlitchPath[0].x + 0.0001f, noGlitchPath[0].y, noGlitchPath[0].z);
+        pathCreator.bezierPath = new BezierPath(noGlitchPath, false, PathSpace.xy) {AutoControlLength = 0.31f};
     }
 
     public int GetMaxTile()
     {
-        return 0;
+        return (int)Math.Floor(pathCreator.path.length / spacing);
     }
 }
