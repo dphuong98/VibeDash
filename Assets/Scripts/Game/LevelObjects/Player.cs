@@ -166,7 +166,7 @@ public class Player : MonoBehaviour, IPlayer
             case TileType.Bridge:
                 if (!nextTile.IsTraversed()) TileStack.DecreaseStack();
                 var bridge = Level.GetBridge(nextGridPos, direction);
-                direction = bridge.bridgeParts[1] - bridge.bridgeParts[0];
+                direction = bridge.BridgeParts[1] - bridge.BridgeParts[0];
                 break;
             case TileType.Push:
                 direction = Level.GetTileDirection(nextGridPos);

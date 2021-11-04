@@ -8,31 +8,17 @@ using UnityEngine.Serialization;
 [Serializable]
 public class Bridge
 {
-    [SerializeField] public readonly int MaxLength;
-    [FormerlySerializedAs("BridgeParts")] [SerializeField] public List<Vector3Int> bridgeParts;
+    public List<Vector3Int> BridgeParts { get; private set; }
 
-    public Bridge(int maxLength)
+    public Bridge(List<Vector3Int> bridgeParts)
     {
-        MaxLength = maxLength;
-        bridgeParts = new List<Vector3Int>();
-    }
-    
-    //TODO remove max length
-    public Bridge(int maxLength, List<Vector3Int> bridgeParts)
-    {
-        MaxLength = maxLength;
-        this.bridgeParts = new List<Vector3Int>(bridgeParts);
-    }
-
-    public bool IsValid()
-    {
-        return bridgeParts.Count <= MaxLength;
+        BridgeParts = new List<Vector3Int>(bridgeParts);
     }
 
     public Bridge ReverseBridge()
     {
-        var bridgeClone = new List<Vector3Int>(bridgeParts);
+        var bridgeClone = new List<Vector3Int>(BridgeParts);
         bridgeClone.Reverse();
-        return new Bridge(MaxLength, bridgeClone);
+        return new Bridge(bridgeClone);
     }
 }

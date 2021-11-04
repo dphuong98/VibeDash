@@ -84,23 +84,23 @@ public class Level : MonoBehaviour, ILevel
     public Bridge GetBridge(Vector3Int gridPos, Vector3Int direction)
     {
         //TODO support overlapping of bridges
-        var bridge = LevelData.Bridges.FirstOrDefault(s => s.bridgeParts.Contains(gridPos));
+        var bridge = LevelData.Bridges.FirstOrDefault(s => s.BridgeParts.Contains(gridPos));
         if (bridge == null) return null;
         
-        var currentIndex = bridge.bridgeParts.IndexOf(gridPos);
-        var previousGridPos = bridge.bridgeParts[currentIndex - 1];
+        var currentIndex = bridge.BridgeParts.IndexOf(gridPos);
+        var previousGridPos = bridge.BridgeParts[currentIndex - 1];
         var previousDirection = gridPos - previousGridPos;
         if (previousDirection == direction)
         {
-            var newBridge = bridge.bridgeParts.GetRange(currentIndex, bridge.bridgeParts.Count - currentIndex);
-            return new Bridge(0, newBridge);
+            var newBridge = bridge.BridgeParts.GetRange(currentIndex, bridge.BridgeParts.Count - currentIndex);
+            return new Bridge(newBridge);
         }
         else
         {
             //Reverse bridge
-            var newBridge = bridge.bridgeParts.GetRange(0, currentIndex + 1);
+            var newBridge = bridge.BridgeParts.GetRange(0, currentIndex + 1);
             newBridge.Reverse();
-            return new Bridge(0, newBridge);
+            return new Bridge(newBridge);
         }
     }
 
