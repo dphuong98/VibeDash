@@ -22,8 +22,6 @@ public class LevelBuilderEditor : BuilderEditor<LevelData>
 
     public override void OnInspectorGUI()
     {
-        base.OnInspectorGUI();
-        
         #region Info
             GUILayout.Label("Level Info", EditorStyles.boldLabel);
             

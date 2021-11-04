@@ -76,8 +76,8 @@ public class LevelBuilder : Builder<LevelData>
         }
 
         //Render and handle bridge connections
-        DrawBridgeBuilder(sceneView);
-
+        DrawBridgeBuilderPreview(sceneView);
+        
         //Other GUI option
     }
 
@@ -323,7 +323,7 @@ public class LevelBuilder : Builder<LevelData>
         nonEditingBridgeBuilders.DrawBridges(levelGrid, bridges);
     }
 
-    private void DrawBridgeBuilder(SceneView sceneView)
+    private void DrawBridgeBuilderPreview(SceneView sceneView)
     {
         if (!IsBuildingBridge())
         {
@@ -350,7 +350,8 @@ public class LevelBuilder : Builder<LevelData>
         {
             previewBridge.Add(mouseGridPos);
         }
-        UpdateBridgeBuilding(previewBridge); 
+        
+        UpdateBridgeBuilding(previewBridge);
     }
 
     private TileType GetTileType(MiniStage miniStage, Vector3Int gridPos)
