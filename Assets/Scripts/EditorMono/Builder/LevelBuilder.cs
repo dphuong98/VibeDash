@@ -15,15 +15,17 @@ public class LevelBuilder : Builder<LevelData>
     public static string LevelFolder => levelFolder;
 
     private GameObject miniStagePrefab;
+    private GameObject bridgeBuilderPrefab;
 
     public LevelData LoadedLevelData => LoadedItem;
     public LevelData EditingLevelData => EditingItem;
 
     //Members
-    private int maxBridgeLength;
-    private BridgeBuilder bridgeBuilder;
     private Grid levelGrid;
+    private int maxBridgeLength;
     private Bridge editingBridge;
+    private BridgeBuilder editingBridgeBuilder;
+    private BridgeBuilderManager nonEditingBridgeBuilders;
     
     private List<MiniStage> miniStages = new List<MiniStage>();
     private List<Bridge> bridges = new List<Bridge>();
@@ -31,23 +33,31 @@ public class LevelBuilder : Builder<LevelData>
     private void OnEnable()
     {
         levelGrid = GetComponentInChildren<Grid>();
+        nonEditingBridgeBuilders = GetComponentInChildren<BridgeBuilderManager>();
+
         SceneView.duringSceneGui += DrawSceneGUI;
         Init();
     }
 
     private void OnDisable()
     {
+        if (editingBridgeBuilder) DestroyImmediate(editingBridgeBuilder.gameObject);
+        
         SceneView.duringSceneGui -= DrawSceneGUI;
     }
 
     private void Init()
     {
         miniStagePrefab = Resources.Load<GameObject>("Prefabs/Editor/MiniStage");
+        bridgeBuilderPrefab = Resources.Load<GameObject>("Prefabs/Editor/BridgeBuilder");
 
+        editingBridgeBuilder = Instantiate(bridgeBuilderPrefab, transform).GetComponent<BridgeBuilder>();
+        editingBridgeBuilder.name = "EditingBridgeBuilder";
+        editingBridgeBuilder.gameObject.SetActive(false);
+        
         if (miniStages == null) miniStages = new List<MiniStage>();
         if (bridges == null) bridges = new List<Bridge>();
-
-        bridgeBuilder = GetComponentInChildren<BridgeBuilder>(true);
+        
         base.Init(levelFolder);
     }
     
@@ -65,7 +75,6 @@ public class LevelBuilder : Builder<LevelData>
         }
 
         //Render and handle bridge connections
-        DrawBridge();
         DrawBridgeBuilder();
 
         //Other GUI option
@@ -149,31 +158,40 @@ public class LevelBuilder : Builder<LevelData>
     private void ApplyChanges()
     {
         if (EditingLevelData == null) return;
-        
+
+        var dataUpdated = false;
+
+        var miniStagePreviousCount = miniStages.Count;
         miniStages.RemoveAll(s => s == null);
-
-        var stageData =
-            miniStages.ToDictionary(s => s.StageData, s => GetGridPosition(s.transform.position));
-
+        if (miniStages.Count != miniStagePreviousCount)
+            dataUpdated = true;
+        
+        //Check for displaced bridges
         for (var i = bridges.Count - 1; i >= 0; i--)
         {
             var bridgeStart = bridges[i].BridgeParts.First();
             if (GetTileType(GetMiniStage(bridgeStart), bridgeStart) != TileType.Exit)
             {
                 bridges.RemoveAt(i);
-                return;
+                dataUpdated = true;
             }
 
             var bridgeEnd = bridges[i].BridgeParts.Last();
             if (GetTileType(GetMiniStage(bridgeEnd), bridgeEnd) != TileType.Entrance)
             {
                 bridges.RemoveAt(i);
-                return;
+                dataUpdated = true;
             }
-
         }
         
-        EditingLevelData.Import(stageData, bridges);
+        if (dataUpdated)
+        {
+            var stageData =
+                miniStages.ToDictionary(s => s.StageData, s => GetGridPosition(s.transform.position));
+
+            UpdateBridgeDrawing();
+            EditingLevelData.Import(stageData, bridges);
+        }
     }
 
     public void ImportStage(string path, Vector3Int gridPos = default)
@@ -251,7 +269,7 @@ public class LevelBuilder : Builder<LevelData>
             //Finish building bridge
             if (IsBuildingBridge() &&
                 gridTileType == TileType.Entrance &&
-                bridgeBuilder.GetMaxTile() <= maxBridgeLength)
+                editingBridgeBuilder.GetMaxTile() <= maxBridgeLength)
             {
                 var nearestNeighbor = GetEmptyNeighbor(mouseGridPos);
                 if (nearestNeighbor != null)
@@ -260,6 +278,7 @@ public class LevelBuilder : Builder<LevelData>
                     editingBridge.BridgeParts.Add(mouseGridPos);
                     bridges.Add(editingBridge);
                     StopBridgeBuilding();
+                    UpdateBridgeDrawing();
                 }
                 return;
             }
@@ -274,7 +293,7 @@ public class LevelBuilder : Builder<LevelData>
                 else
                 {
                     editingBridge.BridgeParts.Add(mouseGridPos);
-                    UpdateBridge(editingBridge.BridgeParts);
+                    UpdateBridgeBuilding(editingBridge.BridgeParts);
                 }
             }
         }
@@ -287,7 +306,7 @@ public class LevelBuilder : Builder<LevelData>
             if (editingBridge.BridgeParts.Count > 2)
             {
                 editingBridge.BridgeParts.RemoveAt(editingBridge.BridgeParts.Count - 1);
-                UpdateBridge(editingBridge.BridgeParts);
+                UpdateBridgeBuilding(editingBridge.BridgeParts);
                 return;
             }
             
@@ -297,34 +316,26 @@ public class LevelBuilder : Builder<LevelData>
 
     private void StartBridgeBuilding(List<Vector3Int> bridgeParts)
     {
-        bridgeBuilder.gameObject.SetActive(true);
-        UpdateBridge(bridgeParts);
+        editingBridgeBuilder.gameObject.SetActive(true);
+        UpdateBridgeBuilding(bridgeParts);
     }
 
-    private void UpdateBridge(List<Vector3Int> bridgeParts)
+    private void UpdateBridgeBuilding(List<Vector3Int> bridgeParts)
     {
-        bridgeBuilder.SetBridge(bridgeParts.Select(s => levelGrid.GetCellCenterWorld(s)));
-        Debug.Log(bridgeBuilder.GetMaxTile());
+        editingBridgeBuilder.SetBridge(bridgeParts.Select(s => levelGrid.GetCellCenterWorld(s)));
     }
 
     private void StopBridgeBuilding()
     {
         editingBridge = null;
-        bridgeBuilder.gameObject.SetActive(false);
+        editingBridgeBuilder.gameObject.SetActive(false);
     }
 
-    private void DrawBridge()
+    private void UpdateBridgeDrawing()
     {
-        // Handles.color = Color.yellow;
-        // foreach (var bridge in bridges)
-        // {
-        //     for (int i = 0; i < bridge.bridgeParts.Count - 1; i++)
-        //     {
-        //         Handles.DrawLine(GetWorldPosition(bridge.bridgeParts[i]), GetWorldPosition(bridge.bridgeParts[i+1]));
-        //     }
-        // }
+        nonEditingBridgeBuilders.DrawBridges(levelGrid, bridges);
     }
-    
+
     private void DrawBridgeBuilder()
     {
         if (!IsBuildingBridge())
@@ -335,11 +346,11 @@ public class LevelBuilder : Builder<LevelData>
         
         //Render entrance for bridge end
         
-        var remainingBridgeLength = maxBridgeLength - bridgeBuilder.GetMaxTile();
+        var remainingBridgeLength = maxBridgeLength - editingBridgeBuilder.GetMaxTile();
         HandlesExt.DrawText(GetWorldPosition(editingBridge.BridgeParts.Last()), "" + remainingBridgeLength, 150, Color.white);
         
-        //Render editing bridge
-        bridgeBuilder.SetBezierColor(remainingBridgeLength < 0 ? Color.red : Color.green);
+        //Set valid or invalid color for bridge builder
+        editingBridgeBuilder.SetBezierColor(remainingBridgeLength < 0 ? Color.red : Color.green);
     }
 
     private TileType GetTileType(MiniStage miniStage, Vector3Int gridPos)
@@ -367,6 +378,7 @@ public class LevelBuilder : Builder<LevelData>
 
     private bool IsBuildingBridge()
     {
+        //TODO understand suggested refactor
         return editingBridge != null &&
                editingBridge.BridgeParts != null &&
                editingBridge.BridgeParts.Count > 0;
