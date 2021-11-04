@@ -9,6 +9,8 @@ namespace PathCreation {
 
         public event System.Action pathUpdated;
 
+        public bool IsEditingBridge;
+        
         [SerializeField, HideInInspector]
         PathCreatorData editorData;
         [SerializeField, HideInInspector]
@@ -88,7 +90,7 @@ namespace PathCreation {
 
                     if (globalEditorDisplaySettings.visibleWhenNotSelected) {
 
-                        Gizmos.color = globalEditorDisplaySettings.bezierPath;
+                        Gizmos.color = IsEditingBridge ? globalEditorDisplaySettings.editingBridgePath : globalEditorDisplaySettings.bridgePath;
 
                         for (int i = 0; i < path.NumPoints; i++) {
                             int nextI = i + 1;

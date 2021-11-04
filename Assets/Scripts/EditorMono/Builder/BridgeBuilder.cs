@@ -27,6 +27,14 @@ public class BridgeBuilder : MonoBehaviour
 
     public void SetBezierColor(Color color)
     {
-        displaySettings.bezierPath = color;
+        if (pathCreator.IsEditingBridge)
+            displaySettings.editingBridgePath = color;
+        else
+            displaySettings.bridgePath = color;
+    }
+
+    public void SetEditingBridge(bool state)
+    {
+        pathCreator.IsEditingBridge = state;
     }
 }
