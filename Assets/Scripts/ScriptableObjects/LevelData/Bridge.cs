@@ -8,16 +8,18 @@ using UnityEngine.Serialization;
 [Serializable]
 public class Bridge
 {
-    public List<Vector3Int> BridgeParts { get; private set; }
+    [SerializeField] private List<Vector3Int> bridgeParts;
+
+    public List<Vector3Int> BridgeParts => bridgeParts;
 
     public Bridge(List<Vector3Int> bridgeParts)
     {
-        BridgeParts = new List<Vector3Int>(bridgeParts);
+        this.bridgeParts = new List<Vector3Int>(bridgeParts);
     }
 
     public Bridge ReverseBridge()
     {
-        var bridgeClone = new List<Vector3Int>(BridgeParts);
+        var bridgeClone = new List<Vector3Int>(bridgeParts);
         bridgeClone.Reverse();
         return new Bridge(bridgeClone);
     }

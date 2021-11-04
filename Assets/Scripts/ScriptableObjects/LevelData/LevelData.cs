@@ -29,8 +29,8 @@ public class LevelData : ScriptableObject, IInit, ICopiable<LevelData>
 
     public void CopyFrom(LevelData other)
     {
-        this.stagePositions = new StagePosition(other.stagePositions);
-        this.bridges = new List<Bridge>(other.bridges);
+        stagePositions = new StagePosition(other.stagePositions);
+        bridges = new List<Bridge>(other.bridges);
     }
 
     public void Import(Dictionary<StageData, Vector3Int> stagePositions, List<Bridge> bridges)

@@ -1,4 +1,5 @@
 ﻿
+using PathCreation;
 using UnityEngine;
 public interface ILevelLoader: IBasicObject
 {
@@ -54,15 +55,17 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
         //Place bridges
         foreach (var bridge in levelData.Bridges)
         {
-            for (var i = 0; i < bridge.BridgeParts.Count; i++)
-            {
-                if (i == 0 || i == bridge.BridgeParts.Count - 1) continue;
-                var worldPos = levelGrid.GetCellCenterWorld(bridge.BridgeParts[i]);
-                worldPos.y = 0;
-                
-                //TODO place directional bridge
-                PlaceTile(worldPos, TileType.Bridge, LevelRoot);
-            }
+            //var bezierPath = new BezierPath(bridge.BridgeParts, false, PathSpace.xz);
+            
+            // for (var i = 0; i < bridge.BridgeParts.Count; i++)
+            // {
+            //     if (i == 0 || i == bridge.BridgeParts.Count - 1) continue;
+            //     var worldPos = levelGrid.GetCellCenterWorld(bridge.BridgeParts[i]);
+            //     worldPos.y = 0;
+            //     
+            //     //TODO place directional bridge
+            //     PlaceTile(worldPos, TileType.Bridge, LevelRoot);
+            // }
         }
     }
 
