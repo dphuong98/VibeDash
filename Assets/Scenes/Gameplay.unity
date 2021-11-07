@@ -800,13 +800,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 998735783}
+  - component: {fileID: 998735784}
   m_Layer: 0
-  m_Name: WorldOrigin
+  m_Name: PathCreator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &998735783
 Transform:
   m_ObjectHideFlags: 0
@@ -814,13 +815,67 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 998735782}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 330300288}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &998735784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 998735782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e5ac92bc18f545cc84cd886ece82b4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsEditingBridge: 0
+  editorData:
+    _bezierPath:
+      points:
+      - {x: -2, y: 0, z: 0}
+      - {x: -1, y: 0, z: 0.5}
+      - {x: 1, y: 0, z: -0.5}
+      - {x: 2, y: 0, z: 0}
+      isClosed: 0
+      space: 2
+      controlMode: 0
+      autoControlLength: 0.3
+      boundsUpToDate: 0
+      bounds:
+        m_Center: {x: 0, y: 0, z: 0}
+        m_Extent: {x: 2, y: 0.14433756, z: 0}
+      perAnchorNormalsAngle:
+      - 0
+      - 0
+      globalNormalsAngle: 0
+      flipNormals: 0
+    vertexPathUpToDate: 0
+    vertexPathMaxAngleError: 0.3
+    vertexPathMinVertexSpacing: 0.01
+    showTransformTool: 1
+    showPathBounds: 0
+    showPerSegmentBounds: 0
+    displayAnchorPoints: 0
+    displayControlPoints: 0
+    bezierHandleScale: 1
+    globalDisplaySettingsFoldout: 0
+    keepConstantHandleSize: 0
+    showNormalsInVertexMode: 0
+    showBezierPathInVertexMode: 0
+    showDisplayOptions: 1
+    showPathOptions: 1
+    showVertexPathDisplayOptions: 0
+    showVertexPathOptions: 1
+    showNormals: 1
+    showNormalsHelpInfo: 0
+    tabIndex: 0
+  initialized: 1
 --- !u!1 &1004096268
 GameObject:
   m_ObjectHideFlags: 0
@@ -2149,6 +2204,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelRoot: {fileID: 706560434}
+  pathCreator: {fileID: 998735784}
+  bridgeEntryPrefab: {fileID: 5745008388756971587, guid: eecd13d315f43cc45819f26886248971,
+    type: 3}
 --- !u!1001 &3220155110390766800
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2226,6 +2284,11 @@ PrefabInstance:
       propertyPath: level
       value: 
       objectReference: {fileID: 706560435}
+    - target: {fileID: 8239446510450856017, guid: 08312fd05ed3b5944bc544bbe105bfcb,
+        type: 3}
+      propertyPath: pathCreator
+      value: 
+      objectReference: {fileID: 998735784}
     - target: {fileID: 8239446510450856017, guid: 08312fd05ed3b5944bc544bbe105bfcb,
         type: 3}
       propertyPath: worldOrigin

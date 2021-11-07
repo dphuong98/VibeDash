@@ -62,9 +62,9 @@ public class Game : MonoBehaviour, IGame
             AssetDatabase.SaveAssets();
         }
     }
-
+    
     [SerializeField] private LevelData debugLevelData;
-
+    
     [SerializeField] private TilePrefabPack pack;
     [SerializeField] private Transform finishLine;
     [SerializeField] private CameraController cameraController;

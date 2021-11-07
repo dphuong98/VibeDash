@@ -1,4 +1,5 @@
 ﻿
+using System.Linq;
 using PathCreation;
 using UnityEngine;
 public interface ILevelLoader: IBasicObject
@@ -13,7 +14,11 @@ public interface ILevelLoader: IBasicObject
 public class LevelLoader : MonoBehaviour, ILevelLoader
 {
     [SerializeField] private Transform levelRoot;
+    [SerializeField] private PathCreator pathCreator;
+    [SerializeField] private GameObject bridgeEntryPrefab;
 
+    private const float bridgeSpacing = 0.9f;
+    
     public TilePrefabPack Pack { get; set; }
     public Transform LevelRoot => levelRoot;
     
@@ -55,11 +60,31 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
         foreach (var bridge in levelData.Bridges)
         {
             var worldPos = levelGrid.GetCellCenterWorld(bridge.BridgeParts[1]);
-            PlaceTile(worldPos, TileType.Bridge, LevelRoot);
+            Instantiate(bridgeEntryPrefab, worldPos, Quaternion.identity, LevelRoot);
             
             worldPos = levelGrid.GetCellCenterWorld(bridge.BridgeParts[bridge.BridgeParts.Count - 2]);
-            PlaceTile(worldPos, TileType.Bridge, LevelRoot);
+            Instantiate(bridgeEntryPrefab, worldPos, Quaternion.identity, LevelRoot);
+            
+            var worldPath = bridge.BridgeParts.Select(s => levelGrid.GetCellCenterWorld(s)).ToList();
+            var bezierPath = new BezierPath(worldPath);
+            pathCreator.bezierPath = bezierPath;
+
+            var bridgeDistance = bridgeSpacing;
+            while (bridgeDistance < pathCreator.path.length)
+            {
+                PlaceBridgeModel(pathCreator.path.GetPointAtDistance(bridgeDistance, EndOfPathInstruction.Stop),
+                    pathCreator.path.GetRotationAtDistance(bridgeDistance, EndOfPathInstruction.Stop),
+                    LevelRoot);
+                bridgeDistance += bridgeSpacing;
+            }
         }
+    }
+
+    private void PlaceBridgeModel(Vector3 position, Quaternion rotation, Transform parentTransform)
+    {
+        position = new Vector3(position.x, parentTransform.position.y, position.z);
+        rotation.eulerAngles = new Vector3(rotation.eulerAngles.x, rotation.eulerAngles.y, 0);
+        Instantiate(Pack.BridgePrefab, position, rotation, parentTransform);
     }
 
     private void LoadStage(Grid levelGrid, Vector3 position, StageData stageData)

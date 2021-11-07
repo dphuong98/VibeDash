@@ -50,7 +50,7 @@ public class Player : MonoBehaviour, IPlayer
 
     [Space]
     [Header("BridgeMovement")]
-    [SerializeField] private Transform worldOrigin;
+    [SerializeField] private PathCreator pathCreator;
     
     public Transform Root => transform;
     public IInputController InputController => inputController;
@@ -65,9 +65,9 @@ public class Player : MonoBehaviour, IPlayer
     private Vector3Int currentGridPos;
     private Vector3Int direction;
 
+    private const float bridgeSpacing = 1.1f;
     private float bridgeDistance;
     private Bridge currentBridge;
-    private VertexPath currentBridgePath;
 
     public PlayerState CurrentState { get; private set; }
 
@@ -202,9 +202,9 @@ public class Player : MonoBehaviour, IPlayer
     private void BridgeMove()
     {
         bridgeDistance += Speed / 100f;
-        Root.position = currentBridgePath.GetPointAtDistance(bridgeDistance, EndOfPathInstruction.Stop);;
-        
-        if (bridgeDistance > currentBridgePath.length)
+        Root.position = pathCreator.path.GetPointAtDistance(bridgeDistance, EndOfPathInstruction.Stop);;
+
+        if (bridgeDistance > pathCreator.path.length)
         {
             var bridgeParts = currentBridge.BridgeParts;
             currentGridPos = Level.LevelGrid.WorldToCell(Root.position);
@@ -233,9 +233,9 @@ public class Player : MonoBehaviour, IPlayer
             {
                 var worldPath = bridge.BridgeParts.Select(s => Level.LevelGrid.GetCellCenterWorld(s)).ToList();
                 var bezierPath = new BezierPath(worldPath);
-                bridgeDistance = 0;
+                bridgeDistance = bridgeSpacing;
                 currentBridge = bridge;
-                currentBridgePath = new VertexPath(bezierPath, worldOrigin);
+                pathCreator.bezierPath = bezierPath;
                 SetState(PlayerState.BridgeMoving);
                 return;
             }
