@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -356,6 +356,7 @@ Transform:
   - {fileID: 4505375018883954553}
   - {fileID: 1391648510}
   - {fileID: 706560434}
+  - {fileID: 998735783}
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -790,6 +791,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 889951639}
   m_CullTransparentMesh: 0
+--- !u!1 &998735782
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 998735783}
+  m_Layer: 0
+  m_Name: WorldOrigin
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &998735783
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 998735782}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 330300288}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1004096268
 GameObject:
   m_ObjectHideFlags: 0
@@ -1299,11 +1330,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 330300288}
     m_Modifications:
-    - target: {fileID: 3298110373406058788, guid: d63748b84db76784d9eaf141289b364d,
-        type: 3}
-      propertyPath: m_Center.y
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3298110373406058789, guid: d63748b84db76784d9eaf141289b364d,
         type: 3}
       propertyPath: m_Name
@@ -2190,21 +2216,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 3220155111895870655, guid: 08312fd05ed3b5944bc544bbe105bfcb,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.2588191
-      objectReference: {fileID: 0}
-    - target: {fileID: 3220155111895870655, guid: 08312fd05ed3b5944bc544bbe105bfcb,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0.9659258
-      objectReference: {fileID: 0}
-    - target: {fileID: 3220155111895870655, guid: 08312fd05ed3b5944bc544bbe105bfcb,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 150
-      objectReference: {fileID: 0}
     - target: {fileID: 7197447462539069313, guid: 08312fd05ed3b5944bc544bbe105bfcb,
         type: 3}
       propertyPath: stackCountText
@@ -2215,6 +2226,11 @@ PrefabInstance:
       propertyPath: level
       value: 
       objectReference: {fileID: 706560435}
+    - target: {fileID: 8239446510450856017, guid: 08312fd05ed3b5944bc544bbe105bfcb,
+        type: 3}
+      propertyPath: worldOrigin
+      value: 
+      objectReference: {fileID: 998735783}
     - target: {fileID: 8239446510450856017, guid: 08312fd05ed3b5944bc544bbe105bfcb,
         type: 3}
       propertyPath: inputController

@@ -1,9 +1,11 @@
 ﻿
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using _Main.Game.Interfaces;
+using PathCreation;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
@@ -14,6 +16,7 @@ public enum PlayerState
 {
     Idle,
     Moving,
+    BridgeMoving,
     Win,
     Dead,
 }
@@ -33,15 +36,21 @@ public interface IPlayer: IBasicObject, SimpleStateMachine<PlayerState>
 
 public class Player : MonoBehaviour, IPlayer
 {
+    [Header("Game")]
     [SerializeField] private InputController inputController;
     [SerializeField] private Level level;
     [SerializeField] private TileStack tileStack;
     [SerializeField] private Transform modelPivot;
 
     [Space]
+    [Header("Animation")]
     [SerializeField] private AnimatorController modelAnimationController;
     [SerializeField] private Animator playerAnimation;
     [SerializeField] private Animator playerModelAnimation;
+
+    [Space]
+    [Header("BridgeMovement")]
+    [SerializeField] private Transform worldOrigin;
     
     public Transform Root => transform;
     public IInputController InputController => inputController;
@@ -55,6 +64,10 @@ public class Player : MonoBehaviour, IPlayer
     private const int Speed = 30;
     private Vector3Int currentGridPos;
     private Vector3Int direction;
+
+    private float bridgeDistance;
+    private Bridge currentBridge;
+    private VertexPath currentBridgePath;
 
     public PlayerState CurrentState { get; private set; }
 
@@ -78,12 +91,7 @@ public class Player : MonoBehaviour, IPlayer
 
         DestroyPlayerModel();
     }
-
-    private void FixedUpdate()
-    {
-        Move();
-    }
-
+    
     private void SpawnPlayerModel()
     {
         var defaultModelName = "Mousey";
@@ -95,10 +103,26 @@ public class Player : MonoBehaviour, IPlayer
         playerModelAnimation.runtimeAnimatorController = modelAnimationController;
         playerModelAnimation.applyRootMotion = false;
     }
-
+    
     private void DestroyPlayerModel()
     {
         if (playerModel) Destroy(playerModel);
+    }
+
+    private void FixedUpdate()
+    {
+        switch (CurrentState)
+        {
+            case PlayerState.Moving:
+                Move();
+                break;
+            case PlayerState.BridgeMoving:
+                BridgeMove();
+                break;
+            case PlayerState.Idle:
+                ColliderHit();
+                break;
+        }
     }
 
     private void Move()
@@ -107,19 +131,19 @@ public class Player : MonoBehaviour, IPlayer
         
         var levelGrid = Level.LevelGrid;
         var nextGridPos = currentGridPos + direction;
+        var currentTile = Level.GetTile(currentGridPos);
         var nextTile = Level.GetTile(nextGridPos);
 
-        //First step of moving from tile to tile
+        //Start from currentGridPos
         if (Root.position == levelGrid.GetCellCenterWorld(currentGridPos))
         {
-            if (nextTile != null && 
-                (!nextTile.IsPassable() || nextTile.TileType == TileType.Bridge && !nextTile.IsTraversed() && TileStack.StackCount == 0))
+            if (currentTile == null ||
+                nextTile != null && !nextTile.IsPassable())
             {
                 SetState(PlayerState.Idle);
                 return;
             }
             
-            var currentTile = Level.GetTile(currentGridPos);
             if (currentTile.HasRoad() && !currentTile.IsTraversed())
             {
                 TileStack.IncreaseStack();
@@ -143,57 +167,89 @@ public class Player : MonoBehaviour, IPlayer
         //Arrived at endGridPos
         Root.position = levelGrid.GetCellCenterWorld(nextGridPos);
 
-        //Check WinCondition
-        var raycastHits = Physics.RaycastAll(Root.position + 3 * Vector3.up, Vector3.down);
-        if (raycastHits.Any(hit => hit.transform.CompareTag("FinishLine"))) //TODO raycast all
+        //Tile logic
+        if (nextTile != null)
+        {
+            switch (nextTile.TileType)
+            {
+                case TileType.Push:
+                    direction = Level.GetTileDirection(nextGridPos);
+                    break;
+                case TileType.Corner:
+                    var upVector = Level.GetTileDirection(nextGridPos);
+                    var rightVector = upVector.RotateClockwise();
+                    if (direction == -upVector) direction = rightVector;
+                    if (direction == -rightVector) direction = upVector;
+                    break;
+                case TileType.PortalBlue: case TileType.PortalOrange:
+                    var otherPortal = Level.GetOtherPortal(nextGridPos);
+                    if (otherPortal != null)
+                    {
+                        Root.position = levelGrid.GetCellCenterWorld((Vector3Int) otherPortal);
+                        SetState(PlayerState.Idle);
+                    }
+                    break;
+                case TileType.Stop:
+                    SetState(PlayerState.Idle);
+                    break;
+            }
+            nextTile.OnEnter();
+        }
+
+        currentGridPos = nextGridPos;
+    }
+
+    private void BridgeMove()
+    {
+        bridgeDistance += Speed / 100f;
+        Root.position = currentBridgePath.GetPointAtDistance(bridgeDistance, EndOfPathInstruction.Stop);;
+        
+        if (bridgeDistance > currentBridgePath.length)
+        {
+            var bridgeParts = currentBridge.BridgeParts;
+            currentGridPos = Level.LevelGrid.WorldToCell(Root.position);
+            direction = bridgeParts[bridgeParts.Count - 1] - bridgeParts[bridgeParts.Count - 2];
+            SetState(PlayerState.Moving);
+        }
+    }
+
+    private void ColliderHit()
+    {
+        var raycastHits = Physics.RaycastAll(Root.position + Vector3.up, Vector3.down);
+        
+        //Check WinCondition, this should be placed here after fully enter a tile
+        if (raycastHits.Any(hit => hit.transform.CompareTag("FinishLine")))
         {
             SetState(PlayerState.Win);
             OnPlayerWin.Invoke();
             return;
         }
         
+        //Check for bridge entry point
+        if (raycastHits.Any(hit => hit.transform.CompareTag("BridgeEntry")))
+        {
+            var bridge = Level.GetBridge(currentGridPos);
+            if (bridge != null)
+            {
+                var worldPath = bridge.BridgeParts.Select(s => Level.LevelGrid.GetCellCenterWorld(s)).ToList();
+                var bezierPath = new BezierPath(worldPath);
+                bridgeDistance = 0;
+                currentBridge = bridge;
+                currentBridgePath = new VertexPath(bezierPath, worldOrigin);
+                SetState(PlayerState.BridgeMoving);
+                return;
+            }
+        }
+        
         //Check LoseCondition
-        if (nextTile == null)
+        if (Level.GetTile(currentGridPos) == null)
         {
             SetState(PlayerState.Dead);
             OnPlayerFell.Invoke();
             return;
         }
-        
-        //Tile logic
-        switch (nextTile.TileType)
-        {
-            case TileType.Bridge:
-                if (!nextTile.IsTraversed()) TileStack.DecreaseStack();
-                var bridge = Level.GetBridge(nextGridPos, direction);
-                direction = bridge.BridgeParts[1] - bridge.BridgeParts[0];
-                break;
-            case TileType.Push:
-                direction = Level.GetTileDirection(nextGridPos);
-                break;
-            case TileType.Corner:
-                var upVector = Level.GetTileDirection(nextGridPos);
-                var rightVector = upVector.RotateClockwise();
-                if (direction == -upVector) direction = rightVector;
-                if (direction == -rightVector) direction = upVector;
-                break;
-            case TileType.PortalBlue: case TileType.PortalOrange:
-                var otherPortal = Level.GetOtherPortal(nextGridPos);
-                if (otherPortal != null)
-                {
-                    Root.position = levelGrid.GetCellCenterWorld((Vector3Int) otherPortal);
-                    SetState(PlayerState.Idle);
-                }
-                break;
-            case TileType.Stop:
-                SetState(PlayerState.Idle);
-                break;
-        }
-        
-        nextTile.OnEnter();
-        currentGridPos = nextGridPos;
     }
-
+    
     private void SetState(PlayerState newState)
     {
         CurrentState = newState;
@@ -218,6 +274,7 @@ public class Player : MonoBehaviour, IPlayer
         //Check movable
         if (CurrentState == PlayerState.Moving || CurrentState == PlayerState.Dead) return;
 
+        //TODO bridge start
         currentGridPos = Level.LevelGrid.WorldToCell(Root.position);
         this.direction = direction;
         

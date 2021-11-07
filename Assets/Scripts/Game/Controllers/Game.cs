@@ -140,7 +140,6 @@ public class Game : MonoBehaviour, IGame
         }
 
         var finishLinePos = (Vector3) level.GetFinishLinePos();
-        finishLinePos.y = 0;
         FinishLine.position = finishLinePos;
     }
 

@@ -12,6 +12,11 @@ public class Bridge
 
     public List<Vector3Int> BridgeParts => bridgeParts;
 
+    public Bridge(Bridge bridge)
+    {
+        this.bridgeParts = new List<Vector3Int>(bridge.bridgeParts);
+    }
+    
     public Bridge(List<Vector3Int> bridgeParts)
     {
         this.bridgeParts = new List<Vector3Int>(bridgeParts);

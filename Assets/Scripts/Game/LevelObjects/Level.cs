@@ -15,7 +15,7 @@ public interface ILevel: IBasicObject
     Vector3? GetFinishLinePos();
     
     ITile GetTile(Vector3Int gridPos);
-    Bridge GetBridge(Vector3Int gridPos, Vector3Int direction);
+    Bridge  GetBridge(Vector3Int gridPos);
     Vector3Int GetTileDirection(Vector3Int gridPos);
     Vector3Int? GetOtherPortal(Vector3Int gridPos);
     
@@ -81,27 +81,20 @@ public class Level : MonoBehaviour, ILevel
         return null;
     }
 
-    public Bridge GetBridge(Vector3Int gridPos, Vector3Int direction)
+    public Bridge GetBridge(Vector3Int gridPos)
     {
-        //TODO support overlapping of bridges
-        var bridge = LevelData.Bridges.FirstOrDefault(s => s.BridgeParts.Contains(gridPos));
-        if (bridge == null) return null;
+        var bridge = LevelData.Bridges.FirstOrDefault(s => s.BridgeParts[1] == gridPos);
+        if (bridge != null) return new Bridge(bridge);
         
-        var currentIndex = bridge.BridgeParts.IndexOf(gridPos);
-        var previousGridPos = bridge.BridgeParts[currentIndex - 1];
-        var previousDirection = gridPos - previousGridPos;
-        if (previousDirection == direction)
+        bridge = LevelData.Bridges.FirstOrDefault(s => s.BridgeParts[s.BridgeParts.Count - 2] == gridPos);
+        if (bridge != null)
         {
-            var newBridge = bridge.BridgeParts.GetRange(currentIndex, bridge.BridgeParts.Count - currentIndex);
-            return new Bridge(newBridge);
+            bridge = new Bridge(bridge);
+            bridge.ReverseBridge();
+            return bridge;
         }
-        else
-        {
-            //Reverse bridge
-            var newBridge = bridge.BridgeParts.GetRange(0, currentIndex + 1);
-            newBridge.Reverse();
-            return new Bridge(newBridge);
-        }
+
+        return null;
     }
 
     public Vector3Int GetTileDirection(Vector3Int gridPos)

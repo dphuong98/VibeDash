@@ -48,24 +48,17 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
         foreach (var stage in levelData.StagePositions)
         {
             var stageWorldPos = levelGrid.CellToWorld(stage.Value);
-            stageWorldPos.y = 0;
             LoadStage(levelGrid, stageWorldPos, stage.Key);
         }
         
         //Place bridges
         foreach (var bridge in levelData.Bridges)
         {
-            //var bezierPath = new BezierPath(bridge.BridgeParts, false, PathSpace.xz);
+            var worldPos = levelGrid.GetCellCenterWorld(bridge.BridgeParts[1]);
+            PlaceTile(worldPos, TileType.Bridge, LevelRoot);
             
-            // for (var i = 0; i < bridge.BridgeParts.Count; i++)
-            // {
-            //     if (i == 0 || i == bridge.BridgeParts.Count - 1) continue;
-            //     var worldPos = levelGrid.GetCellCenterWorld(bridge.BridgeParts[i]);
-            //     worldPos.y = 0;
-            //     
-            //     //TODO place directional bridge
-            //     PlaceTile(worldPos, TileType.Bridge, LevelRoot);
-            // }
+            worldPos = levelGrid.GetCellCenterWorld(bridge.BridgeParts[bridge.BridgeParts.Count - 2]);
+            PlaceTile(worldPos, TileType.Bridge, LevelRoot);
         }
     }
 
@@ -78,7 +71,7 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
                 var tile = stageData[x, y];
                 var gridPos = new Vector2Int(x, y);
                 var worldPos = position + levelGrid.GetCellCenterWorld(gridPos);
-                worldPos.y = 0;
+                worldPos.y = position.y;
                 
                 if (stageData.TileDirections.TryGetValue(gridPos, out var direction))
                 {
