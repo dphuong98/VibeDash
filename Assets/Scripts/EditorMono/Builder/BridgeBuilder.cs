@@ -10,7 +10,6 @@ public class BridgeBuilder : MonoBehaviour
 {
     [SerializeField] private PathCreator pathCreator;
     [SerializeField] private GlobalDisplaySettings displaySettings;
-    private const float spacing = 1.1f; //Suitable for tile length of 1 Unity unit (size of a cube)
     
     public void SetBridge(IEnumerable<Vector3> path)
     {
@@ -22,7 +21,7 @@ public class BridgeBuilder : MonoBehaviour
 
     public int GetMaxTile()
     {
-        return (int)Math.Floor(pathCreator.path.length / spacing);
+        return (int)Math.Floor(pathCreator.path.length / GameConstants.bridgeTileSpacing);
     }
 
     public void SetBezierColor(Color color)

@@ -17,7 +17,8 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
     [SerializeField] private PathCreator pathCreator;
     [SerializeField] private GameObject bridgeEntryPrefab;
 
-    private const float bridgeSpacing = 0.9f;
+    private const float bridgeModelSpacing = 0.65f;
+    private const float bridgeTileSpacing = GameConstants.bridgeTileSpacing;
     
     public TilePrefabPack Pack { get; set; }
     public Transform LevelRoot => levelRoot;
@@ -69,13 +70,22 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
             var bezierPath = new BezierPath(worldPath);
             pathCreator.bezierPath = bezierPath;
 
-            var bridgeDistance = bridgeSpacing;
+            var bridgeDistance = bridgeModelSpacing;
             while (bridgeDistance < pathCreator.path.length)
             {
                 PlaceBridgeModel(pathCreator.path.GetPointAtDistance(bridgeDistance, EndOfPathInstruction.Stop),
                     pathCreator.path.GetRotationAtDistance(bridgeDistance, EndOfPathInstruction.Stop),
                     LevelRoot);
-                bridgeDistance += bridgeSpacing;
+                bridgeDistance += bridgeModelSpacing;
+            }
+
+            bridgeDistance = GameConstants.bridgeTileSpacing;
+            while (bridgeDistance < pathCreator.path.length)
+            {
+                PlaceBridgeTile(pathCreator.path.GetPointAtDistance(bridgeDistance, EndOfPathInstruction.Stop),
+                    pathCreator.path.GetRotationAtDistance(bridgeDistance, EndOfPathInstruction.Stop),
+                    LevelRoot);
+                bridgeDistance += bridgeTileSpacing;
             }
         }
     }
@@ -85,6 +95,13 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
         position = new Vector3(position.x, parentTransform.position.y, position.z);
         rotation.eulerAngles = new Vector3(rotation.eulerAngles.x, rotation.eulerAngles.y, 0);
         Instantiate(Pack.BridgePrefab, position, rotation, parentTransform);
+    }
+    
+    private void PlaceBridgeTile(Vector3 position, Quaternion rotation, Transform parentTransform)
+    {
+        position = new Vector3(position.x, parentTransform.position.y, position.z);
+        rotation.eulerAngles = new Vector3(rotation.eulerAngles.x, rotation.eulerAngles.y, 0);
+        Instantiate(Pack.RoadPrefab, position, rotation, parentTransform);
     }
 
     private void LoadStage(Grid levelGrid, Vector3 position, StageData stageData)

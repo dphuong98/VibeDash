@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum Axis
+{
+    X, Y, Z
+}
+
 public static class Vector3Ext
 {
     //TODO Doesn't make much sense to rotate a vector3
@@ -21,6 +26,17 @@ public static class Vector3Ext
         vector.x += vector.y;
         vector.y = vector.x - vector.y;
         vector.x -= vector.y;
+
+        vector.x = -vector.x;
+
+        return vector;
+    }
+    
+    public static Vector3 RotateCounterClockwiseXZ(this Vector3 vector)
+    {
+        vector.x += vector.z;
+        vector.z = vector.x - vector.z;
+        vector.x -= vector.z;
 
         vector.x = -vector.x;
 
