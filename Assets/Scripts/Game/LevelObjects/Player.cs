@@ -256,7 +256,7 @@ public class Player : MonoBehaviour, IPlayer
 
         switch (newState)
         {
-            case PlayerState.Moving:
+            case PlayerState.Moving: case PlayerState.BridgeMoving:
                 playerAnimation.SetBool("IsMoving", true);
                 playerModelAnimation.SetBool("IsMoving", true);
                 break;
@@ -265,6 +265,7 @@ public class Player : MonoBehaviour, IPlayer
                 playerAnimation.SetFloat("xAxis", direction.x);
                 playerAnimation.SetFloat("yAxis", direction.y);
                 playerModelAnimation.SetBool("IsMoving", false);
+                ColliderHit();
                 break;
         }
     }
@@ -274,7 +275,7 @@ public class Player : MonoBehaviour, IPlayer
         //Check movable
         if (CurrentState == PlayerState.Moving || CurrentState == PlayerState.Dead) return;
 
-        //TODO bridge start
+        //TODO mid bridge input
         currentGridPos = Level.LevelGrid.WorldToCell(Root.position);
         this.direction = direction;
         
