@@ -313,7 +313,9 @@ public class Player : MonoBehaviour, IPlayer
 
     private bool IsMidBridge()
     {
-        return currentBridge.BridgeParts != null && currentBridge.BridgeParts.Count != 0;
+        return currentBridge != null &&
+               currentBridge.BridgeParts != null &&
+               currentBridge.BridgeParts.Count != 0;
     }
     
     private void SetState(PlayerState newState)

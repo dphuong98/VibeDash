@@ -178,9 +178,10 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
         }
         
         if (!prefab) return;
-        
-        var rotation = Quaternion.Euler(new Vector3
-            {y = Vector3.Angle(Vector3.up, new Vector3(direction.x, direction.y, 0))});
+
+        var tileDirection = (Vector3)direction.ToVector3Int();
+        var angleDifference = Vector3.SignedAngle(tileDirection, Vector3.up, Vector3.forward);
+        var rotation = Quaternion.Euler(new Vector3 {y = angleDifference});
         
         Instantiate(prefab, position, rotation, parentTransform);
     }

@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b600e0df47ceb74ca2d142a423ef708, type: 3}
+  m_Name: LevelData2
+  m_EditorClassIdentifier: 
+  stagePositions:
+    keyData:
+    - {fileID: 11400000, guid: 210f1a221d49b3f4aa00bf22eda9e112, type: 2}
+    - {fileID: 11400000, guid: 8f894a25b07fa184697cedd1b0afecc1, type: 2}
+    - {fileID: 11400000, guid: dca56c1b58a49cc4684c570e578a32df, type: 2}
+    valueData:
+    - {x: 0, y: 0, z: 0}
+    - {x: -3, y: 24, z: 0}
+    - {x: 3, y: 48, z: 0}
+  bridges:
+  - bridgeParts:
+    - {x: 4, y: 14, z: 0}
+    - {x: 4, y: 15, z: 0}
+    - {x: 4, y: 19, z: 0}
+    - {x: -1, y: 19, z: 0}
+    - {x: -1, y: 23, z: 0}
+    - {x: -1, y: 24, z: 0}
+  - bridgeParts:
+    - {x: 7, y: 32, z: 0}
+    - {x: 7, y: 33, z: 0}
+    - {x: 2, y: 36, z: 0}
+    - {x: 16, y: 40, z: 0}
+    - {x: 3, y: 44, z: 0}
+    - {x: 7, y: 47, z: 0}
+    - {x: 7, y: 48, z: 0}
