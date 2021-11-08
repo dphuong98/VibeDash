@@ -208,6 +208,17 @@ public class Player : MonoBehaviour, IPlayer
         Quaternion tileStackRotation;
         bridgeDistance += Speed / 100f;
         
+        if (bridgeDistance > pathCreator.path.length)
+        {
+            var bridgeParts = currentBridge.BridgeParts;
+            currentGridPos = bridgeParts[bridgeParts.Count - 1];
+            direction = bridgeParts[bridgeParts.Count - 1] - bridgeParts[bridgeParts.Count - 2];
+            currentBridge = null;
+            Root.position = Level.LevelGrid.GetCellCenterWorld(currentGridPos);
+            SetState(PlayerState.Moving);
+            return;
+        }
+        
         if (bridgeDistance > nextBridgeTileDistance)
         {
             var tile = Level.GetBridgeTile(Root.position);
@@ -242,15 +253,6 @@ public class Player : MonoBehaviour, IPlayer
         tileStackRotation = pathCreator.path.GetRotationAtDistance(bridgeDistance, EndOfPathInstruction.Stop);
         tileStackRotation.eulerAngles = new Vector3(0, tileStackRotation.eulerAngles.y, 0);
         TileStack.Root.rotation = tileStackRotation;
-
-        if (bridgeDistance > pathCreator.path.length)
-        {
-            var bridgeParts = currentBridge.BridgeParts;
-            currentGridPos = Level.LevelGrid.WorldToCell(Root.position);
-            direction = bridgeParts[bridgeParts.Count - 1] - bridgeParts[bridgeParts.Count - 2];
-            currentBridge = null;
-            SetState(PlayerState.Moving);
-        }
     }
 
     private void BridgeMoveReverse()
@@ -266,7 +268,7 @@ public class Player : MonoBehaviour, IPlayer
         if (bridgeDistance < 0)
         {
             var bridgeParts = currentBridge.BridgeParts;
-            currentGridPos = Level.LevelGrid.WorldToCell(Root.position);
+            currentGridPos = bridgeParts[0];
             direction = bridgeParts[0] - bridgeParts[1];
             inReversed = false;
             currentBridge = null;

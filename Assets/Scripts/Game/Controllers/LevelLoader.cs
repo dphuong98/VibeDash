@@ -83,7 +83,7 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
             }
 
             bridgeDistance = GameConstants.bridgeTileSpacing;
-            while (bridgeDistance < pathCreator.path.length)
+            while (bridgeDistance < pathCreator.path.length - GameConstants.bridgeTileSpacing)
             {
                 PlaceBridgeTile(pathCreator.path.GetPointAtDistance(bridgeDistance, EndOfPathInstruction.Stop),
                     pathCreator.path.GetRotationAtDistance(bridgeDistance, EndOfPathInstruction.Stop),
