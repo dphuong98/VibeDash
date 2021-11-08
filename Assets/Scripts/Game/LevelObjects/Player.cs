@@ -81,7 +81,7 @@ public class Player : MonoBehaviour, IPlayer
         TileStack.Setup();
 
         SpawnPlayerModel();
-        SetState(PlayerState.Idle);
+        CurrentState = PlayerState.Idle;
     }
 
     public void CleanUp()
