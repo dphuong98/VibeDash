@@ -28,7 +28,7 @@ public class TileStack : MonoBehaviour, ITileStack
     public int StackCount { get; private set; }
 
     private Transform stackCube;
-    private const float tileStackScale = 2;
+    private const float tileStackScale = 1.5f;
     private const string stackLayerName = "Stacks";
     private float stackTileHeight;
 
@@ -52,16 +52,21 @@ public class TileStack : MonoBehaviour, ITileStack
     public void IncreaseStack()
     {
         StackCount++; stackCountText.text = StackCount.ToString();
-        playerModel.position += new Vector3 {y = tileStackScale * stackTileHeight};
-        stackCube.position = new Vector3(stackCube.position.x, tileStackScale * stackTileHeight * StackCount / 2, stackCube.position.z);
-        stackCube.localScale = new Vector3(1, tileStackScale * StackCount, 1); //TODO remove hardcode
+        UpdateTransforms();
     }
 
     public void DecreaseStack()
     {
         StackCount--; stackCountText.text = StackCount.ToString();
-        playerModel.position -= new Vector3 {y = tileStackScale * stackTileHeight};
-        stackCube.position = new Vector3(stackCube.position.x, tileStackScale * stackTileHeight * StackCount / 2, stackCube.position.z);
-        stackCube.localScale = new Vector3(1, tileStackScale * StackCount, 1);
+        UpdateTransforms();
+    }
+
+    private void UpdateTransforms()
+    {
+        var stackCubeScale = StackCount == 0 ? tileStackScale : tileStackScale * StackCount;
+        var stackCubeHeight = stackCubeScale * stackTileHeight;
+        playerModel.position = new Vector3(playerModel.position.x, stackCubeHeight, playerModel.position.z);
+        stackCube.position = new Vector3(stackCube.position.x, stackCubeHeight / 2, stackCube.position.z);
+        stackCube.localScale = new Vector3(1, stackCubeScale, 1);
     }
 }

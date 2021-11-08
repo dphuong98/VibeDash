@@ -15,6 +15,7 @@ public interface ILevel: IBasicObject
     Vector3? GetFinishLinePos();
     
     ITile GetTile(Vector3Int gridPos);
+    ITile GetBridgeTile(Vector3 worldPos);
     Bridge  GetBridge(Vector3Int gridPos);
     Vector3Int GetTileDirection(Vector3Int gridPos);
     Vector3Int? GetOtherPortal(Vector3Int gridPos);
@@ -71,6 +72,7 @@ public class Level : MonoBehaviour, ILevel
     
     public ITile GetTile(Vector3Int gridPos)
     {
+        //TODO raycast all, its not broken atm so dont fix
         var position = levelGrid.GetCellCenterWorld(gridPos);
         
         if (Physics.Raycast(position + Vector3.up, Vector3.down, out var hitInfo, Mathf.Infinity, tileLayerMask))
@@ -79,6 +81,15 @@ public class Level : MonoBehaviour, ILevel
         }
 
         return null;
+    }
+
+    public ITile GetBridgeTile(Vector3 worldPos)
+    {
+        var raycastHits = Physics.RaycastAll(worldPos + Vector3.up, Vector3.down);
+
+        var tileHit = raycastHits.Where(s => s.transform.GetComponent<ITile>() is var tile &&
+                                             tile != null && tile.TileType == TileType.Blank);
+        return tileHit.Any() ? tileHit.First().transform.GetComponent<ITile>() : null;
     }
 
     public Bridge GetBridge(Vector3Int gridPos)

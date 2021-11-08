@@ -6,6 +6,7 @@ public interface ILevelLoader: IBasicObject
 {
     TilePrefabPack Pack { get; set; }
     Transform LevelRoot { get; }
+    Transform BridgeRoot { get; }
 
     ILevel GetLevel();
     void LoadLevel(LevelData levelData); 
@@ -14,6 +15,7 @@ public interface ILevelLoader: IBasicObject
 public class LevelLoader : MonoBehaviour, ILevelLoader
 {
     [SerializeField] private Transform levelRoot;
+    [SerializeField] private Transform bridgeRoot;
     [SerializeField] private PathCreator pathCreator;
     [SerializeField] private GameObject bridgeEntryPrefab;
 
@@ -22,6 +24,7 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
     
     public TilePrefabPack Pack { get; set; }
     public Transform LevelRoot => levelRoot;
+    public Transform BridgeRoot => bridgeRoot;
     
     
     public void Setup()
@@ -75,7 +78,7 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
             {
                 PlaceBridgeModel(pathCreator.path.GetPointAtDistance(bridgeDistance, EndOfPathInstruction.Stop),
                     pathCreator.path.GetRotationAtDistance(bridgeDistance, EndOfPathInstruction.Stop),
-                    LevelRoot);
+                    BridgeRoot);
                 bridgeDistance += bridgeModelSpacing;
             }
 
@@ -84,7 +87,7 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
             {
                 PlaceBridgeTile(pathCreator.path.GetPointAtDistance(bridgeDistance, EndOfPathInstruction.Stop),
                     pathCreator.path.GetRotationAtDistance(bridgeDistance, EndOfPathInstruction.Stop),
-                    LevelRoot);
+                    BridgeRoot);
                 bridgeDistance += bridgeTileSpacing;
             }
         }
@@ -101,7 +104,8 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
     {
         position = new Vector3(position.x, parentTransform.position.y, position.z);
         rotation.eulerAngles = new Vector3(rotation.eulerAngles.x, rotation.eulerAngles.y, 0);
-        Instantiate(Pack.RoadPrefab, position, rotation, parentTransform);
+        var bridgeTileObject = Instantiate(Pack.BlankPrefab, position, rotation, parentTransform);
+        bridgeTileObject.GetComponent<Tile>().transform.GetChild(0).gameObject.SetActive(false); //TODO refactor tile system
     }
 
     private void LoadStage(Grid levelGrid, Vector3 position, StageData stageData)

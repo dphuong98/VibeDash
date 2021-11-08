@@ -66,6 +66,7 @@ public class Player : MonoBehaviour, IPlayer
     private Vector3Int direction;
 
     private const float bridgeSpacing = 1.1f;
+    private float nextBridgeTileDistance;
     private float bridgeDistance;
     private Bridge currentBridge;
 
@@ -201,8 +202,38 @@ public class Player : MonoBehaviour, IPlayer
 
     private void BridgeMove()
     {
+        Quaternion tileStackRotation;
         bridgeDistance += Speed / 100f;
+        
+        if (bridgeDistance > nextBridgeTileDistance)
+        {
+            var tile = Level.GetBridgeTile(Root.position);
+            if (tile != null && !tile.IsTraversed())
+            {
+                //TODO refactor tile system
+                tile.OnEnter();
+                tileStack.DecreaseStack();
+            }
+            
+            nextBridgeTileDistance += GameConstants.bridgeTileSpacing;
+            if (nextBridgeTileDistance <= pathCreator.path.length &&
+                tileStack.StackCount == 0)
+            {
+                var currentTileDistance = nextBridgeTileDistance - GameConstants.bridgeTileSpacing;
+                
+                Root.position = pathCreator.path.GetPointAtDistance(currentTileDistance, EndOfPathInstruction.Stop);;
+                tileStackRotation = pathCreator.path.GetRotationAtDistance(currentTileDistance, EndOfPathInstruction.Stop);
+                tileStackRotation.eulerAngles = new Vector3(0, tileStackRotation.eulerAngles.y, 0);
+                TileStack.Root.rotation = tileStackRotation;
+                SetState(PlayerState.Idle);
+                return;
+            }
+        }
+        
         Root.position = pathCreator.path.GetPointAtDistance(bridgeDistance, EndOfPathInstruction.Stop);;
+        tileStackRotation = pathCreator.path.GetRotationAtDistance(bridgeDistance, EndOfPathInstruction.Stop);
+        tileStackRotation.eulerAngles = new Vector3(0, tileStackRotation.eulerAngles.y, 0);
+        TileStack.Root.rotation = tileStackRotation;
 
         if (bridgeDistance > pathCreator.path.length)
         {
@@ -221,7 +252,6 @@ public class Player : MonoBehaviour, IPlayer
         if (raycastHits.Any(hit => hit.transform.CompareTag("FinishLine")))
         {
             SetState(PlayerState.Win);
-            OnPlayerWin.Invoke();
             return;
         }
         
@@ -233,6 +263,7 @@ public class Player : MonoBehaviour, IPlayer
             {
                 var worldPath = bridge.BridgeParts.Select(s => Level.LevelGrid.GetCellCenterWorld(s)).ToList();
                 var bezierPath = new BezierPath(worldPath);
+                nextBridgeTileDistance = GameConstants.bridgeTileSpacing;
                 bridgeDistance = bridgeSpacing;
                 currentBridge = bridge;
                 pathCreator.bezierPath = bezierPath;
@@ -245,7 +276,6 @@ public class Player : MonoBehaviour, IPlayer
         if (Level.GetTile(currentGridPos) == null)
         {
             SetState(PlayerState.Dead);
-            OnPlayerFell.Invoke();
             return;
         }
     }
@@ -266,6 +296,12 @@ public class Player : MonoBehaviour, IPlayer
                 playerAnimation.SetFloat("yAxis", direction.y);
                 playerModelAnimation.SetBool("IsMoving", false);
                 ColliderHit();
+                break;
+            case PlayerState.Dead:
+                OnPlayerFell.Invoke();
+                break;
+            case PlayerState.Win:
+                OnPlayerWin.Invoke();
                 break;
         }
     }

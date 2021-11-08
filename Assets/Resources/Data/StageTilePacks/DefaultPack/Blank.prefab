@@ -60,7 +60,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tileType: 4
   RoadGameObject: {fileID: 0}
-  BlankGameObject: {fileID: 0}
+  BlankGameObject: {fileID: 1217520495925990211}
 --- !u!1 &1217520495925990211
 GameObject:
   m_ObjectHideFlags: 0

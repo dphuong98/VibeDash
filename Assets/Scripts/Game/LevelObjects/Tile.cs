@@ -10,7 +10,7 @@ public interface ITile
     bool IsPassable();
     bool HasRoad();
     bool IsTraversed();
-    
+
     void OnEnter();
     void OnExit();
 }
@@ -42,9 +42,10 @@ public class Tile : MonoBehaviour, ITile
 
     public void OnEnter()
     {
-        if (TileType == TileType.Bridge && !IsTraversed())
+        if (TileType == TileType.Blank && !IsTraversed())
         {
             BlankGameObject.SetActive(true);
+            traversed = true;
         }
     }
 
