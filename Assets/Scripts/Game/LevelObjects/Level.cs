@@ -87,12 +87,7 @@ public class Level : MonoBehaviour, ILevel
         if (bridge != null) return new Bridge(bridge);
         
         bridge = LevelData.Bridges.FirstOrDefault(s => s.BridgeParts[s.BridgeParts.Count - 2] == gridPos);
-        if (bridge != null)
-        {
-            bridge = new Bridge(bridge);
-            bridge.ReverseBridge();
-            return bridge;
-        }
+        if (bridge != null) return bridge.ReverseBridge();
 
         return null;
     }
