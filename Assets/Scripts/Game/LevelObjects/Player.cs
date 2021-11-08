@@ -215,6 +215,7 @@ public class Player : MonoBehaviour, IPlayer
             direction = bridgeParts[bridgeParts.Count - 1] - bridgeParts[bridgeParts.Count - 2];
             currentBridge = null;
             Root.position = Level.LevelGrid.GetCellCenterWorld(currentGridPos);
+            TileStack.Root.eulerAngles = new Vector3();
             SetState(PlayerState.Moving);
             return;
         }
