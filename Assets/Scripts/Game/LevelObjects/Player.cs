@@ -27,6 +27,8 @@ public interface IPlayer: IBasicObject, SimpleStateMachine<PlayerState>
     IInputController InputController { get; }
     ILevel Level { get; }
     ITileStack TileStack { get; }
+
+    void Play();
     
     UnityEvent OnInput { get; set; }
     UnityEvent OnPlayerWin { get; set; }
@@ -94,6 +96,11 @@ public class Player : MonoBehaviour, IPlayer
         InputController.CleanUp();
 
         DestroyPlayerModel();
+    }
+    
+    public void Play()
+    {
+        currentGridPos = Level.LevelGrid.WorldToCell(Root.position);
     }
     
     private void SpawnPlayerModel()

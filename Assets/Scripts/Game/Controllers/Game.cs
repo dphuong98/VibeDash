@@ -65,10 +65,18 @@ public class Game : MonoBehaviour, IGame
         }
     }
     
+    [Header("Debug")]
     [SerializeField] private LevelData debugLevelData;
+
+    [Space]
+    [Header("Game assets")]
     [SerializeField] private GameObject preplayUI;
-    
+    [SerializeField] private GameObject winWindow;
+    [SerializeField] private GameObject loseWindow;
     [SerializeField] private TilePrefabPack pack;
+    
+    [Space]
+    [Header("Game interface members")]
     [SerializeField] private Transform finishLine;
     [SerializeField] private CameraController cameraController;
     [SerializeField] private LevelLoader levelLoader;
@@ -130,6 +138,8 @@ public class Game : MonoBehaviour, IGame
     public void Play()
     {
         Load();
+        
+        Player.Play();
     }
 
     private void Load()
@@ -192,12 +202,14 @@ public class Game : MonoBehaviour, IGame
         Debug.Log("Win");
         CurrentState = GameState.Win;
         PlayerPrefs.SetInt(SaveDataKeys.CurrentLevel, PlayerPrefs.GetInt(SaveDataKeys.CurrentLevel)+1);
+        winWindow.SetActive(true);
     }
 
     private void GameLost()
     {
         Debug.Log("Lose");
         CurrentState = GameState.Lose;
+        loseWindow.SetActive(true);
     }
     
     private void DisablePreplayUI()
