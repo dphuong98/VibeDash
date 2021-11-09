@@ -107,6 +107,7 @@ public class Game : MonoBehaviour, IGame
         Player.Setup();
         
         CurrentState = GameState.Preplay;
+        preplayUI.SetActive(true);
 
         //Load player progression
     }
@@ -159,14 +160,6 @@ public class Game : MonoBehaviour, IGame
         CleanUp();
     }
 
-    private void DisablePreplayUI()
-    {
-        if (CurrentState != GameState.Preplay) return;
-
-        CurrentState = GameState.Playing;
-        preplayUI.SetActive(false);
-    }
-    
     private void GameWin()
     {
         Debug.Log("Win");
@@ -177,5 +170,18 @@ public class Game : MonoBehaviour, IGame
     {
         Debug.Log("Lose");
         CurrentState = GameState.Lose;
+    }
+    
+    private void DisablePreplayUI()
+    {
+        if (CurrentState != GameState.Preplay) return;
+
+        CurrentState = GameState.Playing;
+        preplayUI.SetActive(false);
+    }
+
+    public void UpdateSelectedAssets()
+    {
+        if (PlayerPrefs.GetString(SaveDataKeys.PlayerModelName) != Player.Root.name) Restart();
     }
 }

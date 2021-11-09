@@ -36,6 +36,11 @@ public class LevelLoader : MonoBehaviour, ILevelLoader
     public void CleanUp()
     {
         GetLevel().CleanUp();
+
+        foreach (Transform child in bridgeRoot)
+        {
+            Destroy(child.gameObject);
+        }
     }
 
     public ILevel GetLevel()
