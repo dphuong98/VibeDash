@@ -8,10 +8,12 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.PlayerLoop;
+using UnityEngine.Rendering;
 using UnityEngine.Serialization;
 
 public enum GameState
 {
+    Preplay,
     Playing,
     Win,
     Lose
@@ -64,6 +66,7 @@ public class Game : MonoBehaviour, IGame
     }
     
     [SerializeField] private LevelData debugLevelData;
+    [SerializeField] private GameObject preplayUI;
     
     [SerializeField] private TilePrefabPack pack;
     [SerializeField] private Transform finishLine;
@@ -98,11 +101,12 @@ public class Game : MonoBehaviour, IGame
         LevelLoader.Setup();
         
         Player.TileStack.RoadPrefab = Pack.RoadPrefab;
+        Player.OnInput.AddListener(DisablePreplayUI);
         Player.OnPlayerWin.AddListener(GameWin);
         Player.OnPlayerFell.AddListener(GameLost);
         Player.Setup();
         
-        CurrentState = GameState.Playing;
+        CurrentState = GameState.Preplay;
 
         //Load player progression
     }
@@ -153,6 +157,14 @@ public class Game : MonoBehaviour, IGame
     private void OnApplicationQuit()
     {
         CleanUp();
+    }
+
+    private void DisablePreplayUI()
+    {
+        if (CurrentState != GameState.Preplay) return;
+
+        CurrentState = GameState.Playing;
+        preplayUI.SetActive(false);
     }
     
     private void GameWin()

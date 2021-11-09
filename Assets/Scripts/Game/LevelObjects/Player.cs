@@ -28,6 +28,7 @@ public interface IPlayer: IBasicObject, SimpleStateMachine<PlayerState>
     ILevel Level { get; }
     ITileStack TileStack { get; }
     
+    UnityEvent OnInput { get; set; }
     UnityEvent OnPlayerWin { get; set; }
     UnityEvent OnPlayerFell { get; set; }
     
@@ -57,6 +58,7 @@ public class Player : MonoBehaviour, IPlayer
     public ILevel Level => level;
     public ITileStack TileStack => tileStack;
 
+    public UnityEvent OnInput { get; set; } = new UnityEvent();
     public UnityEvent OnPlayerWin { get; set; } = new UnityEvent();
     public UnityEvent OnPlayerFell { get; set; } = new UnityEvent();
     
@@ -356,6 +358,8 @@ public class Player : MonoBehaviour, IPlayer
     {
         //Check movable
         if (CurrentState == PlayerState.Moving || CurrentState == PlayerState.Dead) return;
+        
+        OnInput.Invoke();
 
         if (!IsMidBridge())
         {
