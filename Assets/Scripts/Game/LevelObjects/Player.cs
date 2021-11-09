@@ -357,7 +357,7 @@ public class Player : MonoBehaviour, IPlayer
     public void HandleInput(Vector3Int direction)
     {
         //Check movable
-        if (CurrentState == PlayerState.Moving || CurrentState == PlayerState.Dead) return;
+        if (CurrentState == PlayerState.Moving || CurrentState == PlayerState.Dead || CurrentState == PlayerState.Win) return;
         
         OnInput.Invoke();
 

@@ -121,6 +121,12 @@ public class Game : MonoBehaviour, IGame
         AutoloadLevelData = null;
     }
 
+    [ContextMenu("Reset Progression")]
+    public void ResetProgression()
+    {
+        PlayerPrefs.SetInt(SaveDataKeys.CurrentLevel, 0);
+    }
+
     public void Play()
     {
         Load();
@@ -128,12 +134,33 @@ public class Game : MonoBehaviour, IGame
 
     private void Load()
     {
-        //TODO: Add player progression current level
+        var loaded = false;
+
+#if UNITY_EDITOR
         if (AutoloadLevelData != null)
+        {
             LevelLoader.LoadLevel(AutoloadLevelData);
+            loaded = true;
+        }
         else if (debugLevelData != null)
+        {
             LevelLoader.LoadLevel(debugLevelData);
-        else return;
+            loaded = true;
+        }
+#endif
+        
+        if (!loaded)
+        {
+            var levelNumber = PlayerPrefs.GetInt(SaveDataKeys.CurrentLevel);
+            var levelDatas = Resources.LoadAll<LevelData>(ResourcePaths.LevelDataFolder);
+            if (levelDatas.Length <= levelNumber)
+            {
+                Debug.LogError("LevelData not found");
+                return;
+            }
+            
+            LevelLoader.LoadLevel(levelDatas[levelNumber]);
+        }
         
         //Place Player and FinishLine
         var level = LevelLoader.GetLevel();
@@ -164,6 +191,7 @@ public class Game : MonoBehaviour, IGame
     {
         Debug.Log("Win");
         CurrentState = GameState.Win;
+        PlayerPrefs.SetInt(SaveDataKeys.CurrentLevel, PlayerPrefs.GetInt(SaveDataKeys.CurrentLevel)+1);
     }
 
     private void GameLost()

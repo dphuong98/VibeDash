@@ -5,4 +5,6 @@ using UnityEngine;
 public static class SaveDataKeys
 {
     public const string PlayerModelName = "PlayerModelName";
+    
+    public const string CurrentLevel = "CurrentLevel";
 }
