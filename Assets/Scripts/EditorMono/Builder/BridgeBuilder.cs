@@ -21,7 +21,9 @@ public class BridgeBuilder : MonoBehaviour
 
     public int GetMaxTile()
     {
-        return (int)Math.Floor(pathCreator.path.length / GameConstants.bridgeTileSpacing);
+        var bridgeTileSpacing = GameConstants.bridgeTileSpacing;
+        var bridgeBuildingLength = pathCreator.path.length - bridgeTileSpacing;
+        return FloatExt.Div(bridgeBuildingLength, bridgeTileSpacing);
     }
 
     public void SetBezierColor(Color color)

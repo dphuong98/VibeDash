@@ -64,9 +64,9 @@ public class Player : MonoBehaviour, IPlayer
     private const int Speed = 30;
     private Vector3Int currentGridPos;
     private Vector3Int direction;
-
-    private const float bridgeSpacing = 1.1f;
+    
     private bool inReversed;
+    private float fittedBridgeTileSpacing;
     private float nextBridgeTileDistance;
     private float bridgeDistance;
     private Bridge currentBridge;
@@ -229,7 +229,7 @@ public class Player : MonoBehaviour, IPlayer
                 tileStack.DecreaseStack();
             }
             
-            nextBridgeTileDistance += GameConstants.bridgeTileSpacing;
+            nextBridgeTileDistance += fittedBridgeTileSpacing;
             if (nextBridgeTileDistance <= pathCreator.path.length &&
                 tileStack.StackCount == 0)
             {
@@ -238,7 +238,7 @@ public class Player : MonoBehaviour, IPlayer
                         pathCreator.path.GetPointAtDistance(nextBridgeTileDistance, EndOfPathInstruction.Stop));
                 if (nextBridgeTile != null && !nextBridgeTile.IsTraversed())
                 {
-                    var currentTileDistance = nextBridgeTileDistance - GameConstants.bridgeTileSpacing;
+                    var currentTileDistance = nextBridgeTileDistance - fittedBridgeTileSpacing;
                 
                     Root.position = pathCreator.path.GetPointAtDistance(currentTileDistance, EndOfPathInstruction.Stop);;
                     tileStackRotation = pathCreator.path.GetRotationAtDistance(currentTileDistance, EndOfPathInstruction.Stop);
@@ -296,10 +296,15 @@ public class Player : MonoBehaviour, IPlayer
             {
                 var worldPath = bridge.BridgeParts.Select(s => Level.LevelGrid.GetCellCenterWorld(s)).ToList();
                 var bezierPath = new BezierPath(worldPath);
-                nextBridgeTileDistance = GameConstants.bridgeTileSpacing;
-                bridgeDistance = bridgeSpacing;
-                currentBridge = bridge;
                 pathCreator.bezierPath = bezierPath;
+                currentBridge = bridge;
+                bridgeDistance = GameConstants.bridgeTileSpacing;
+                
+                fittedBridgeTileSpacing = GameConstants.bridgeTileSpacing;
+                var bridgeBuildingLength = pathCreator.path.length - fittedBridgeTileSpacing;
+                var excessLength = FloatExt.Mod(bridgeBuildingLength, fittedBridgeTileSpacing);
+                fittedBridgeTileSpacing += excessLength / FloatExt.Div(bridgeBuildingLength, fittedBridgeTileSpacing);
+                nextBridgeTileDistance = GameConstants.bridgeTileSpacing;
                 SetState(PlayerState.BridgeMoving);
                 return;
             }
